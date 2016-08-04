@@ -1,0 +1,22 @@
+#!/usr/bin/python3
+
+import curses   # our lovely buddy for making the terminal not hell.
+stdscr = curses.initscr()       # give us a WindowObject to work with.
+curses.start_color()
+curses.curs_set(0)
+curses.use_default_colors()
+for i in range(0,curses.COLORS):
+        curses.init_pair(i+1,i,-1)
+
+def run(self):
+	while True:
+		c = stdscr.getch()
+		stdscr.clear()
+
+#		stdscr.addch(0,0,c)
+		stdscr.addstr(str(c))
+
+		stdscr.refresh()
+
+
+curses.wrapper(run)
