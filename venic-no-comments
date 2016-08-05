@@ -17,7 +17,7 @@ global viewport, filecursor, screeny, screenCursor
 def updateScreen():
 	stdscr.clear()	# clear the screen. it may, later in the future, be more efficient to know what characters have been changed, and fix only those, but for now we can afford clearing the whole screen.
 	screeny = 0
-#	global screenCursor
+	global screenCursor
 	neededCursorSpaces = 0
 	neededStringLength = 0
 	screenCursor = [0,0]
@@ -185,7 +185,7 @@ for i in range(0,curses.COLORS):
 	curses.init_pair(i+1,i,-1)
 
 def runVenic(self):
-	global viewport, filecursor, screeny, screenCursor
+	global viewport, filecursor
 	viewport = [0,0]
 	filecursor = [0,0]
 	updateScreen()
