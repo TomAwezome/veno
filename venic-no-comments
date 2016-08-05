@@ -5,34 +5,19 @@ import argparse	# venic is required to be started with a filename, need to parse
 parser = argparse.ArgumentParser()	# initialize argument parser
 parser.add_argument("filename")	# add an argument to our program, we need a file
 args = parser.parse_args()	# actually parse the arguments Venic was given
-# this is where we need to decide if there needs to be a better way to store the file.
-	# our current options are:
-		# (1). Store the file as a plain old string
-		# (2). Store the file as an array of strings (lines, essentially)
-		# (3). Store the file as an array of arrays of characters (first array is file, individual arrays are the lines, characters are the characters--duh)
-		# (4). Store ONLY WHAT YOU NEED in RAM, use one of above methods?
-		# (5). Store characters of strings of arrays of strings of arrays (okay, not really. You tell me what options I'm missing out on.)
-		
-		# Commentary:
-		# I think that if I do the same character method, but have *intelligent* cursor positioning and text entry and string representation/visualization (so tabs are a _breeze._), it could function as I envision it to.		
-file = open(args.filename)	# try to grab the file requested into its own object
-lines = [line.rstrip('\n') for line in file]	# assign. to a lines array, the newline-stripped content of each line.
-file.close
 
-# need to make a new, or at least drastically/heavily change existing, update function.
-# using a file cursor, and not some representation variable of the visual cursor, is a way better idea. You can base your visual cursor __ON__ the file cursor.
-# how will tabs work?
-	# (1). tabs are a _file_ construct, to us they are handled spaces. B)
-		# how does the math for tabs even work? assuming a tab is say, as I think in Nano, 8 spaces.
-			# keep track of index? if filecursor x is over 8, add 8, etc-- use to subtract from current position to return number of needed spaces to print?
+file = open(args.filename,'r+')	# try to grab the file requested into its own object
+lines = [line.rstrip('\n') for line in file]	# assign. to a lines array, the newline-stripped content of each line.
+file.close()
+
+global viewport, filecursor, screeny, screenCursor
 
 
 
 def updateScreen():
 	stdscr.clear()	# clear the screen. it may, later in the future, be more efficient to know what characters have been changed, and fix only those, but for now we can afford clearing the whole screen.
-#	screenx = 0
 	screeny = 0
-	global screenCursor
+#	global screenCursor
 	neededCursorSpaces = 0
 	neededStringLength = 0
 	screenCursor = [0,0]
@@ -41,27 +26,20 @@ def updateScreen():
 	for line in lines[viewport[1]:]:
 		if screeny >= stdscr.getmaxyx()[0]-1:
 			break
-#		if viewport[1]+screeny == filecursor[1]:
-#			screenCursor[1] = screeny
 
 		lineindex = 0
 		screenlineindex = lineindex
 		tabColumn = 4 - 1	# the 8 is how many 'spaces' you want a tab to be, the minus one is due to implementation :T
 		tabColumnIncrease = tabColumn + 1
-		spacedString = str(lineNumber)+" | "
+		spacedString = ""
 		for character in line:
 			if screenlineindex-viewport[0] >= stdscr.getmaxyx()[1]-1:
-#			if screenlineindex >= stdscr.getmaxyx()[1]-1:	# is viewport even necessary here?
 				break
 
-#			if viewport[1] + screeny == filecursor[1] and lineindex < filecursor[0]:
-#				screenCursor[0] += 1
-#				screenCursor[1] = screeny
 			if filecursor[1]-viewport[1] == screeny:
 				if lineindex == filecursor[0]:
 					neededCursorSpaces = spacedString.count("\xA0")
 					neededStringLength = len(spacedString.replace("\xA0",""))
-#					neededLineIndex = lineindex
 
 			if character == "\t":
 				while tabColumn < screenlineindex:
@@ -69,31 +47,25 @@ def updateScreen():
 				neededSpaces = (tabColumn+1) - screenlineindex
 				spacedString += "\xA0"*neededSpaces
 				screenlineindex += neededSpaces
-#				if viewport[1] + screeny == filecursor[1] and lineindex+viewport[0] < filecursor[0]:
-#					screenCursor[0] += neededSpaces
 			else:
-#				if viewport[1] + screeny == filecursor[1] and lineindex+viewport[0] < filecursor[0]:
-#					screenCursor[0] += 1
 				spacedString += character
 				screenlineindex += 1
+
 			if filecursor[1]-viewport[1] == screeny:
 				if filecursor[0] == len(line):
 					neededCursorSpaces = spacedString.count("\xA0")
 					neededStringLength = len(spacedString.replace("\xA0",""))
 
-
-
 			lineindex += 1
 
-#		if viewport[1]+screeny == filecursor[1] and lineindex == filecursor[0]:
-#			stdscr.attroff(curses.A_REVERSE)
-
 		stdscr.move(screeny,0)
-		spacedString = spacedString[viewport[0]:]
-		stdscr.addnstr(spacedString,stdscr.getmaxyx()[1], curses.color_pair(8))
-		if viewport[1]+screeny == filecursor[1]:
-			screenCursor[0] = neededCursorSpaces+neededStringLength-viewport[0]
+		lineNumberStringPrefix = str(lineNumber)+" "*( len(str(len(lines)))-len(str(lineNumber)) )+"\u2503"
+		spacedString = lineNumberStringPrefix+spacedString[viewport[0]:]
+		stdscr.addnstr(spacedString,stdscr.getmaxyx()[1], curses.color_pair(10))
+		if viewport[0]+screeny == filecursor[1]:
+			screenCursor[0] = len(lineNumberStringPrefix)+neededCursorSpaces+neededStringLength-viewport[0]
 			stdscr.chgat(screenCursor[1],screenCursor[0], 1, curses.A_REVERSE)
+
 		screeny += 1
 		lineNumber += 1
 	
@@ -177,7 +149,6 @@ def saveFile():
 		fileString += line+"\n"
 	fileString = fileString[:-1]	# get rid of the trailing newline
 	file.write(fileString)
-#	file.writelines(lines)
 	file.close()
 	
 def handleKeyboard(c):
@@ -214,7 +185,7 @@ for i in range(0,curses.COLORS):
 	curses.init_pair(i+1,i,-1)
 
 def runVenic(self):
-	global viewport, filecursor
+	global viewport, filecursor, screeny, screenCursor
 	viewport = [0,0]
 	filecursor = [0,0]
 	updateScreen()
