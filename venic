@@ -75,7 +75,7 @@ def updateScreen():
 		
 		lineNumberStringPrefix = str(lineNumber)+" "*( len(str(len(lines)))-len(str(lineNumber)) )+"\u2503"
 		spacedString = lineNumberStringPrefix+spacedString[viewport[0]:]
-		stdscr.addnstr(spacedString,stdscr.getmaxyx()[1], curses.color_pair(35))
+		stdscr.addnstr(spacedString,stdscr.getmaxyx()[1], curses.color_pair(0))
 		
 		if filecursor[1] == viewport[1]+screeny:
 			screenCursor[0] = len(lineNumberStringPrefix)+neededCursorSpaces+neededStringLength-viewport[0]
