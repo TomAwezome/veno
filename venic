@@ -29,7 +29,7 @@ file.close
 
 
 def updateScreen():
-	stdscr.clear()	# clear the screen. it may, later in the future, be more efficient to know what characters have been changed, and fix only those, but for now we can afford clearing the whole screen.
+	stdscr.erase()	# clear the screen. it may, later in the future, be more efficient to know what characters have been changed, and fix only those, but for now we can afford clearing the whole screen.
 #	screenx = 0
 	screeny = 0
 	global screenCursor
