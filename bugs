@@ -1,12 +1,9 @@
 BUGS/TODO IN VENIC:
 
 	- cannot CREATE new file with venic
-	- cursor move right, at end of line, when off the screen, will result in the cursor going down, and the viewport just being shifted over one
 	- text/cursor features missing:
 		- pattern search
 		- cut/copy/paste
 		- start/end of file
 		- likely more
-	- ctrl-c should ideally be a keybinding for something in the future but is consistently caught by ncurses wrapper / getch()
-	- new main implementation, modularization
-	- getkey() as opposed to getch()
+	- ctrl-c should ideally be a keybinding for something in the future, currently caught by main venic file try except
