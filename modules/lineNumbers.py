@@ -1,5 +1,3 @@
-import time
-
 def keepWindowInMainScreen(H,W,Y,X,Window):
 	offscreenY = 0
 	offscreenX = 0
@@ -86,44 +84,58 @@ def keepWindowInMainScreen(H,W,Y,X,Window):
 
 	if windowAltered:
 		standardscreen.erase()
-		
+
 def start(venicGlobals):
-	global testWindow, standardscreen, intendedX, intendedY, intendedWidth, intendedHeight
+	global standardscreen, intendedX, intendedY, intendedWidth, intendedHeight, lineNumberWindow
 	standardscreen = venicGlobals["stdscr"]
 
-	intendedX = 50
-	intendedY = 20
-	intendedWidth = 30
-	intendedHeight = 30
+	intendedY = venicGlobals["filewin"].getbegyx()[0]
+	intendedWidth = 5
+	intendedX = venicGlobals["filewin"].getbegyx()[1] - intendedWidth
+	intendedHeight = venicGlobals["filewin"].getmaxyx()[0]
 
-	testWindow = venicGlobals["curses"].newwin(intendedHeight, intendedWidth,intendedY,intendedX) # sizeY sizeX posY posX
-	testWindow.erase()
+	if intendedX < 0:
+		intendedX = 0
 
-	keepWindowInMainScreen(intendedHeight,intendedWidth,intendedY,intendedX,testWindow)
+	lineNumberWindow = venicGlobals["curses"].newwin(intendedHeight,intendedWidth,intendedY,intendedX) # sizeY sizeX posY posX
+	lineNumberWindow.erase()
 
-	# testWindow.box()
-	# testWindow.addstr("test text")
-	testPanel = venicGlobals["panel"].new_panel(testWindow)
-	venicGlobals["testpanel2"] = testPanel
-#	venicGlobals["testwindow2"] = testWindow
-	# venicGlobals["test2"] = "test"
-	testPanel.top()
+	keepWindowInMainScreen(intendedHeight,intendedWidth,intendedY,intendedX,lineNumberWindow)
+
+	lineNumberPanel = venicGlobals["panel"].new_panel(lineNumberWindow)
+	venicGlobals["lineNumberPanel"] = lineNumberPanel	# if panel not added to venicGlobals, garbage collector eats it
+	# lineNumberPanel.top()
+	venicGlobals["filepanel"].top()
+
 def loop(venicGlobals):
-	testWindow.erase()
-	standardscreen.erase()
+	global totalLines
+	lineNumberWindow.erase()
 
-	keepWindowInMainScreen(intendedHeight,intendedWidth,intendedY,intendedX,testWindow)
+	totalLines = len(venicGlobals["modules"]["fileWindow"].fileLines)
+	intendedWidth = len(str(totalLines))+2
+	intendedX = venicGlobals["filewin"].getbegyx()[1] - intendedWidth+1
+	intendedY = venicGlobals["filewin"].getbegyx()[0]
+	intendedHeight = venicGlobals["filewin"].getmaxyx()[0]
 
-	# testWindow.box()
+	#venicGlobals["modules"]["fileWindow"].forceWindowCheck()
 
-	testWindow.addstr(0,0,"!"*testWindow.getmaxyx()[1]*(testWindow.getmaxyx()[0]-1))
-	# standardscreen.addstr(0,0,"testWindow YX		"+str(testWindow.getbegyx()))
-	# standardscreen.addstr(1,0,"testWindow size YX	"+str(testWindow.getmaxyx()))
-	# standardscreen.addstr(2,0,"stdscr size YX		"+str(standardscreen.getmaxyx()))
-	# standardscreen.addstr(3,0,"intendedY		"+str(intendedY))
-	# standardscreen.addstr(4,0,"intendedX		"+str(intendedX))
-	# standardscreen.addstr(5,0,"intendedHeight		"+str(intendedHeight))
-	# standardscreen.addstr(6,0,"intendedWidth		"+str(intendedWidth))
+	# intendedX = venicGlobals["filewin"].getbegyx()[1]
+	keepWindowInMainScreen(intendedHeight,intendedWidth,intendedY,intendedX,lineNumberWindow)
+	if intendedX >= 0:
+		lineNumberWindow.mvwin(intendedY,intendedX)
+	else:
+		lineNumberWindow.mvwin(intendedY,0)
+
+	# lineNumberWindow.box()
+	windowY = 0
+	currentLine = venicGlobals["modules"]["fileWindow"].viewport[1]
+	if intendedX >= 0:
+		while windowY < lineNumberWindow.getmaxyx()[0]-1 and windowY+currentLine < totalLines:
+			# venicGlobals["debug"]["empty file LN"] = (windowY,0,str(currentLine+windowY)+(" "*(len(str(totalLines))-len(str(currentLine+windowY))))+"┃")
+			lineNumberWindow.addstr(windowY,0,str(currentLine+windowY)+(" "*(len(str(totalLines))-len(str(currentLine+windowY))))+"┃")
+			windowY += 1
+
+	# lineNumberWindow.addstr(0,0,str(intendedY))
 
 def kill(venicGlobals):
 	pass

@@ -1,9 +1,11 @@
 #!/usr/bin/python3
 import curses
 import importlib
+import traceback
 venicGlobals = {}
 venicGlobals["curses"] = curses
 venicGlobals["importlib"] = importlib
+venicGlobals["debug"] = {}
 
 debug = False
 
@@ -27,15 +29,15 @@ debug = False
 		# possible advantage would be try except handling of ctrl-C code... think about it for a bit
 		# yeah, go with a module of its own...
 
-moduleListFile = open("./config/modules")
+moduleListFile = open("/home/tom/docs/code/git/venic/config/modules")
 moduleNameList = [line.rstrip('\n') for line in moduleListFile]
 moduleListFile.close()
 
-startModuleFile = open("./config/start")
+startModuleFile = open("/home/tom/docs/code/git/venic/config/start")
 startModuleNames = [line.rstrip('\n') for line in startModuleFile]
 startModuleFile.close()
 
-loopModuleFile = open("./config/loop")
+loopModuleFile = open("/home/tom/docs/code/git/venic/config/loop")
 loopModuleNames = [line.rstrip('\n') for line in loopModuleFile]
 loopModuleFile.close()
 
@@ -46,11 +48,23 @@ for module in moduleNameList:
 
 venicGlobals["modules"] = modules
 
-for module in startModuleNames:
-	modules[module].start(venicGlobals)
 
 
-#debug = True
+# debug = True
+if debug == False:
+	try:
+		for module in startModuleNames:
+			modules[module].start(venicGlobals)
+	except:
+		# cry
+		startModuleNames.reverse()
+		for module in startModuleNames:
+			modules[module].kill(venicGlobals)
+		str(traceback.print_exc())           # Print the exception
+elif debug == True:
+	for module in startModuleNames:
+			modules[module].start(venicGlobals)
+
 while True:
 	if debug == False:
 		try:
@@ -60,9 +74,16 @@ while True:
 			startModuleNames.reverse()
 			for module in startModuleNames:
 				modules[module].kill(venicGlobals)
+			str(traceback.print_exc())
 			break
 	elif debug == True:
 		for module in loopModuleNames:
 				modules[module].loop(venicGlobals)
 
-#print([i for i in venicGlobals])
+# for i in venicGlobals:
+# 	print(i, venicGlobals[i])
+# 	if i == "stdscr":
+# 		print(venicGlobals[i].getmaxyx())
+# 	print(" ")
+
+# print(venicGlobals["debug"]["empty file LN"])
