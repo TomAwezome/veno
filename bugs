@@ -7,3 +7,5 @@ BUGS/TODO IN VENIC:
 		- start/end of file
 		- likely more
 	- ctrl-c should ideally be a keybinding for something in the future, currently caught by main venic file try except
+	- significant delay with operations with very fast consecutive key presses (pasting into terminal, scrolling with mouse)
+		- check time since last key press in KeyBindings and determine action based on speed and key pressed

@@ -132,7 +132,7 @@ def loop(venicGlobals):
 	if intendedX >= 0:
 		while windowY < lineNumberWindow.getmaxyx()[0] and windowY+currentLine < totalLines:
 			# venicGlobals["debug"]["empty file LN"] = (windowY,0,str(currentLine+windowY)+(" "*(len(str(totalLines))-len(str(currentLine+windowY))))+"┃")
-			lineNumberWindow.addstr(windowY,0,str(currentLine+windowY)+(" "*(len(str(totalLines))-len(str(currentLine+windowY))))+"┃")
+			lineNumberWindow.addstr(windowY,0,str(currentLine+windowY+1)+(" "*(len(str(totalLines))-len(str(currentLine+windowY+1))))+"┃")
 			windowY += 1
 
 	# lineNumberWindow.addstr(0,0,str(intendedY))

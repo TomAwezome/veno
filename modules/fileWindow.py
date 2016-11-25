@@ -133,6 +133,14 @@ def start(venicGlobals):
 def forceWindowCheck():
 	keepWindowInMainScreen(intendedHeight,intendedWidth,intendedY,intendedX,filewin)
 
+def drawCursor(venicGlobals):
+	if filecursor[1] >= viewport[1] and filecursor[1] <= viewport[1]+filewin.getmaxyx()[0]-1:
+		if len(fileLines) == 0:
+			fileLines.append("")
+		tabDiff = len(fileLines[filecursor[1]][:filecursor[0]].expandtabs(4)) - len(fileLines[filecursor[1]][:filecursor[0]])
+		if filecursor[0]-viewport[0]+tabDiff <= filewin.getmaxyx()[1]-2 and filecursor[0]-viewport[0]+tabDiff >= 0:
+			filewin.chgat(filecursor[1]-viewport[1],filecursor[0]-viewport[0]+tabDiff,1,venicGlobals["curses"].color_pair(3) | venicGlobals["curses"].A_REVERSE)
+
 def loop(venicGlobals):
 	global tabDiff
 	filewin.erase()
@@ -147,17 +155,12 @@ def loop(venicGlobals):
 	windowY = 0
 
 	for line in fileLines[viewport[1]:viewport[1]+filewin.getmaxyx()[0]]:
-		filewin.addnstr(windowY,0,line.expandtabs(4)[viewport[0]:],filewin.getmaxyx()[1]-1)
+		filewin.addnstr(windowY,0,line.expandtabs(4)[viewport[0]:],filewin.getmaxyx()[1]-1,venicGlobals["curses"].color_pair(0))
 		windowY += 1
 
 	# filewin.addstr(0,0,str(intendedY))
 
-	if filecursor[1] >= viewport[1] and filecursor[1] <= viewport[1]+filewin.getmaxyx()[0]-1:
-		if len(fileLines) == 0:
-			fileLines.append("")
-		tabDiff = len(fileLines[filecursor[1]][:filecursor[0]].expandtabs(4)) - len(fileLines[filecursor[1]][:filecursor[0]])
-		if filecursor[0]-viewport[0]+tabDiff <= filewin.getmaxyx()[1]-2 and filecursor[0]-viewport[0]+tabDiff >= 0:
-			filewin.chgat(filecursor[1]-viewport[1],filecursor[0]-viewport[0]+tabDiff,1,venicGlobals["curses"].color_pair(3) | venicGlobals["curses"].A_REVERSE)
+	drawCursor(venicGlobals)
 
 def kill(venicGlobals):
 	pass

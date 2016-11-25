@@ -2,10 +2,17 @@
 import curses
 import importlib
 import traceback
+import pygments
+import pygments.lexers as lexers
+
+codeLexer = lexers.PythonLexer()
+
 venicGlobals = {}
 venicGlobals["curses"] = curses
 venicGlobals["importlib"] = importlib
 venicGlobals["debug"] = {}
+venicGlobals["pygments"] = pygments
+venicGlobals["lexer"] = codeLexer
 
 debug = False
 
@@ -87,3 +94,7 @@ while True:
 # 	print(" ")
 
 # print(venicGlobals["debug"]["empty file LN"])
+
+
+
+

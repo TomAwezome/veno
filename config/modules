@@ -3,3 +3,4 @@ MainWindow
 fileWindow
 KeyBindings
 lineNumbers
+syntaxHighlighting
