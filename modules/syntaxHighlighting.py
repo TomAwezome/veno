@@ -67,7 +67,7 @@ def loop(venicGlobals):
 			closer = False
 			openerCount = 0
 			closerCount = 0
-			colorData = []	# [[color,start,num]]
+			colorData = [[]]	# [[color,start,num]]
 			colorDataRowIndex = 0
 			while colorInstances > 0:
 				colorIndex = properLine.find('\x03',lineIndex)
@@ -81,8 +81,11 @@ def loop(venicGlobals):
 
 
 				if (colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(4))-len(windowCodeLines[windowY][:colorIndex])) > windowSize[1]:
+					#if colorData != []:
 					colorData.pop()
 					break
+
+
 
 				if opener == False and closer == False:
 					if str.isdigit(properLine[colorIndex+1:colorIndex+3]):
@@ -94,44 +97,21 @@ def loop(venicGlobals):
 					
 					closerCount += 1
 					closer = False
-					
-					
-
-
-#					(len(windowCodeLines[windowY][:colorIndex].expandtabs(4))-len(windowCodeLines[windowY][:colorIndex]))
-
-
+					colorData.append([])
 
 				if opener == True:
-					colorData.append([])
 					colorData[colorDataRowIndex].append(properLine[colorIndex+1:colorIndex+3])
 					colorData[colorDataRowIndex].append((colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(4))-len(windowCodeLines[windowY][:colorIndex])))
-					
 					openerCount += 1
 					opener = False
 					closer = True
-				
 
-#				venicGlobals["filewin"].clear()
-#				venicGlobals["filewin"].addstr(0,0,str(colorData))
 
-#				venicGlobals["filewin"].addstr(0,0,"formatted line length: "+str(len(properLine)))
-#				venicGlobals["filewin"].addstr(1,0,"original line length: "+str(len(windowCodeLines[windowY])))
-#				venicGlobals["filewin"].addstr(1,0,str(colorIndex))
-#				venicGlobals["filewin"].addstr(2,0,"original line: "+windowCodeLines[windowY])
-#				venicGlobals["filewin"].addstr(3,0,"formatted line: "+str([properLine]))
-#				venicGlobals["filewin"].addstr(2,0,str(lineIndex))
-#				venicGlobals["filewin"].addstr(3,0,str(colorInstances))
-#				venicGlobals["modules"]["MainWindow"].loop(venicGlobals)
 				colorInstances -= 1
 
-#				time.sleep(.001)
-
-#			venicGlobals["filewin"].chgat(windowY,0,venicGlobals["curses"].color_pair(3))
 			for row in colorData:
-				venicGlobals["filewin"].chgat(windowY,row[1],row[2],venicGlobals["curses"].color_pair(int(row[0])))
-#				time.sleep(.1)
-#				venicGlobals["modules"]["MainWindow"].loop(venicGlobals)
+				if row != []:
+					venicGlobals["filewin"].chgat(windowY,row[1],row[2],venicGlobals["curses"].color_pair(int(row[0])))
 		windowY += 1
 		if windowY > windowSize[0]-1:
 			break
