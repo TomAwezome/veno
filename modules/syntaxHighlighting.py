@@ -82,7 +82,14 @@ def loop(venicGlobals):
 
 				if (colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(4))-len(windowCodeLines[windowY][:colorIndex])) > windowSize[1]:
 					#if colorData != []:
-					colorData.pop()
+					if closer == True and colorData[colorDataRowIndex][1] < windowSize[1]-1:
+						colorData[colorDataRowIndex].append(windowSize[1]-colorData[colorDataRowIndex][1])
+						colorDataRowIndex += 1
+						closerCount += 1
+						closer = False
+						colorData.append([])
+					else:
+						colorData.pop()
 					break
 
 
