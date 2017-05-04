@@ -2,7 +2,7 @@ import string
 def start(venicGlobals):
 	import os
 	global keybindingModules, keybindingNameList
-	keybindingListFile = open('/home/tom/docs/code/git/venic/modules/keybindings/enabled')
+	keybindingListFile = open(venicGlobals["modulesDir"] + "/keybindings/enabled")
 	keybindingFileList = [line.rstrip('\n') for line in keybindingListFile]
 	keybindingListFile.close()
 	
