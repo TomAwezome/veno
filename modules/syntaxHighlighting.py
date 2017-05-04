@@ -80,15 +80,15 @@ def loop(venicGlobals):
 				# ... oh, do i need to subtract from the formatted string? given that its internal character indexes are technically being changed by the presence of ^C characters...
 
 
-				if (colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(4))-len(windowCodeLines[windowY][:colorIndex])) > windowSize[1]:
+				if (colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(4))-len(windowCodeLines[windowY][:colorIndex])) > windowSize[1]: # if color is offscreen right
 					#if colorData != []:
-					if closer == True and colorData[colorDataRowIndex][1] < windowSize[1]-1:
+					if closer == True and colorData[colorDataRowIndex][1] < windowSize[1]-1:	# if closer and opener is on screen
 						colorData[colorDataRowIndex].append(windowSize[1]-colorData[colorDataRowIndex][1])
 						colorDataRowIndex += 1
 						closerCount += 1
 						closer = False
 						colorData.append([])
-					else:
+					else:	# if opener is also offscreen right
 						colorData.pop()
 					break
 
@@ -99,7 +99,17 @@ def loop(venicGlobals):
 						opener = True
 				
 				if closer == True:
-					colorData[colorDataRowIndex].append((colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(4))-len(windowCodeLines[windowY][:colorIndex]))-colorData[colorDataRowIndex][1])
+					if colorData[colorDataRowIndex][1]-fileViewport[0] < 0:	# if opener is offscreen
+						if (colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(4))-len(windowCodeLines[windowY][:colorIndex]))-fileViewport[0] > 0: # if closer is on screen
+							colorData[colorDataRowIndex][1] = 0
+							colorData[colorDataRowIndex].append((colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(4))-len(windowCodeLines[windowY][:colorIndex]))-fileViewport[0])
+						else: # if closer is not on screen
+							colorData.pop()
+							colorDataRowIndex -= 1
+					else:
+						colorData[colorDataRowIndex].append((colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(4))-len(windowCodeLines[windowY][:colorIndex]))-colorData[colorDataRowIndex][1])
+						colorData[colorDataRowIndex][1] = colorData[colorDataRowIndex][1]-fileViewport[0]
+
 					colorDataRowIndex += 1
 					
 					closerCount += 1
