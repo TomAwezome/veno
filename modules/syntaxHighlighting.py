@@ -105,11 +105,11 @@ def loop(venicGlobals):
 				# ... oh, do i need to subtract from the formatted string? given that its internal character indexes are technically being changed by the presence of ^C characters...
 
 
-				if (colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(4))-len(windowCodeLines[windowY][:colorIndex])) > windowSize[1]: # if color is offscreen right
+				if (colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(4))-len(windowCodeLines[windowY][:colorIndex]))-fileViewport[0] > windowSize[1]: # if color is offscreen right
 					#if colorData != []:
-					if closer == True and colorData[colorDataRowIndex][1] < windowSize[1]-1:	# if closer and opener is on screen
+					if closer == True and colorData[colorDataRowIndex][1]-fileViewport[0] < windowSize[1]-1:	# if closer and opener is on screen
 						colorData[colorDataRowIndex][1] = max(colorData[colorDataRowIndex][1]-fileViewport[0],0)
-						colorData[colorDataRowIndex].append(windowSize[1]-colorData[colorDataRowIndex][1])
+						colorData[colorDataRowIndex].append(windowSize[1]+fileViewport[0]-colorData[colorDataRowIndex][1])
 						colorDataRowIndex += 1
 						closerCount += 1
 						closer = False
