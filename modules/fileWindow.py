@@ -295,3 +295,15 @@ def saveFile():
 
 def searchForText():
 	pass
+
+def scrollDown():
+	scrollAmount = 20
+	while scrollAmount > 0:
+		moveFilecursorDown()
+		scrollAmount -= 1
+
+def scrollUp():
+	scrollAmount = 20
+	while scrollAmount > 0:
+		moveFilecursorUp()
+		scrollAmount -= 1
