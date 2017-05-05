@@ -8,6 +8,13 @@ def start(venicGlobals):
 	file.close()
 	venicGlobals["venicFile"] = fileString
 	venicGlobals["venicFileName"] = args.filename
+	try:
+		try:
+			venicGlobals["lexer"] = venicGlobals["pygments"].lexers.guess_lexer_for_filename(args.filename,fileString)
+		except:
+			venicGlobals["lexer"] = venicGlobals["pygments"].lexers.guess_lexer(fileString)
+	except:
+		venicGlobals["lexer"] = None
 def loop(venicGlobals):
 	pass
 def kill(venicGlobals):

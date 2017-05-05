@@ -6,14 +6,14 @@ import pygments
 import pygments.lexers as lexers
 import os
 
-codeLexer = lexers.PythonLexer()
+#codeLexer = lexers.PythonLexer()
 
 venicGlobals = {}
 venicGlobals["curses"] = curses
 venicGlobals["importlib"] = importlib
 venicGlobals["debug"] = {}
 venicGlobals["pygments"] = pygments
-venicGlobals["lexer"] = codeLexer
+#venicGlobals["lexer"] = codeLexer
 
 root_dir = os.path.dirname(os.path.realpath(__file__))
 venicGlobals["configDir"] = root_dir + "/config"
