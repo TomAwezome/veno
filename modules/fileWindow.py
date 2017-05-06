@@ -307,3 +307,17 @@ def scrollUp():
 	while scrollAmount > 0:
 		moveFilecursorUp()
 		scrollAmount -= 1
+
+def deleteLineAtFilecursor():
+	if filecursor[1] != len(fileLines)-1:
+		fileLines.pop(filecursor[1])
+		if len(fileLines[filecursor[1]]) >= filecursor[0]:
+			pass
+		else:
+			filecursor[0] = len(fileLines[filecursor[1]])
+	else:
+		fileLines.pop(filecursor[1])
+		if len(fileLines)-1 >= 0:
+			moveFilecursorUp()
+		else:
+			filecursor[0] = 0
