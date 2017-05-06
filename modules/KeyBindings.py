@@ -18,6 +18,10 @@ def start(venicGlobals):
 #		print(keybindingName)
 def loop(venicGlobals):
 	c = venicGlobals["stdscr"].getch()
+	if c == -1:
+		return
+	else:
+		pass
 	c = venicGlobals["curses"].keyname(c)
 	c = c.decode("utf-8")
 		
