@@ -13,6 +13,8 @@ def start(venicGlobals):
 			venicGlobals["lexer"] = venicGlobals["pygments"].lexers.guess_lexer_for_filename(args.filename,fileString)
 		except:
 			venicGlobals["lexer"] = venicGlobals["pygments"].lexers.guess_lexer(fileString)
+		if venicGlobals["lexer"].name == "PHP":
+			venicGlobals["lexer"] = venicGlobals["pygments"].lexers.PhpLexer(startinline=True)
 	except:
 		venicGlobals["lexer"] = None
 def loop(venicGlobals):
