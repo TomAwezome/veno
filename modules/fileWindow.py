@@ -321,3 +321,14 @@ def deleteLineAtFilecursor():
 			moveFilecursorUp()
 		else:
 			filecursor[0] = 0
+
+def deleteTextAtFilecursor():
+	if filecursor[0]+1 <= len(fileLines[filecursor[1]]): # if there is text to the right of our filecursor
+		lineStringLeft = fileLines[filecursor[1]][:filecursor[0]]
+		lineStringRight = fileLines[filecursor[1]][filecursor[0]+1:]
+		fileLines[filecursor[1]] = lineStringLeft+lineStringRight
+	elif filecursor[1] != len(fileLines)-1: # else (no text to right of filecursor) if there is line below
+		nextLine = fileLines[filecursor[1]+1] # append line below to current line
+		fileLines.pop(filecursor[1]+1)
+		fileLines[filecursor[1]] += nextLine
+
