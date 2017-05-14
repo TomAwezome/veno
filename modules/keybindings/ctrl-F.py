@@ -1,5 +1,5 @@
 # import time
 def run(modules):
-	modules["fileWindow"].searchForText()
+	modules["magicBar"].search()
 
 	# time.sleep(1)

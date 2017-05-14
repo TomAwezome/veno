@@ -88,6 +88,7 @@ while True:
 			for module in startModuleNames:
 				modules[module].kill(venicGlobals)
 			str(traceback.print_exc())
+#			print(venicGlobals)
 			break
 	elif debug == True:
 		for module in loopModuleNames:
