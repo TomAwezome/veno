@@ -206,7 +206,10 @@ def loop(venicGlobals):
 #		try:
 		#if patternMatches != None:
 		try:
-			nextMatch = next(patternMatches) # next operates to go down iterator, in this case if hitting first instance of given string, next() will start at that first index and continue through matches
+			try:
+				nextMatch = next(patternMatches) # next operates to go down iterator, in this case if hitting first instance of given string, next() will start at that first index and continue through matches
+			except TypeError:
+				return
 			searchIndexY = venicGlobals["venicFile"][:nextMatch.start()].count('\n')
 			searchLines = venicGlobals["venicFile"][:nextMatch.start()].split('\n')
 			if len(searchLines) > 0:

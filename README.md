@@ -21,4 +21,5 @@ Multi-purpose text/code editor meant for easy and vast expandability.
  - Ctrl-W -- save file
  - Ctrl-A , Home Key -- go to start of line in file
  - Ctrl-E , End Key -- go to end of line in file
-
+ - Ctrl-F -- find regex string in file
+ - Ctrl-G -- find next match in file
