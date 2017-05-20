@@ -87,7 +87,9 @@ def keepWindowInMainScreen(H,W,Y,X,Window):
 	if windowAltered:
 		standardscreen.erase()
 def start(venicGlobals):
-	global standardscreen, intendedX, intendedY, intendedWidth, intendedHeight, magicBarWindow, magicBarPanel, use, patternMatches
+	global standardscreen, intendedX, intendedY, intendedWidth, intendedHeight, magicBarWindow, magicBarPanel, use, patternMatches, searchString, searchCursorX
+	searchCursorX = 0
+	searchString = ""
 	use = ""
 	patternMatches = None
 	standardscreen = venicGlobals["stdscr"]
@@ -104,7 +106,7 @@ def start(venicGlobals):
 	magicBarPanel.hide()
 
 def loop(venicGlobals):
-	global use, patternMatches, pattern, patternMatch
+	global use, patternMatches, pattern, patternMatch, searchString, searchCursorX
 	cursor = venicGlobals["modules"]["fileWindow"].filecursor
 #	magicBarWindow.erase()
 	# change intended window info here
@@ -120,11 +122,20 @@ def loop(venicGlobals):
 		intendedHeight = 1
 		keepWindowInMainScreen(intendedHeight, intendedWidth, intendedY, intendedX, magicBarWindow)
 	
-		magicBarWindow.box()
+#		magicBarWindow.box()
 #	magicBarWindow.addstr(0, 0, "222")
-		searchCursorX = 0 
-		searchString = ""
+
+		if searchString != "":
+			pass
+		else:
+			searchString = ""
 		venicGlobals["modules"]["MainWindow"].loop(venicGlobals)
+		keepWindowInMainScreen(intendedHeight, intendedWidth, intendedY, intendedX, magicBarWindow)
+		magicBarWindow.addnstr(0,0,searchString, magicBarWindow.getmaxyx()[1]-1, venicGlobals["curses"].A_REVERSE)
+		if searchCursorX <= magicBarWindow.getmaxyx()[1]-2 and searchCursorX >= 0:
+			magicBarWindow.chgat(0,searchCursorX, 1, venicGlobals["curses"].color_pair(2) | venicGlobals["curses"].A_REVERSE)
+		venicGlobals["modules"]["MainWindow"].loop(venicGlobals)
+
 	# keypress loop: begin catching characters
 		while True: # break out of this loop with enter key
 			magicBarWindow.erase()
