@@ -125,10 +125,6 @@ def loop(venicGlobals):
 #		magicBarWindow.box()
 #	magicBarWindow.addstr(0, 0, "222")
 
-		if searchString != "":
-			pass
-		else:
-			searchString = ""
 		venicGlobals["modules"]["MainWindow"].loop(venicGlobals)
 		keepWindowInMainScreen(intendedHeight, intendedWidth, intendedY, intendedX, magicBarWindow)
 		magicBarWindow.addnstr(0,0,searchString, magicBarWindow.getmaxyx()[1]-1, venicGlobals["curses"].A_REVERSE)
@@ -177,10 +173,32 @@ def loop(venicGlobals):
 #		if patternMatch is not None:
 			searchIndexY = venicGlobals["venicFile"][:nextMatch.start()].count('\n')
 			searchLines = venicGlobals["venicFile"][:nextMatch.start()].split('\n')
-
 			if len(searchLines) > 0:
 				searchIndexX = len(searchLines[len(searchLines)-1])
-		
+		except StopIteration:
+			pass
+
+		try:
+			while searchIndexY < cursor[1]:
+				try:
+					nextMatch = next(patternMatches)
+					searchIndexY = venicGlobals["venicFile"][:nextMatch.start()].count('\n')
+					searchLines = venicGlobals["venicFile"][:nextMatch.start()].split('\n')
+					if len(searchLines) > 0:
+						searchIndexX = len(searchLines[len(searchLines)-1])
+				except StopIteration:
+					break
+
+			if searchIndexY == cursor[1] and searchIndexX < cursor[0]:
+				try:
+					nextMatch = next(patternMatches)
+					searchIndexY = venicGlobals["venicFile"][:nextMatch.start()].count('\n')
+					searchLines = venicGlobals["venicFile"][:nextMatch.start()].split('\n')
+					if len(searchLines) > 0:
+						searchIndexX = len(searchLines[len(searchLines)-1])
+				except StopIteration:
+					pass
+
 			while cursor[1] > searchIndexY:
 				venicGlobals["modules"]["fileWindow"].moveFilecursorUp()
 			while cursor[1] < searchIndexY:
@@ -189,11 +207,12 @@ def loop(venicGlobals):
 				venicGlobals["modules"]["fileWindow"].moveFilecursorLeft()
 			while cursor[0] < searchIndexX:
 				venicGlobals["modules"]["fileWindow"].moveFilecursorRight()
-		except StopIteration:
+
+
+			keepWindowInMainScreen(intendedHeight, intendedWidth, intendedY, intendedX, magicBarWindow)
+		except NameError:
 			pass
-
-
-		keepWindowInMainScreen(intendedHeight, intendedWidth, intendedY, intendedX, magicBarWindow)
+		
 		venicGlobals["modules"]["fileWindow"].loop(venicGlobals) # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
 		venicGlobals["modules"]["syntaxHighlighting"].loop(venicGlobals)
 		venicGlobals["modules"]["lineNumbers"].loop(venicGlobals)
