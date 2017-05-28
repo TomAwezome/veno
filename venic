@@ -6,6 +6,11 @@ import pygments
 import pygments.lexers as lexers
 import os
 
+import cProfile
+from pstats import Stats
+#prof = cProfile.Profile()
+#prof.enable()
+
 #codeLexer = lexers.PythonLexer()
 
 venicGlobals = {}
@@ -88,6 +93,7 @@ while True:
 			for module in startModuleNames:
 				modules[module].kill(venicGlobals)
 			str(traceback.print_exc())
+#			prof.print_stats(sort="cumulative")			
 #			print(venicGlobals)
 			break
 	elif debug == True:

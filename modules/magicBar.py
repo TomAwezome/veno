@@ -113,6 +113,14 @@ def loop(venicGlobals):
 
 #	keepWindowInMainScreen(intendedHeight,intendedWidth,intendedY,intendedX,magicBarWindow)
 
+
+
+
+
+
+
+
+
 	if use == "search":
 		magicBarPanel.show()
 		magicBarPanel.top()
@@ -219,6 +227,13 @@ def loop(venicGlobals):
 
 		use = ""
 	
+
+
+
+
+
+
+
 	elif use == "searchNext":
 		magicBarPanel.show()
 		magicBarPanel.top()
@@ -264,6 +279,134 @@ def loop(venicGlobals):
 
 		use = ""
 
+
+
+
+
+
+
+
+
+	elif use == "replace":
+		magicBarPanel.show()
+		magicBarPanel.top()
+		intendedX = 0
+		intendedY = standardscreen.getmaxyx()[0]
+		intendedWidth = standardscreen.getmaxyx()[1]-1
+		intendedHeight = 1
+		keepWindowInMainScreen(intendedHeight, intendedWidth, intendedY, intendedX, magicBarWindow)
+	
+#		magicBarWindow.box()
+#	magicBarWindow.addstr(0, 0, "222")
+
+		venicGlobals["modules"]["MainWindow"].loop(venicGlobals)
+		keepWindowInMainScreen(intendedHeight, intendedWidth, intendedY, intendedX, magicBarWindow)
+		magicBarWindow.addnstr(0,0,searchString, magicBarWindow.getmaxyx()[1]-1, venicGlobals["curses"].A_REVERSE)
+		if searchCursorX <= magicBarWindow.getmaxyx()[1]-2 and searchCursorX >= 0:
+			magicBarWindow.chgat(0,searchCursorX, 1, venicGlobals["curses"].color_pair(2) | venicGlobals["curses"].A_REVERSE)
+		venicGlobals["modules"]["MainWindow"].loop(venicGlobals)
+
+
+	## search string
+	# keypress loop: begin catching characters
+		while True: # break out of this loop with enter key
+			magicBarWindow.erase()
+			c = venicGlobals["stdscr"].getch()
+			if c == -1:
+				continue
+			c = venicGlobals["curses"].keyname(c)
+			c = c.decode("utf-8")
+			
+			if c in string.punctuation + string.digits + string.ascii_letters + string.whitespace:
+				searchStringLeft = searchString[:searchCursorX]+c
+				searchStringRight = searchString[searchCursorX:]
+				searchString = searchStringLeft + searchStringRight
+				searchCursorX += 1
+			elif c == "KEY_LEFT" and searchCursorX > 0:
+				searchCursorX -= 1
+			elif c == "KEY_RIGHT" and searchCursorX < len(searchString): # later deal with offscreen typing
+				searchCursorX += 1
+			elif c == "KEY_BACKSPACE":
+				if searchCursorX > 0:
+					searchStringLeft = searchString[:searchCursorX-1]
+					searchStringRight = searchString[searchCursorX:]
+					searchString = searchStringLeft + searchStringRight
+					searchCursorX -= 1
+			elif c == "^J":
+				break
+			
+			keepWindowInMainScreen(intendedHeight, intendedWidth, intendedY, intendedX, magicBarWindow)
+			magicBarWindow.addnstr(0,0,searchString, magicBarWindow.getmaxyx()[1]-1, venicGlobals["curses"].A_REVERSE)
+			if searchCursorX <= magicBarWindow.getmaxyx()[1]-2 and searchCursorX >= 0:
+				magicBarWindow.chgat(0,searchCursorX, 1, venicGlobals["curses"].color_pair(2) | venicGlobals["curses"].A_REVERSE)
+			venicGlobals["modules"]["MainWindow"].loop(venicGlobals)
+		
+		firstString = searchString
+		
+	## replacement string
+	# keypress loop: begin catching characters
+		searchString = ""
+		searchCursorX = 0
+		venicGlobals["modules"]["MainWindow"].loop(venicGlobals)
+		keepWindowInMainScreen(intendedHeight, intendedWidth, intendedY, intendedX, magicBarWindow)
+		magicBarWindow.addnstr(0,0,searchString, magicBarWindow.getmaxyx()[1]-1, venicGlobals["curses"].A_REVERSE)
+		if searchCursorX <= magicBarWindow.getmaxyx()[1]-2 and searchCursorX >= 0:
+			magicBarWindow.chgat(0,searchCursorX, 1, venicGlobals["curses"].color_pair(2) | venicGlobals["curses"].A_REVERSE)
+		venicGlobals["modules"]["MainWindow"].loop(venicGlobals)
+
+		while True: # break out of this loop with enter key
+			magicBarWindow.erase()
+			c = venicGlobals["stdscr"].getch()
+			if c == -1:
+				continue
+			c = venicGlobals["curses"].keyname(c)
+			c = c.decode("utf-8")
+			
+			if c in string.punctuation + string.digits + string.ascii_letters + string.whitespace:
+				searchStringLeft = searchString[:searchCursorX]+c
+				searchStringRight = searchString[searchCursorX:]
+				searchString = searchStringLeft + searchStringRight
+				searchCursorX += 1
+			elif c == "KEY_LEFT" and searchCursorX > 0:
+				searchCursorX -= 1
+			elif c == "KEY_RIGHT" and searchCursorX < len(searchString): # later deal with offscreen typing
+				searchCursorX += 1
+			elif c == "KEY_BACKSPACE":
+				if searchCursorX > 0:
+					searchStringLeft = searchString[:searchCursorX-1]
+					searchStringRight = searchString[searchCursorX:]
+					searchString = searchStringLeft + searchStringRight
+					searchCursorX -= 1
+			elif c == "^J":
+				break
+			
+			keepWindowInMainScreen(intendedHeight, intendedWidth, intendedY, intendedX, magicBarWindow)
+			magicBarWindow.addnstr(0,0,searchString, magicBarWindow.getmaxyx()[1]-1, venicGlobals["curses"].A_REVERSE)
+			if searchCursorX <= magicBarWindow.getmaxyx()[1]-2 and searchCursorX >= 0:
+				magicBarWindow.chgat(0,searchCursorX, 1, venicGlobals["curses"].color_pair(2) | venicGlobals["curses"].A_REVERSE)
+			venicGlobals["modules"]["MainWindow"].loop(venicGlobals)
+			
+		secondString = searchString
+
+		fileLines = venicGlobals["modules"]["fileWindow"].fileLines
+		fileString = '\n'.join(fileLines)
+		replacedString = re.sub(firstString, secondString, fileString)
+		venicGlobals["modules"]["fileWindow"].fileLines = replacedString.splitlines()
+
+
+
+
+		keepWindowInMainScreen(intendedHeight, intendedWidth, intendedY, intendedX, magicBarWindow)
+		venicGlobals["modules"]["fileWindow"].loop(venicGlobals) # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
+		venicGlobals["modules"]["syntaxHighlighting"].loop(venicGlobals)
+		venicGlobals["modules"]["lineNumbers"].loop(venicGlobals)
+
+		use = ""
+		
+		
+		
+
+
 	# search mode
 		# make visible, magicBarPanel.show()
 		# perhaps change intended window info here for search configuration
@@ -297,3 +440,7 @@ def search():
 def searchNext():
 	global use
 	use = "searchNext"
+
+def replace():
+	global use
+	use = "replace"
