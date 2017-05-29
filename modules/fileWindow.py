@@ -186,16 +186,7 @@ def moveFilecursorUp():
 				filecursor[0] = len(fileLines[filecursor[1]])
 			elif len(fileLines[filecursor[1]]) == 0:
 				filecursor[0] = 0
-	while filecursor[1] < viewport[1]:
-		moveViewportUp()
-	while filecursor[1] > filewin.getmaxyx()[0]+viewport[1]-1:
-		moveViewportDown()
-	tabDiff = len(fileLines[filecursor[1]][:filecursor[0]].expandtabs(4)) - len(fileLines[filecursor[1]][:filecursor[0]])
-	while filecursor[0]-viewport[0]+tabDiff > filewin.getmaxyx()[1]-2:
-		moveViewportRight()
-	while filecursor[0]-viewport[0]+tabDiff < 0:
-		moveViewportLeft()
-
+		moveViewportToCursor()
 
 def moveFilecursorDown():
 	if filecursor[1] < len(fileLines)-1:
@@ -205,52 +196,72 @@ def moveFilecursorDown():
 				filecursor[0] = len(fileLines[filecursor[1]])
 			elif len(fileLines[filecursor[1]]) == 0:
 				filecursor[0] = 0
-		while filecursor[1] > filewin.getmaxyx()[0]+viewport[1]-1:
-			moveViewportDown()
-		while filecursor[1] < viewport[1]:
-			moveViewportUp()
-	tabDiff = len(fileLines[filecursor[1]][:filecursor[0]].expandtabs(4)) - len(fileLines[filecursor[1]][:filecursor[0]])
-	while filecursor[0]-viewport[0]+tabDiff > filewin.getmaxyx()[1]-2:
-		moveViewportRight()
-	while filecursor[0]-viewport[0]+tabDiff < 0:
-		moveViewportLeft()
+		moveViewportToCursor()
 
 
 def moveFilecursorLeft():
 	if filecursor[0] > 0:
 		filecursor[0] -= 1
+		moveViewportToCursor()
 	elif filecursor[0] == 0 and filecursor[1] != 0:
 		moveFilecursorUp()
 		gotoEndOfLine()
-	tabDiff = len(fileLines[filecursor[1]][:filecursor[0]].expandtabs(4)) - len(fileLines[filecursor[1]][:filecursor[0]])
-	while filecursor[0]-viewport[0]+tabDiff > filewin.getmaxyx()[1]-2:
-		moveViewportRight()
-	while filecursor[0]-viewport[0]+tabDiff < 0:
-		moveViewportLeft()
 
 def moveFilecursorRight():
 	if filecursor[0] < len(fileLines[filecursor[1]]):
 		filecursor[0] += 1
+		moveViewportToCursor()
 	elif filecursor[0] == len(fileLines[filecursor[1]]) and filecursor[1] != len(fileLines)-1:
 		moveFilecursorDown()
 		gotoStartOfLine()
+
+def moveViewportToCursorX():
 	tabDiff = len(fileLines[filecursor[1]][:filecursor[0]].expandtabs(4)) - len(fileLines[filecursor[1]][:filecursor[0]])
-	while filecursor[0]-viewport[0]+tabDiff > filewin.getmaxyx()[1]-2:
-		moveViewportRight()
-	while filecursor[0]-viewport[0]+tabDiff < 0:
-		moveViewportLeft()
+	cursorX = filecursor[0] + tabDiff
+	viewportWidth = filewin.getmaxyx()[1]
+	if viewport[0] > cursorX:
+		viewport[0] = cursorX
+	elif viewport[0] < cursorX - viewportWidth:
+		viewport[0] = cursorX - viewportWidth
+
+def moveViewportToCursorY():
+	cursorY = filecursor[1]
+	viewportHeight = filewin.getmaxyx()[0] - 1
+	if viewport[1] > cursorY:
+		viewport[1] = cursorY
+	elif viewport[1] < cursorY - viewportHeight:
+		viewport[1] = cursorY - viewportHeight
+
+def moveViewportToCursor():
+	moveViewportToCursorX()
+	moveViewportToCursorY()
+
+def gotoLine(lineNum, preserveX = False):
+	if lineNum < len(fileLines) and lineNum > -1:
+		filecursor[1] = lineNum
+		if (preserveX):
+			if filecursor[0] > len(fileLines[filecursor[1]]):
+				if len(fileLines[filecursor[1]]) > 0:
+					filecursor[0] = len(fileLines[filecursor[1]])
+				elif len(fileLines[filecursor[1]]) == 0:
+					filecursor[0] = 0
+		else:
+			filecursor[0] = 0
+		moveViewportToCursor()
+
+def gotoStartOfFile():
+	gotoLine(0)
+
+def gotoEndOfFile():
+	gotoLine(len(fileLines)-1)
 
 def gotoStartOfLine():
 	filecursor[0] = 0
-	tabDiff = len(fileLines[filecursor[1]][:filecursor[0]].expandtabs(4)) - len(fileLines[filecursor[1]][:filecursor[0]])
-	while filecursor[0]-viewport[0]+tabDiff < 0:
-		moveViewportLeft()
+	moveViewportToCursorX()
 
 def gotoEndOfLine():
 	filecursor[0] = len(fileLines[filecursor[1]])
-	tabDiff = len(fileLines[filecursor[1]][:filecursor[0]].expandtabs(4)) - len(fileLines[filecursor[1]][:filecursor[0]])
-	while filecursor[0]-viewport[0]+tabDiff > filewin.getmaxyx()[1]-2:
-		moveViewportRight()
+	moveViewportToCursorX()
 
 def enterTextAtFilecursor(text):
 	lineStringLeft = fileLines[filecursor[1]][:filecursor[0]]
