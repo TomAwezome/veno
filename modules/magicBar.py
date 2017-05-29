@@ -293,6 +293,11 @@ def loop(venicGlobals):
 					searchStringRight = gotoLineString[gotoLineCursorX:]
 					gotoLineString = searchStringLeft + searchStringRight
 					gotoLineCursorX -= 1
+			elif c == "KEY_DC":
+				if gotoLineCursorX+1 <= len(gotoLineString): # if there is text to the right of our cursor
+					searchStringLeft = gotoLineString[:gotoLineCursorX]
+					searchStringRight = gotoLineString[gotoLineCursorX+1:]
+					gotoLineString = searchStringLeft+searchStringRight
 			elif c == "^J":
 				break
 
