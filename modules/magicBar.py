@@ -173,6 +173,11 @@ def loop(venicGlobals):
 					searchStringRight = searchString[searchCursorX:]
 					searchString = searchStringLeft + searchStringRight
 					searchCursorX -= 1
+			elif c == "KEY_DC":
+				if searchCursorX+1 <= len(searchString): # if there is text to the right of our cursor
+					searchStringLeft = searchString[:searchCursorX]
+					searchStringRight = searchString[searchCursorX+1:]
+					searchString = searchStringLeft+searchStringRight
 			elif c == "^J":
 				break
 			
@@ -359,6 +364,11 @@ def loop(venicGlobals):
 					searchStringRight = searchString[searchCursorX:]
 					searchString = searchStringLeft + searchStringRight
 					searchCursorX -= 1
+			elif c == "KEY_DC":
+				if searchCursorX+1 <= len(searchString): # if there is text to the right of our cursor
+					searchStringLeft = searchString[:searchCursorX]
+					searchStringRight = searchString[searchCursorX+1:]
+					searchString = searchStringLeft+searchStringRight
 			elif c == "^J":
 				break
 			
@@ -407,6 +417,11 @@ def loop(venicGlobals):
 					searchStringRight = searchString[searchCursorX:]
 					searchString = searchStringLeft + searchStringRight
 					searchCursorX -= 1
+			elif c == "KEY_DC":
+				if searchCursorX+1 <= len(searchString): # if there is text to the right of our cursor
+					searchStringLeft = searchString[:searchCursorX]
+					searchStringRight = searchString[searchCursorX+1:]
+					searchString = searchStringLeft+searchStringRight
 			elif c == "^J":
 				break
 			
