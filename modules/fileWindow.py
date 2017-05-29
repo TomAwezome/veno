@@ -309,15 +309,11 @@ def searchForText():
 
 def scrollDown():
 	scrollAmount = 20
-	while scrollAmount > 0:
-		moveFilecursorDown()
-		scrollAmount -= 1
+	gotoLine(min(filecursor[1] + scrollAmount, len(fileLines)-1))
 
 def scrollUp():
 	scrollAmount = 20
-	while scrollAmount > 0:
-		moveFilecursorUp()
-		scrollAmount -= 1
+	gotoLine(max(filecursor[1] - scrollAmount, 0))
 
 def deleteLineAtFilecursor():
 	if filecursor[1] != len(fileLines)-1:
