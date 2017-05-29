@@ -106,12 +106,18 @@ def start(venicGlobals):
 	magicBarPanel.hide()
 
 def loop(venicGlobals):
-	global use, patternMatches, pattern, patternMatch, searchString, searchCursorX
+	global use, patternMatches, pattern, patternMatch, searchString, searchCursorX, firstString, secondString
 	cursor = venicGlobals["modules"]["fileWindow"].filecursor
 #	magicBarWindow.erase()
 	# change intended window info here
 
 #	keepWindowInMainScreen(intendedHeight,intendedWidth,intendedY,intendedX,magicBarWindow)
+
+
+
+
+
+
 
 
 
@@ -143,7 +149,10 @@ def loop(venicGlobals):
 	# keypress loop: begin catching characters
 		while True: # break out of this loop with enter key
 			magicBarWindow.erase()
-			c = venicGlobals["stdscr"].getch()
+			try:
+				c = venicGlobals["stdscr"].getch()
+			except KeyboardInterrupt:
+				break
 			if c == -1:
 				continue
 			c = venicGlobals["curses"].keyname(c)
@@ -197,7 +206,7 @@ def loop(venicGlobals):
 				except StopIteration:
 					break
 
-			if searchIndexY == cursor[1] and searchIndexX < cursor[0]:
+			while searchIndexY == cursor[1] and searchIndexX < cursor[0]:
 				try:
 					nextMatch = next(patternMatches)
 					searchIndexY = venicGlobals["venicFile"][:nextMatch.start()].count('\n')
@@ -227,6 +236,13 @@ def loop(venicGlobals):
 
 		use = ""
 	
+
+
+
+
+
+
+
 
 
 
@@ -287,6 +303,14 @@ def loop(venicGlobals):
 
 
 
+
+
+
+
+
+
+
+
 	elif use == "replace":
 		magicBarPanel.show()
 		magicBarPanel.top()
@@ -311,7 +335,10 @@ def loop(venicGlobals):
 	# keypress loop: begin catching characters
 		while True: # break out of this loop with enter key
 			magicBarWindow.erase()
-			c = venicGlobals["stdscr"].getch()
+			try:
+				c = venicGlobals["stdscr"].getch()
+			except KeyboardInterrupt:
+				break
 			if c == -1:
 				continue
 			c = venicGlobals["curses"].keyname(c)
@@ -356,7 +383,10 @@ def loop(venicGlobals):
 
 		while True: # break out of this loop with enter key
 			magicBarWindow.erase()
-			c = venicGlobals["stdscr"].getch()
+			try:
+				c = venicGlobals["stdscr"].getch()
+			except KeyboardInterrupt:
+				break
 			if c == -1:
 				continue
 			c = venicGlobals["curses"].keyname(c)
@@ -390,21 +420,210 @@ def loop(venicGlobals):
 
 		fileLines = venicGlobals["modules"]["fileWindow"].fileLines
 		fileString = '\n'.join(fileLines)
-		replacedString = re.sub(firstString, secondString, fileString)
-		venicGlobals["modules"]["fileWindow"].fileLines = replacedString.splitlines()
+
+
+		# next we'll find the first occurence (relative to our cursor) of our to-be-replaced string, and move the file cursor there and have our current nexMatch be that occurence
+
+		pattern = re.compile(firstString)
+#		patternMatch = pattern.search(venicGlobals["venicFile"])
+		patternMatches = pattern.finditer(venicGlobals["venicFile"])
+		try:
+			nextMatch = next(patternMatches)
+#		if patternMatch is not None:
+			searchIndexY = venicGlobals["venicFile"][:nextMatch.start()].count('\n')
+			searchLines = venicGlobals["venicFile"][:nextMatch.start()].split('\n')
+			if len(searchLines) > 0:
+				searchIndexX = len(searchLines[len(searchLines)-1])
+		except StopIteration:
+			pass
+
+		try:
+			while searchIndexY < cursor[1]:
+				try:
+					nextMatch = next(patternMatches)
+					searchIndexY = venicGlobals["venicFile"][:nextMatch.start()].count('\n')
+					searchLines = venicGlobals["venicFile"][:nextMatch.start()].split('\n')
+					if len(searchLines) > 0:
+						searchIndexX = len(searchLines[len(searchLines)-1])
+				except StopIteration:
+					break
+
+			while searchIndexY == cursor[1] and searchIndexX < cursor[0]:
+				try:
+					nextMatch = next(patternMatches)
+					searchIndexY = venicGlobals["venicFile"][:nextMatch.start()].count('\n')
+					searchLines = venicGlobals["venicFile"][:nextMatch.start()].split('\n')
+					if len(searchLines) > 0:
+						searchIndexX = len(searchLines[len(searchLines)-1])
+				except StopIteration:
+					pass
+
+			while cursor[1] > searchIndexY:
+				venicGlobals["modules"]["fileWindow"].moveFilecursorUp()
+			while cursor[1] < searchIndexY:
+				venicGlobals["modules"]["fileWindow"].moveFilecursorDown()
+			while cursor[0] > searchIndexX:
+				venicGlobals["modules"]["fileWindow"].moveFilecursorLeft()
+			while cursor[0] < searchIndexX:
+				venicGlobals["modules"]["fileWindow"].moveFilecursorRight()
+
+
+			keepWindowInMainScreen(intendedHeight, intendedWidth, intendedY, intendedX, magicBarWindow)
+		except NameError:
+			pass
+
+		venicGlobals["modules"]["fileWindow"].loop(venicGlobals) # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
+		venicGlobals["modules"]["syntaxHighlighting"].loop(venicGlobals)
+		venicGlobals["modules"]["lineNumbers"].loop(venicGlobals)
+		venicGlobals["modules"]["MainWindow"].loop(venicGlobals)
+
+
+		# now we need to use .start() and .end() of match to chop and glue strings together, and re.sub the matching indices, and after replacing instance, repeat process again (using modified file, to adjust for differences in the indices after splicing replacement in)
+		# while we do this, we need to factor in keypresses, so that users can enter 'y' or 'n' to replace match, and can use either ESC or ctrl-C to cancel this use of magicBar module
+
+		# start while loop for keypresses (perhaps update window contents before this to show position at first instance)
+			# if 'y':
+				# replacedString = re.sub(firstString, secondString, fileString[start:end])
+				# left = fileString[:start]
+				# right = fileString[end:]
+				# combined = left + replacedString + right
+				# windowCodeLines = combined.splitlines()
+				#? venicGlobals["venicFile"] = combined
+			# if 'n':
+				# pass
+			# if 'esc'
+				# break
+
+			# patternMatches = pattern.finditer(venicGlobals["venicFile"])
+			# nextMatch = next(patternMatches) # break if except StopIteration:
+			# adjust cursor
+
+#		useSwapped = False
+		while True: # break out of this loop with enter key
+			try:
+				nextMatch
+			except NameError:
+				break
+			magicBarWindow.erase()
+			magicBarWindow.addnstr(0, 0, "Replace? (y/n/a) ['a' = All]", magicBarWindow.getmaxyx()[1] - 1, venicGlobals["curses"].A_REVERSE)	
+			venicGlobals["modules"]["MainWindow"].loop(venicGlobals)
+			try:
+				c = venicGlobals["stdscr"].getch()
+			except KeyboardInterrupt:
+				break
+			if c == -1:
+				continue
+			c = venicGlobals["curses"].keyname(c)
+			c = c.decode("utf-8")
+			
+			if c == "y":
+				fileLines = venicGlobals["modules"]["fileWindow"].fileLines
+				fileString = '\n'.join(fileLines)
+
+				replacedString = re.sub(firstString, secondString, fileString[nextMatch.start():nextMatch.end()])
+				replaceStringLeft = fileString[:nextMatch.start()]
+				replaceStringRight = fileString[nextMatch.end():]
+				replaceStringCombined = replaceStringLeft + replacedString + replaceStringRight
+				venicGlobals["modules"]["fileWindow"].fileLines = replaceStringCombined.splitlines()
+				venicGlobals["venicFile"] = replaceStringCombined
+			elif c == "n":
+				pass
+			elif c == "a":
+#				use = "replaceAll"
+#				useSwapped = True
+				fileLines = venicGlobals["modules"]["fileWindow"].fileLines
+				fileString = '\n'.join(fileLines)
+				replacedString = re.sub(firstString, secondString, fileString)
+				venicGlobals["venicFile"] = replacedString
+				venicGlobals["modules"]["fileWindow"].fileLines = replacedString.splitlines()
+				break
+
+#				searchCursorX += 1
+#			elif c == "KEY_LEFT" and searchCursorX > 0:
+#				searchCursorX -= 1
+#			elif c == "KEY_RIGHT" and searchCursorX < len(searchString): # later deal with offscreen typing
+#				searchCursorX += 1
+#			elif c == "KEY_BACKSPACE":
+#				if searchCursorX > 0:
+#					searchStringLeft = searchString[:searchCursorX-1]
+#					searchStringRight = searchString[searchCursorX:]
+#					searchString = searchStringLeft + searchStringRight
+#					searchCursorX -= 1
+			elif c == "^J":
+				break
+
+			patternMatches = pattern.finditer(venicGlobals["venicFile"])
+			try:
+				nextMatch = next(patternMatches)
+#			if patternMatch is not None:
+				searchIndexY = venicGlobals["venicFile"][:nextMatch.start()].count('\n')
+				searchLines = venicGlobals["venicFile"][:nextMatch.start()].split('\n')
+				if len(searchLines) > 0:
+					searchIndexX = len(searchLines[len(searchLines)-1])
+			except StopIteration:
+				break
+
+			try:
+				while searchIndexY < cursor[1]:
+					try:
+						nextMatch = next(patternMatches)
+						searchIndexY = venicGlobals["venicFile"][:nextMatch.start()].count('\n')
+						searchLines = venicGlobals["venicFile"][:nextMatch.start()].split('\n')
+						if len(searchLines) > 0:
+							searchIndexX = len(searchLines[len(searchLines)-1])
+					except StopIteration:
+						break
+
+				while searchIndexY == cursor[1] and searchIndexX < cursor[0]:
+					try:
+						nextMatch = next(patternMatches)
+						searchIndexY = venicGlobals["venicFile"][:nextMatch.start()].count('\n')
+						searchLines = venicGlobals["venicFile"][:nextMatch.start()].split('\n')
+						if len(searchLines) > 0:
+							searchIndexX = len(searchLines[len(searchLines)-1])
+					except StopIteration:
+						break
+
+				while cursor[1] > searchIndexY:
+					venicGlobals["modules"]["fileWindow"].moveFilecursorUp()
+				while cursor[1] < searchIndexY:
+					venicGlobals["modules"]["fileWindow"].moveFilecursorDown()
+				while cursor[0] > searchIndexX:
+					venicGlobals["modules"]["fileWindow"].moveFilecursorLeft()
+				while cursor[0] < searchIndexX:
+					venicGlobals["modules"]["fileWindow"].moveFilecursorRight()
+
+
+				keepWindowInMainScreen(intendedHeight, intendedWidth, intendedY, intendedX, magicBarWindow)
+			except NameError:
+				pass
+
+			keepWindowInMainScreen(intendedHeight, intendedWidth, intendedY, intendedX, magicBarWindow)
+#			magicBarWindow.addnstr(0,0,searchString, magicBarWindow.getmaxyx()[1]-1, venicGlobals["curses"].A_REVERSE)
+#			if searchCursorX <= magicBarWindow.getmaxyx()[1]-2 and searchCursorX >= 0:
+#				magicBarWindow.chgat(0,searchCursorX, 1, venicGlobals["curses"].color_pair(2) | venicGlobals["curses"].A_REVERSE)
+			venicGlobals["modules"]["fileWindow"].loop(venicGlobals) # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
+			venicGlobals["modules"]["syntaxHighlighting"].loop(venicGlobals)
+			venicGlobals["modules"]["lineNumbers"].loop(venicGlobals)
+			venicGlobals["modules"]["MainWindow"].loop(venicGlobals)
 
 
 
+#		fileLines = venicGlobals["modules"]["fileWindow"].fileLines
+#		fileString = '\n'.join(fileLines)
+#		replacedString = re.sub(firstString, secondString, fileString)
+#		venicGlobals["venicFile"] = replacedString
+#		venicGlobals["modules"]["fileWindow"].fileLines = replacedString.splitlines()		
 
+		magicBarWindow.erase()
 		keepWindowInMainScreen(intendedHeight, intendedWidth, intendedY, intendedX, magicBarWindow)
 		venicGlobals["modules"]["fileWindow"].loop(venicGlobals) # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
 		venicGlobals["modules"]["syntaxHighlighting"].loop(venicGlobals)
 		venicGlobals["modules"]["lineNumbers"].loop(venicGlobals)
 
+#		if useSwapped == False:
 		use = ""
-		
-		
-		
+
 
 
 	# search mode

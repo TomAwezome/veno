@@ -6,8 +6,8 @@ import pygments
 import pygments.lexers as lexers
 import os
 
-import cProfile
-from pstats import Stats
+#import cProfile
+#from pstats import Stats
 #prof = cProfile.Profile()
 #prof.enable()
 
