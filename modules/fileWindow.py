@@ -218,7 +218,7 @@ def moveFilecursorRight():
 def moveViewportToCursorX():
 	tabDiff = len(fileLines[filecursor[1]][:filecursor[0]].expandtabs(4)) - len(fileLines[filecursor[1]][:filecursor[0]])
 	cursorX = filecursor[0] + tabDiff
-	viewportWidth = filewin.getmaxyx()[1]
+	viewportWidth = filewin.getmaxyx()[1] - 2
 	if viewport[0] > cursorX:
 		viewport[0] = cursorX
 	elif viewport[0] < cursorX - viewportWidth:
