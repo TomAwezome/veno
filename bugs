@@ -2,7 +2,6 @@ BUGS/TODO IN VENIC:
 
 	- cannot CREATE new file with venic
 	- text/cursor features missing:
-		- pattern search
 		- cut/copy/paste
 		- start/end of file
 		- likely more
