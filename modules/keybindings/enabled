@@ -22,3 +22,6 @@ ctrl-D
 KEY_DC
 ctrl-G
 ctrl-H
+ctrl-L
+KEY_F(3)
+KEY_F(4)
