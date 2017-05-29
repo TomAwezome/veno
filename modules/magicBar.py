@@ -206,7 +206,7 @@ def loop(venicGlobals):
 				except StopIteration:
 					break
 
-			while searchIndexY == cursor[1] and searchIndexX < cursor[0]:
+			while searchIndexY == cursor[1] and searchIndexX <= cursor[0]:
 				try:
 					nextMatch = next(patternMatches)
 					searchIndexY = venicGlobals["venicFile"][:nextMatch.start()].count('\n')
@@ -214,7 +214,7 @@ def loop(venicGlobals):
 					if len(searchLines) > 0:
 						searchIndexX = len(searchLines[len(searchLines)-1])
 				except StopIteration:
-					pass
+					break
 
 			while cursor[1] > searchIndexY:
 				venicGlobals["modules"]["fileWindow"].moveFilecursorUp()
@@ -456,7 +456,7 @@ def loop(venicGlobals):
 					if len(searchLines) > 0:
 						searchIndexX = len(searchLines[len(searchLines)-1])
 				except StopIteration:
-					pass
+					break
 
 			while cursor[1] > searchIndexY:
 				venicGlobals["modules"]["fileWindow"].moveFilecursorUp()
