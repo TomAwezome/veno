@@ -16,3 +16,9 @@ ctrl-E
 KEY_HOME
 KEY_END
 ctrl-F
+KEY_PPAGE
+KEY_NPAGE
+ctrl-D
+KEY_DC
+ctrl-G
+ctrl-H

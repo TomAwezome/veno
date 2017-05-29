@@ -295,3 +295,40 @@ def saveFile():
 
 def searchForText():
 	pass
+
+def scrollDown():
+	scrollAmount = 20
+	while scrollAmount > 0:
+		moveFilecursorDown()
+		scrollAmount -= 1
+
+def scrollUp():
+	scrollAmount = 20
+	while scrollAmount > 0:
+		moveFilecursorUp()
+		scrollAmount -= 1
+
+def deleteLineAtFilecursor():
+	if filecursor[1] != len(fileLines)-1:
+		fileLines.pop(filecursor[1])
+		if len(fileLines[filecursor[1]]) >= filecursor[0]:
+			pass
+		else:
+			filecursor[0] = len(fileLines[filecursor[1]])
+	else:
+		fileLines.pop(filecursor[1])
+		if len(fileLines)-1 >= 0:
+			moveFilecursorUp()
+		else:
+			filecursor[0] = 0
+
+def deleteTextAtFilecursor():
+	if filecursor[0]+1 <= len(fileLines[filecursor[1]]): # if there is text to the right of our filecursor
+		lineStringLeft = fileLines[filecursor[1]][:filecursor[0]]
+		lineStringRight = fileLines[filecursor[1]][filecursor[0]+1:]
+		fileLines[filecursor[1]] = lineStringLeft+lineStringRight
+	elif filecursor[1] != len(fileLines)-1: # else (no text to right of filecursor) if there is line below
+		nextLine = fileLines[filecursor[1]+1] # append line below to current line
+		fileLines.pop(filecursor[1]+1)
+		fileLines[filecursor[1]] += nextLine
+

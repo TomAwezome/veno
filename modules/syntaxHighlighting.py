@@ -5,10 +5,30 @@ def start(venicGlobals):
 	
 	fileContents = venicGlobals["venicFile"]
 	codeLexer = venicGlobals["lexer"]
+
+	colorMap = {
+	"0":0,
+	"1":1,
+	"2":5,
+	"3":3,
+	"4":2,
+	"5":4,
+	"6":6,
+	"7":4,
+	"8":4,
+	"9":3,
+	"10":7,
+	"11":5,
+	"12":5,
+	"13":2,
+	"14":8,
+	"15":8
+	}
+
 #	codeLexer = lexers.python
 #	venicGlobals["lexer"] = codeLexer
 	from pygments.formatters import IRCFormatter
-	global codeLexer, IRCFormatter
+	global codeLexer, IRCFormatter, colorMap
 
 def loop(venicGlobals):
 	fileViewport = venicGlobals["viewport"]
@@ -17,8 +37,13 @@ def loop(venicGlobals):
 	windowCodeLines = venicGlobals["modules"]["fileWindow"].fileLines[fileViewport[1]:fileViewport[1]+windowSize[0]]
 	windowCodeString = '\n'.join(windowCodeLines)
 
-	highlightedCodeString = venicGlobals["pygments"].highlight(windowCodeString,codeLexer,IRCFormatter())
-	highlightedCodeLines = highlightedCodeString.split('\n')
+	if venicGlobals["lexer"] != None:
+		highlightedCodeString = venicGlobals["pygments"].highlight(windowCodeString,codeLexer,IRCFormatter())
+		highlightedCodeLines = highlightedCodeString.split('\n')
+	else:
+		highlightedCodeString = windowCodeString
+		highlightedCodeLines = highlightedCodeString.split('\n')
+
 	
 	windowY = 0
 
@@ -80,10 +105,11 @@ def loop(venicGlobals):
 				# ... oh, do i need to subtract from the formatted string? given that its internal character indexes are technically being changed by the presence of ^C characters...
 
 
-				if (colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(4))-len(windowCodeLines[windowY][:colorIndex])) > windowSize[1]: # if color is offscreen right
+				if (colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(4))-len(windowCodeLines[windowY][:colorIndex]))-fileViewport[0] > windowSize[1]: # if color is offscreen right
 					#if colorData != []:
-					if closer == True and colorData[colorDataRowIndex][1] < windowSize[1]-1:	# if closer and opener is on screen
-						colorData[colorDataRowIndex].append(windowSize[1]-colorData[colorDataRowIndex][1])
+					if closer == True and colorData[colorDataRowIndex][1]-fileViewport[0] < windowSize[1]-1:	# if closer and opener is on screen
+						colorData[colorDataRowIndex][1] = max(colorData[colorDataRowIndex][1]-fileViewport[0],0)
+						colorData[colorDataRowIndex].append(windowSize[1]+fileViewport[0]-colorData[colorDataRowIndex][1])
 						colorDataRowIndex += 1
 						closerCount += 1
 						closer = False
@@ -128,7 +154,7 @@ def loop(venicGlobals):
 
 			for row in colorData:
 				if row != []:
-					venicGlobals["filewin"].chgat(windowY,row[1],row[2],venicGlobals["curses"].color_pair(int(row[0])))
+					venicGlobals["filewin"].chgat(windowY,row[1],row[2],venicGlobals["curses"].color_pair(colorMap[str(int(row[0]))]))
 		windowY += 1
 		if windowY > windowSize[0]-1:
 			break

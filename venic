@@ -6,14 +6,19 @@ import pygments
 import pygments.lexers as lexers
 import os
 
-codeLexer = lexers.PythonLexer()
+#import cProfile
+#from pstats import Stats
+#prof = cProfile.Profile()
+#prof.enable()
+
+#codeLexer = lexers.PythonLexer()
 
 venicGlobals = {}
 venicGlobals["curses"] = curses
 venicGlobals["importlib"] = importlib
 venicGlobals["debug"] = {}
 venicGlobals["pygments"] = pygments
-venicGlobals["lexer"] = codeLexer
+#venicGlobals["lexer"] = codeLexer
 
 root_dir = os.path.dirname(os.path.realpath(__file__))
 venicGlobals["configDir"] = root_dir + "/config"
@@ -88,6 +93,8 @@ while True:
 			for module in startModuleNames:
 				modules[module].kill(venicGlobals)
 			str(traceback.print_exc())
+#			prof.print_stats(sort="cumulative")			
+#			print(venicGlobals)
 			break
 	elif debug == True:
 		for module in loopModuleNames:

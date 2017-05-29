@@ -1,5 +1,5 @@
 # import time
 def run(modules):
-	modules["magicBar"].search()
+	modules["magicBar"].replace()
 
 	# time.sleep(1)
