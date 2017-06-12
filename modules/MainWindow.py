@@ -1,4 +1,5 @@
 def start(venicGlobals):
+	global curses, panel, stdscr
 	import curses.panel as panel
 	curses = venicGlobals["curses"]
 	stdscr = curses.initscr()
@@ -6,7 +7,6 @@ def start(venicGlobals):
 	curses.use_default_colors()
 	for i in range(0,curses.COLORS):
 		curses.init_pair(i+1,i,-1)
-	global curses, panel, stdscr
 	venicGlobals["panel"] = panel
 	venicGlobals["stdscr"] = stdscr
 	curses.noecho()
