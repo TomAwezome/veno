@@ -237,23 +237,31 @@ def moveViewportToCursor():
 	moveViewportToCursorY()
 
 def gotoLine(lineNum, preserveX = False):
-	if lineNum < len(fileLines) and lineNum > -1:
-		filecursor[1] = lineNum
-		if (preserveX):
-			if filecursor[0] > len(fileLines[filecursor[1]]):
-				if len(fileLines[filecursor[1]]) > 0:
-					filecursor[0] = len(fileLines[filecursor[1]])
-				elif len(fileLines[filecursor[1]]) == 0:
-					filecursor[0] = 0
-		else:
-			filecursor[0] = 0
-		moveViewportToCursor()
+	setY(lineNum)
+	if not preserveX:
+		setX(0)
+	else:
+		setX(filecursor[0])
+
+	moveViewportToCursor()
 
 def gotoStartOfFile():
 	gotoLine(0)
 
 def gotoEndOfFile():
 	gotoLine(len(fileLines)-1)
+
+def setX(x):
+	filecursor[0] = max(0, min(len(fileLines[filecursor[1]]), x))
+
+def setY(y):
+	filecursor[1] = max(0, min(len(fileLines)-1, y))
+
+def gotoXY(x, y):
+	setY(y)
+	setX(x)
+	moveViewportToCursor()
+
 
 def gotoStartOfLine():
 	filecursor[0] = 0
@@ -338,4 +346,3 @@ def deleteTextAtFilecursor():
 		nextLine = fileLines[filecursor[1]+1] # append line below to current line
 		fileLines.pop(filecursor[1]+1)
 		fileLines[filecursor[1]] += nextLine
-
