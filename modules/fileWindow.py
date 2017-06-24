@@ -247,6 +247,14 @@ def gotoLine(lineNum, preserveX = False):
 					filecursor[0] = 0
 		else:
 			filecursor[0] = 0
+	elif lineNum > len(fileLines) and lineNum > -1:
+		filecursor[1] = len(fileLines) - 1
+		if (preserveX):
+			if filecursor[0] > len(fileLines[filecursor[1]]):
+				if len(fileLines[filecursor[1]]) > 0:
+					filecursor[0] = len(fileLines[filecursor[1]])
+				elif len(fileLines[filecursor[1]]) == 0:
+					filecursor[0] = 0
 		moveViewportToCursor()
 
 def gotoStartOfFile():
