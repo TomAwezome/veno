@@ -145,7 +145,7 @@ def loop(venicGlobals):
 	global tabDiff
 	filewin.erase()
 
-	intendedX = len(str(len(fileLines)))+1
+	intendedX = len(str(len(fileLines)))+1 # hard set value bumping window a bit to allow for lineNumbers module...
 	intendedY = 0
 	intendedHeight = standardscreen.getmaxyx()[0] - intendedY - 1
 	intendedWidth = standardscreen.getmaxyx()[1] - intendedX - 1
