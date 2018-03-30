@@ -1,20 +1,20 @@
 class Window:
-	def __init__(self, manager):
+	def __init__(self, manager, name):
 		self.manager = manager
+		self.name = name
 		self.intendedX = 0 			#<-- 
 		self.intendedY = 0			#<-- just some
-		self.intendedWidth = 40		#<-- default values
-		self.intendedHeight = 40	#<--
+		self.intendedWidth = 1		#<-- default values
+		self.intendedHeight = 1	#<--
 		self.window = manager.curses.newwin(self.intendedHeight, self.intendedWidth, self.intendedY, self.intendedX)
 		self.window.erase()
 		self.keepWindowInMainScreen()
-		self.panel = self.manager.addPanel(self.window)
-		self.panel.top()
-
-
+		self.panel = self.manager.addPanel(self, self.name)
+		#self.panel.top()
 	def update(self):
 		self.window.erase()
 		self.keepWindowInMainScreen()
+		self.window.box()
 	def terminate(self):
 		pass
 	def keepWindowInMainScreen(self):
@@ -22,9 +22,7 @@ class Window:
 		offscreenX = 0
 		offscreen = False
 		windowAltered = False
-
 		# if actual window does not fit in main screen
-
 		if self.manager.stdscr.getmaxyx()[0] <= self.window.getmaxyx()[0] + self.window.getbegyx()[0]:	# if screen size self.intendedX does not fit the window self.intendedX
 			offscreen = True
 			offscreenY = self.window.getbegyx()[0]+self.window.getmaxyx()[0]-self.manager.stdscr.getmaxyx()[0]
@@ -54,9 +52,7 @@ class Window:
 			else:
 				self.window.resize(self.window.getmaxyx()[0], self.window.getmaxyx()[1]-1)
 			windowAltered = True
-
 		# if there is space available to resize window closer to intended dimensions
-
 		if self.intendedHeight > self.window.getmaxyx()[0] and self.manager.stdscr.getmaxyx()[0] > self.window.getmaxyx()[0]+self.window.getbegyx()[0]:
 			self.window.resize(self.window.getmaxyx()[0]+(self.manager.stdscr.getmaxyx()[0]-self.window.getmaxyx()[0]),self.window.getmaxyx()[1])
 			windowAltered = True
@@ -73,9 +69,7 @@ class Window:
 				self.intendedWidth = 1
 			self.window.resize(self.window.getmaxyx()[0],self.intendedWidth)
 			windowAltered = True
-
 		# if window can be moved closer to intended position
-
 		if self.intendedY > self.window.getbegyx()[0] and self.manager.stdscr.getmaxyx()[0] > self.window.getmaxyx()[0]:
 			if self.manager.stdscr.getmaxyx()[0] > self.intendedY+self.window.getmaxyx()[0]:
 				self.window.mvwin(self.intendedY,self.window.getbegyx()[1])
@@ -87,7 +81,6 @@ class Window:
 			if self.manager.stdscr.getmaxyx()[1] > self.intendedX+self.window.getmaxyx()[1]:
 				self.window.mvwin(self.window.getbegyx()[0],self.intendedX)
 				windowAltered = True
-				
 			elif self.intendedX+self.window.getmaxyx()[1] > self.manager.stdscr.getmaxyx()[1]:
 				self.window.mvwin(self.window.getbegyx()[0],self.manager.stdscr.getmaxyx()[1]-self.window.getmaxyx()[1])
 				windowAltered = True
@@ -100,6 +93,5 @@ class Window:
 		if changeX != self.window.getbegyx()[1] or changeY != self.window.getbegyx()[0]:
 			self.window.mvwin(changeY, changeX)
 			windowAltered = True
-
 		if windowAltered:
 			self.manager.stdscr.erase()

@@ -1,126 +1,25 @@
 #!/usr/bin/python3
-### legacy from venic
-import curses
-import importlib
-import traceback
-import pygments
-import pygments.lexers as lexers
-import os
-### moved to test File class
-from modules.file import File
-import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument("filename")
-args = parser.parse_args()
-venicFile = File(args.filename)
 ### statistics on programs
 import cProfile
 from pstats import Stats
 prof = cProfile.Profile()
 prof.enable()
+### legacy from venic
+# import curses
+# import importlib
+import traceback
+# import pygments
+# import pygments.lexers as lexers
+# import os
 ###
-print(venicFile.contents)
-
-
-
-#codeLexer = lexers.PythonLexer()
-
-# venicGlobals = {}
-# venicGlobals["curses"] = curses
-# venicGlobals["importlib"] = importlib
-# venicGlobals["debug"] = {}
-# venicGlobals["pygments"] = pygments
-#venicGlobals["lexer"] = codeLexer
-
-root_dir = os.path.dirname(os.path.realpath(__file__))
-# venicGlobals["configDir"] = root_dir + "/config"
-# venicGlobals["modulesDir"] = root_dir + "/modules"
-
-# debug = False
-
-# some way of loading the modules and orders as last stored
-#	- load files
-#		- python code in standardized functions ("hooks")
-#			- .start()
-#				- maybe accept arguments?
-#				- creates definitions, calls, variables, etc
-#			- .keybindings?
-#				- no, keybindings would be a folder in modules that would have different python files with names like C-o that contain references to methods that would be loaded at .start
-#			- .loop()
-#				- the code that would be run on one frame/input tick
-
-#main code base gets modules, probably based on unified `modules` file, figures out how what to import
-#makes operational stack
-#runs `start` stack
-#loads keybindings, creates interpreter for keypresses inputted
-#runs, as a loop (haha), `loop` stack
-	# would keybindings be a module of its own? I wouldn't think so...
-		# possible advantage would be try except handling of ctrl-C code... think about it for a bit
-		# yeah, go with a module of its own...
-
-
-# moduleListFile = open(venicGlobals["configDir"] + "/modules")
-# moduleNameList = [line.rstrip('\n') for line in moduleListFile]
-# moduleListFile.close()
-
-# startModuleFile = open(venicGlobals["configDir"] + "/start")
-# startModuleNames = [line.rstrip('\n') for line in startModuleFile]
-# startModuleFile.close()
-
-# loopModuleFile = open(venicGlobals["configDir"] + "/loop")
-# loopModuleNames = [line.rstrip('\n') for line in loopModuleFile]
-# loopModuleFile.close()
-
-# modules = {}
-
-# for module in moduleNameList:
-# 	modules[module] = importlib.import_module("modules."+module)
-
-# venicGlobals["modules"] = modules
-
-
-
-# debug = True
-# if debug == False:
-# 	try:
-# 		for module in startModuleNames:
-# 			modules[module].start(venicGlobals)
-# 	except:
-# 		# cry
-# 		startModuleNames.reverse()
-# 		for module in startModuleNames:
-# 			modules[module].kill(venicGlobals)
-# 		str(traceback.print_exc())           # Print the exception
-# elif debug == True:
-# 	for module in startModuleNames:
-# 			modules[module].start(venicGlobals)
-
-# while True:
-# 	if debug == False:
-# 		try:
-# 			for module in loopModuleNames:
-# 				modules[module].loop(venicGlobals)
-# 		except:
-# 			startModuleNames.reverse()
-# 			for module in startModuleNames:
-# 				modules[module].kill(venicGlobals)
-# 			str(traceback.print_exc())
-# 			prof.print_stats(sort="cumulative")			
-# 			print(venicGlobals)
-# 			break
-# 	elif debug == True:
-# 		for module in loopModuleNames:
-# 				modules[module].loop(venicGlobals)
-
-# for i in venicGlobals:
-# 	print(i, venicGlobals[i])
-# 	if i == "stdscr":
-# 		print(venicGlobals[i].getmaxyx())
-# 	print(" ")
-
-# print(venicGlobals["debug"]["empty file LN"])
-
-
-
-
+from modules.engine import Engine
+scheduler = Engine()
+while True:
+	try:
+		scheduler.turn()
+	except:
+		scheduler.terminate()
+		str(traceback.print_exc())  # Print the exception
+		break
+#root_dir = os.path.dirname(os.path.realpath(__file__))
 prof.print_stats(sort="cumulative")
