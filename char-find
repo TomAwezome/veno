@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import curses   # our lovely buddy for making the terminal not hell.
+import curses   # our friendly painter
 stdscr = curses.initscr()       # give us a WindowObject to work with.
 curses.start_color()
 curses.curs_set(0)
