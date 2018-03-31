@@ -6,11 +6,13 @@ class Engine():
 		from modules.file import File 											#
 		from modules.panels import Manager										# Modules being used: File, Manager, fileWindow, Keyboard
 		from modules.fileWindow import FileWindow								# Submodules->Window
-		from modules.keybindings import Keyboard 								#
+		from modules.keybindings import Keyboard
+		# from modules.syntaxhighlighting import Highlighter 						#
 		self.venicFile = File(self.parseArgs().filename)						# Load file provided as only arg.
 		self.panels = Manager()													# Load Manager.
 		self.fileWindow = FileWindow(self.panels, "fileWindow", self.venicFile)	# Create fileWindow.
 		self.fileWindow.update()												# Update fileWindow contents.
+		# self.highlighter = Highlighter(self.panels)
 		self.panels.update()													# Update Panel (Manager) contents.
 		self.keys = Keyboard(self.panels)										# Load Keyboard module.
 	def turn(self):																# Run this method while Engine is running.
