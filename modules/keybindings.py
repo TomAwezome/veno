@@ -11,7 +11,10 @@ class Keyboard:
 		c = self.manager.curses.keyname(c)
 		c = c.decode("utf-8")
 		if c in self.bindings:
-			self.bindings[c]()
+			if c == "^I":
+				self.bindings[c]("\t")
+			else:
+				self.bindings[c]()
 		elif c in string.punctuation + string.digits + string.ascii_letters + " \t":
 			self.bindings["printable-character"](c)
 	def terminate(self):
@@ -33,3 +36,4 @@ class Keyboard:
 		self.bindings["^D"] = self.manager.Windows["fileWindow"].deleteLineAtFilecursor
 		self.bindings["^J"] = self.manager.Windows["fileWindow"].newLineAtFilecursor
 		self.bindings["^W"] = self.manager.Windows["fileWindow"].saveFile
+		self.bindings["^I"] = self.manager.Windows["fileWindow"].enterTextAtFilecursor
