@@ -1,12 +1,26 @@
 # import time
+
+##
+## @brief      Class for highlighter.
+##
 class Highlighter:
+	##
+	## @brief      Constructs the object.
+	##
+	## @param      self     The object
+	## @param      manager  The manager to allow access to drawing on window object in FileWindow
+	##
 	def __init__(self, manager):
+		## The manager to allow access to drawing on window object in FileWindow. TODO: replace manager with Window variable to further scale Highlighter
 		self.manager = manager
 		import pygments
+		## Pygments module
 		self.pygments = pygments
 		import pygments.lexers as lexers
+		## Pygments lexer module
 		self.lexers = lexers
 		from pygments.formatters import IRCFormatter
+		## Pygments formatter IRCFormatter
 		self.irc = IRCFormatter
 # def start(venicGlobals):
 # #	import pygments
@@ -31,6 +45,8 @@ class Highlighter:
 		# "14":8,
 		# "15":9 # Comments. This color.
 		# }
+
+		## colorMap dictionary with format of {"highlighterColorCode":RenderedColorCode}
 		self.colorMap = {
 		"0":9,
 		"1":9,
@@ -50,34 +66,43 @@ class Highlighter:
 		"15":9 # Comments. This color.
 		}
 		
+		## Lexer for filetype
 		self.lexer = None
 		try:
 			try:
-				self.lexer = self.lexer.guess_lexer_for_filename(
+				self.lexer = self.lexers.guess_lexer_for_filename(
 						self.manager.Windows["fileWindow"].file.source,
 						self.manager.Windows["fileWindow"].file.contents
 					)
 			except:
-				self.lexer = self.pygments.lexers.guess_lexer(
+				self.lexer = self.lexers.guess_lexer(
 						self.manager.Windows["fileWindow"].file.contents
 					)
 			if self.lexer.name == "PHP":
-				self.lexer = self.pygments.lexers.PhpLexer(startinline=True)
+				self.lexer = self.lexers.PhpLexer(startinline=True)
 		except:
 			pass
-		
+	##
+	## @brief      Update syntax highlighting on fileWindow
+	##
+	## @param      self  The object
+	##
 	def update(self):
 		fileViewport = self.manager.Windows["fileWindow"].viewport
 		windowSize = self.manager.Windows["fileWindow"].window.getmaxyx()
+
+
+
 		windowCodeLines = self.manager.Windows["fileWindow"].fileLines[fileViewport[1]:fileViewport[1]+windowSize[0]]
 		windowCodeString = '\n'.join(windowCodeLines)
 
 		if self.lexer != None:
 			highlightedCodeString = self.pygments.highlight(windowCodeString,self.lexer,self.irc())
-			highlightedCodeLines = highlightedCodeString.split('\n')
+			## **Highlighted** code lines from windowCodeLines (which is default defined as fileLines[viewport[1]:viewport[1]+windowSize[0]])
+			self.highlightedCodeLines = highlightedCodeString.split('\n')
 		else:
 			highlightedCodeString = windowCodeString
-			highlightedCodeLines = highlightedCodeString.split('\n')
+			self.highlightedCodeLines = highlightedCodeString.split('\n')
 		leadingNewlines = 0
 		for line in windowCodeLines:
 			if line == '':
@@ -93,13 +118,13 @@ class Highlighter:
 				break
 		windowCodeLines.reverse()
 		if trailingNewlines > 0:
-			highlightedCodeLines.extend(['']*trailingNewlines)
+			self.highlightedCodeLines.extend(['']*trailingNewlines)
 		if leadingNewlines > 0:
-			highlightedCodeLines.reverse()
-			highlightedCodeLines.extend(['']*leadingNewlines)
-			highlightedCodeLines.reverse()
+			self.highlightedCodeLines.reverse()
+			self.highlightedCodeLines.extend(['']*leadingNewlines)
+			self.highlightedCodeLines.reverse()
 		windowY = 0
-		for line in highlightedCodeLines:
+		for line in self.highlightedCodeLines:
 			properLine = line
 			properLine = properLine.replace('\x1d','')
 			lineIndex = 0
@@ -182,7 +207,55 @@ class Highlighter:
 # #		we would need filewindow module variables: fileLines?, viewport, window size xy, 
 # #	before we get there... how to color the screen? does it have to be character by character?
 # #	no way!!!! that's insane. it can be done in chunks, searching for the next ^C character index each time.
+	
+	##
+	## @brief      Terminates Highlighter
+	##
+	## @param      self  The object
+	##
 	def terminate(self):
 		pass
 # def kill(venicGlobals):
 # 	pass
+
+
+
+
+
+
+
+
+# get file viewport
+# get window size
+# get file lines corresponding to viewport
+# make code string
+# if there's a lexer
+# 	HIGHLIGHT code string
+# 	make highlightcode lines
+# else
+# 	code string->pretend highlight
+# leading/trailing lines shit?
+# WINDOWY=0
+# for each LINE in HIGHLIGHTED code 	# refer line 6
+# 	opener closer parser bullshit...
+# 	for each ROW of COLORDATA made PER LINE via HIGHLIGHTEDCODELINES:
+# 		change attribute at WINDOWY, indexX,length, color
+# 	WINDOWY ++
+# 	if WINDOWY > windowSize
+# 		break
+
+
+
+# ___Way I *should* do it____
+# get file viewport
+# get window size
+# get file lines of entire window
+# make code string
+# if there's a lexer
+# 	if we need to highlight all of the text again (if modified, if first run..)
+# 	HIGHLIGHT code string
+# 	make highlightcode lines
+# else
+# 	code string => pretend highlight
+# leading trailing lines shit?
+# WINDOWY=
