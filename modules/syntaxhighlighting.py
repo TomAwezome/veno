@@ -13,23 +13,41 @@ class Highlighter:
 # #	import pygments.lexers as lexers
 # 	fileContents = venicGlobals["venicFile"]
 # 	lexer = self.lexer
+		# self.colorMap = {
+		# "0":0,
+		# "1":1,
+		# "2":5,
+		# "3":3,
+		# "4":2,
+		# "5":4,
+		# "6":6,
+		# "7":4,
+		# "8":4,
+		# "9":3,
+		# "10":7,
+		# "11":5,
+		# "12":5,
+		# "13":2,
+		# "14":8,
+		# "15":9 # Comments. This color.
+		# }
 		self.colorMap = {
-		"0":0,
-		"1":1,
-		"2":5,
-		"3":3,
-		"4":2,
-		"5":4,
-		"6":6,
-		"7":4,
-		"8":4,
-		"9":3,
-		"10":7,
-		"11":5,
-		"12":5,
-		"13":2,
-		"14":8,
-		"15":9
+		"0":9,
+		"1":9,
+		"2":10,#class,def,try,if,break,while,for,ints,pass
+		"3":9,
+		"4":9,
+		"5":11,#quotes
+		"6":10,#in,and,or
+		"7":11,#class/function name, 
+		"8":9,
+		"9":9,
+		"10":4,#self,modules,literals
+		"11":9,
+		"12":9,
+		"13":9,
+		"14":9,
+		"15":9 # Comments. This color.
 		}
 		
 		self.lexer = None
