@@ -78,7 +78,6 @@ class Highlighter:
 		else:
 			highlightedCodeString = windowCodeString
 			highlightedCodeLines = highlightedCodeString.split('\n')
-		windowY = 0
 		leadingNewlines = 0
 		for line in windowCodeLines:
 			if line == '':
@@ -99,6 +98,7 @@ class Highlighter:
 			highlightedCodeLines.reverse()
 			highlightedCodeLines.extend(['']*leadingNewlines)
 			highlightedCodeLines.reverse()
+		windowY = 0
 		for line in highlightedCodeLines:
 			properLine = line
 			properLine = properLine.replace('\x1d','')
