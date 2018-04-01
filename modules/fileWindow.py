@@ -11,6 +11,7 @@ class FileWindow(Window):
 		self.panel.bottom()
 		self.file = file
 		self.fileLines = self.file.contents.splitlines()
+		self.modified = False
 		windowY = 0
 		for line in self.fileLines[self.viewport[1]:self.viewport[1]+self.window.getmaxyx()[0]]:
 			self.window.addnstr(windowY,0,line.expandtabs(4)[self.viewport[0]:],self.window.getmaxyx()[1]-1)
