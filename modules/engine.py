@@ -16,7 +16,8 @@ class Engine():
 		self.panels.update()													# Update Panel (Manager) contents.
 		self.keys = Keyboard(self.panels)										# Load Keyboard module.
 	def turn(self):																# Run this method while Engine is running.
-		self.fileWindow.update()												#
+		self.fileWindow.update()
+		self.highlighter.update()												#
 		self.panels.update()													#
 		self.keys.update()														# Grab key input and interpret through bindings.
 	def parseArgs(self):														# 
