@@ -4,11 +4,12 @@ class Highlighter:
 		import pygments
 		self.pygments = pygments
 		from pygments.formatters import IRCFormatter
+		self.irc = IRCFormatter
 # def start(venicGlobals):
 # #	import pygments
 # #	import pygments.lexers as lexers
 # 	fileContents = venicGlobals["venicFile"]
-# 	codeLexer = venicGlobals["lexer"]
+# 	codeLexer = self.lexer
 		self.colorMap = {
 		"0":0,
 		"1":1,
@@ -29,34 +30,51 @@ class Highlighter:
 		}
 	try:
 		try:
-			self.codeLexer = self.pygments.lexers.guess_lexer_for_filename(self.manager.Windows["fileWindow"].file.source,self.manager.Windows["fileWindow"].file.contents)
+			self.codeLexer = self.pygments.lexers.guess_lexer_for_filename(
+					self.manager.Windows["fileWindow"].file.source,
+					self.manager.Windows["fileWindow"].file.contents
+				)
 		except:
-			self.codeLexer = self.pygments.lexers.guess_lexer(self.manager.Windows["fileWindow"].file.contents)
+			self.codeLexer = self.pygments.lexers.guess_lexer(
+					self.manager.Windows["fileWindow"].file.contents
+				)
 		if self.codeLexer.name == "PHP":
-			self.codeLexer = venicGlobals["pygments"].lexers.PhpLexer(startinline=True)
+			self.codeLexer = self.pygments.lexers.PhpLexer(startinline=True)
 	except:
 		self.codeLexer = None		
-
-# #	codeLexer = lexers.python
-# #	venicGlobals["lexer"] = codeLexer
-
-# 	global codeLexer, IRCFormatter, colorMap
 	def update(self):
-		pass
-# def loop(venicGlobals):
-# 	fileViewport = venicGlobals["viewport"]
-# 	windowSize = venicGlobals["filewin"].getmaxyx()
-# #	windowCodeLines = venicGlobals["modules"]["fileWindow"].fileLines[fileViewport[1]-1:fileViewport[1]+windowSize[0]]
-# 	windowCodeLines = venicGlobals["modules"]["fileWindow"].fileLines[fileViewport[1]:fileViewport[1]+windowSize[0]]
-# 	windowCodeString = '\n'.join(windowCodeLines)
+		fileViewport = self.manager.Windows["fileWindow"].viewport
+		windowSize = self.manager.Windows["fileWindow"].window.getmaxyx()
+		windowCodeLines = self.manager.Windows["fileWindow"].fileLines[fileViewport[1]:fileViewport[1]+windowSize[0]]
+		windowCodeString = '\n'.join(windowCodeLines)
 
-# 	if venicGlobals["lexer"] != None:
-# 		highlightedCodeString = venicGlobals["pygments"].highlight(windowCodeString,codeLexer,IRCFormatter())
-# 		highlightedCodeLines = highlightedCodeString.split('\n')
-# 	else:
-# 		highlightedCodeString = windowCodeString
-# 		highlightedCodeLines = highlightedCodeString.split('\n')
-
+		if self.codelexer != None:
+			highlightedCodeString = self.pygments.highlight(windowCodeString,self.codeLexer,self.irc())
+			highlightedCodeLines = highlightedCodeString.split('\n')
+		else:
+			highlightedCodeString = windowCodeString
+			highlightedCodeLines = highlightedCodeString.split('\n')
+		windowY = 0
+		leadingNewlines = 0
+		for line in windowCodeLines:
+			if line == '':
+				leadingNewlines += 1
+			else:
+				break
+		windowCodeLines.reverse()
+		trailingNewlines = 0
+		for line in windowCodeLines:
+			if line == '':
+				trailingNewlines += 1
+			else:
+				break
+		windowCodeLines.reverse()
+		if trailingNewlines > 0:
+			highlightedCodeLines.extend(['']*trailingNewlines)
+		if leadingNewlines > 0:
+			highlightedCodeLines.reverse()
+			highlightedCodeLines.extend(['']*leadingNewlines)
+			highlightedCodeLines.reverse()
 	
 # 	windowY = 0
 
