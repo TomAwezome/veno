@@ -29,7 +29,7 @@ class Highlighter:
 		"12":5,
 		"13":2,
 		"14":8,
-		"15":8
+		"15":9
 		}
 		
 		self.lexer = None
