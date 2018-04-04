@@ -82,7 +82,7 @@ class Highlighter:
 				self.lexer = self.lexers.PhpLexer(startinline=True)
 		except:
 			pass
-		self.modified = True
+		self.manager.Windows["fileWindow"].modified = True
 	##
 	## @brief      Update syntax highlighting on fileWindow
 	##
@@ -94,11 +94,11 @@ class Highlighter:
 		# windowCodeLines = self.manager.Windows["fileWindow"].fileLines[fileViewport[1]:fileViewport[1]+windowSize[0]]
 		windowCodeLines = self.manager.Windows["fileWindow"].fileLines
 		windowCodeString = '\n'.join(windowCodeLines)
-		if self.lexer != None and self.modified == True:
+		if self.lexer != None and self.manager.Windows["fileWindow"].modified == True:
 			highlightedCodeString = self.pygments.highlight(windowCodeString,self.lexer,self.irc())
 			## **Highlighted** code lines from windowCodeLines (which is default defined as fileLines[viewport[1]:viewport[1]+windowSize[0]])
 			self.highlightedCodeLines = highlightedCodeString.split('\n')
-			self.modified = False
+			self.manager.Windows["fileWindow"].modified = False
 		elif self.lexer == None:
 			highlightedCodeString = windowCodeString
 			self.highlightedCodeLines = highlightedCodeString.split('\n')
