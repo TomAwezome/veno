@@ -82,6 +82,7 @@ class Highlighter:
 				self.lexer = self.lexers.PhpLexer(startinline=True)
 		except:
 			pass
+		self.modified = True
 	##
 	## @brief      Update syntax highlighting on fileWindow
 	##
@@ -90,17 +91,15 @@ class Highlighter:
 	def update(self):
 		fileViewport = self.manager.Windows["fileWindow"].viewport
 		windowSize = self.manager.Windows["fileWindow"].window.getmaxyx()
-
-
-
-		windowCodeLines = self.manager.Windows["fileWindow"].fileLines[fileViewport[1]:fileViewport[1]+windowSize[0]]
+		# windowCodeLines = self.manager.Windows["fileWindow"].fileLines[fileViewport[1]:fileViewport[1]+windowSize[0]]
+		windowCodeLines = self.manager.Windows["fileWindow"].fileLines
 		windowCodeString = '\n'.join(windowCodeLines)
-
-		if self.lexer != None:
+		if self.lexer != None and self.modified == True:
 			highlightedCodeString = self.pygments.highlight(windowCodeString,self.lexer,self.irc())
 			## **Highlighted** code lines from windowCodeLines (which is default defined as fileLines[viewport[1]:viewport[1]+windowSize[0]])
 			self.highlightedCodeLines = highlightedCodeString.split('\n')
-		else:
+			self.modified = False
+		elif self.lexer == None:
 			highlightedCodeString = windowCodeString
 			self.highlightedCodeLines = highlightedCodeString.split('\n')
 		leadingNewlines = 0
@@ -123,8 +122,8 @@ class Highlighter:
 			self.highlightedCodeLines.reverse()
 			self.highlightedCodeLines.extend(['']*leadingNewlines)
 			self.highlightedCodeLines.reverse()
-		windowY = 0
-		for line in self.highlightedCodeLines:
+		windowY = fileViewport[1]
+		for line in self.highlightedCodeLines[windowY:windowY+windowSize[0]]:
 			properLine = line
 			properLine = properLine.replace('\x1d','')
 			lineIndex = 0
@@ -141,14 +140,11 @@ class Highlighter:
 				while colorInstances > 0:
 					colorIndex = properLine.find('\x03',lineIndex)
 					lineIndex = colorIndex+1
-					
 					# so what we want is this: start by checking for numbers (I THINK that pygments is working such that colors are simply one number, which uses two digits (none of that 3,5 crap))
 					#			   if it's the number sequence we're expecting: that is now our point IN THE STRING DATA (NO TABS!) that our coloring begins
 					#			   if there's no number sequence AFTER STARTING WITH A SEQUENCE: that is the point IN THE STRING DATA that our coloring stops
 					# how to convert DATA index into TABBED index? after all, that's what's being tossed to the window we are changing the attributes of!
 					# ... oh, do i need to subtract from the formatted string? given that its internal character indexes are technically being changed by the presence of ^C characters...
-
-
 					if (colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(4))-len(windowCodeLines[windowY][:colorIndex]))-fileViewport[0] > windowSize[1]: # if color is offscreen right
 						#if colorData != []:
 						if closer == True and colorData[colorDataRowIndex][1]-fileViewport[0] < windowSize[1]-1:	# if closer and opener is on screen
@@ -161,13 +157,9 @@ class Highlighter:
 						else:	# if opener is also offscreen right
 							colorData.pop()
 						break
-
-
-
 					if opener == False and closer == False:
 						if str.isdigit(properLine[colorIndex+1:colorIndex+3]):
 							opener = True
-					
 					if closer == True:
 						if colorData[colorDataRowIndex][1]-fileViewport[0] < 0:	# if opener is offscreen
 							if (colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(4))-len(windowCodeLines[windowY][:colorIndex]))-fileViewport[0] > 0: # if closer is on screen
@@ -179,28 +171,22 @@ class Highlighter:
 						else:
 							colorData[colorDataRowIndex].append((colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(4))-len(windowCodeLines[windowY][:colorIndex]))-colorData[colorDataRowIndex][1])
 							colorData[colorDataRowIndex][1] = colorData[colorDataRowIndex][1]-fileViewport[0]
-
 						colorDataRowIndex += 1
-						
 						closerCount += 1
 						closer = False
 						colorData.append([])
-
 					if opener == True:
 						colorData[colorDataRowIndex].append(properLine[colorIndex+1:colorIndex+3])
 						colorData[colorDataRowIndex].append((colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(4))-len(windowCodeLines[windowY][:colorIndex])))
 						openerCount += 1
 						opener = False
 						closer = True
-
-
 					colorInstances -= 1
-
 				for row in colorData:
 					if row != []:
-						self.manager.Windows["fileWindow"].window.chgat(windowY,row[1],row[2],self.manager.curses.color_pair(self.colorMap[str(int(row[0]))]))
+						self.manager.Windows["fileWindow"].window.chgat(windowY-fileViewport[1],row[1],row[2],self.manager.curses.color_pair(self.colorMap[str(int(row[0]))]))
 			windowY += 1
-			if windowY > windowSize[0]-1:
+			if windowY > fileViewport[1] + windowSize[0]-1:
 				break
 		self.manager.Windows["fileWindow"].drawCursor()
 # #	where are we getting the string from? the active string... but we would only want the part that the user sees.
