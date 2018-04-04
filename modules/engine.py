@@ -43,7 +43,7 @@ class Engine():
 	def parseArgs(self):														# 
 		import argparse															# load arg parser module for file input
 		parser = argparse.ArgumentParser()										#
-		parser.add_argument("filename")											# create program parameter, filename/path
+		parser.add_argument("filename", nargs='?')											# create program parameter, filename/path
 		return parser.parse_args()												#
 	##
 	## @brief      terminate engine
@@ -52,8 +52,8 @@ class Engine():
 	##
 	def terminate(self):														# Terminate all modules in reverse order of initialization.
 		self.keys.terminate()
-		debug = self.highlighter.highlightedCodeLines
+#		debug = self.highlighter.highlightedCodeLines
 		self.fileWindow.terminate()
 		self.panels.terminate()
 		self.venicFile.terminate()
-		print(debug)
+#		print(debug)

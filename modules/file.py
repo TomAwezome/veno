@@ -11,10 +11,14 @@ class File:
 	def __init__(self, source):
 		## source should be a file location as String.
 		self.source = source
-		file = open(source);
+		if source != None:
+			file = open(source);
 		## contents of file as String
-		self.contents = file.read()
-		file.close()
+			self.contents = file.read()
+			file.close()
+		else:
+			self.contents = ""
+			self.source = "veno.save.tmp"
 	##
 	## @brief      save altered contents to File
 	##
