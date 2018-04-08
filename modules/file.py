@@ -1,12 +1,25 @@
 class File:
 	def __init__(self, source):
 		self.source = source	# source should be a filename string, I'm assuming it'll end up being relative...
-		file = open(source);
-		self.contents = file.read()
-		file.close()
+		try:
+			file = open(source)
+			self.exists = True
+			self.contents = file.read()
+			file.close()
+		except TypeError:
+			self.contents = ""
+			self.source = "file.tmp"
+			self.exists = False
+
 	def save(self, fileString):
-		file = open(self.source, "w")
-		file.write(fileString)
-		file.close()
+		if self.exists:
+			file = open(self.source, "w")
+			file.write(fileString)
+			file.close()
+		else:
+			# magic Bar request filename
+			file = open(self.source, "w")
+			file.write(fileString)
+			file.close()
 	def terminate(self):
 		pass

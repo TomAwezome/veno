@@ -5,13 +5,7 @@ from pstats import Stats
 prof = cProfile.Profile()
 prof.enable()
 ### legacy from venic
-# import curses
-# import importlib
 import traceback
-# import pygments
-# import pygments.lexers as lexers
-# import os
-###
 from modules.engine import Engine
 scheduler = Engine()
 while True:
