@@ -21,4 +21,4 @@ Multi-purpose text/code editor meant for easy and vast expandability.
  - **End Key** -- go to end of line in file
  - **Ctrl-F** -- find regex string in file
  - **Ctrl-G** -- find next match in file
- - **Ctrl-H** -- find and replace all			|Not yet|
+ - **Ctrl-H** -- find and replace all
