@@ -15,6 +15,7 @@ class FileWindow(Window):
 		for line in self.fileLines[self.viewport[1]:self.viewport[1]+self.window.getmaxyx()[0]]:
 			self.window.addnstr(windowY,0,line.expandtabs(4)[self.viewport[0]:],self.window.getmaxyx()[1]-1)
 			windowY += 1
+		self.modified = True ## i.e. Modified since last highlight. Variable used for speed optimization of syntax highlighting algorithm.
 	def update(self):
 		self.window.erase()
 		self.intendedHeight = self.manager.stdscr.getmaxyx()[0] - self.intendedY - 1
@@ -134,6 +135,7 @@ class FileWindow(Window):
 		lineStringLeft += text
 		self.fileLines[self.filecursor[1]] = lineStringLeft + lineStringRight
 		self.moveFilecursorRight()
+		self.modified = True
 	def newLineAtFilecursor(self):
 		lineStringLeft = self.fileLines[self.filecursor[1]][:self.filecursor[0]]
 		lineStringRight = self.fileLines[self.filecursor[1]][self.filecursor[0]:]
@@ -141,6 +143,7 @@ class FileWindow(Window):
 		self.fileLines.insert(self.filecursor[1]+1,"")
 		self.moveFilecursorDown()
 		self.fileLines[self.filecursor[1]] = lineStringRight
+		self.modified = True
 	def backspaceTextAtFilecursor(self):
 		if self.filecursor[0] == 0:
 			if self.filecursor[1] > 0:
@@ -154,6 +157,7 @@ class FileWindow(Window):
 			lineStringRight = self.fileLines[self.filecursor[1]][self.filecursor[0]:]
 			self.fileLines[self.filecursor[1]] = lineStringLeft+lineStringRight
 			self.moveFilecursorLeft()
+		self.modified = True
 		# self.window.mvwin(0,0)
 	def saveFile(self):
 		fileString = ""
@@ -185,6 +189,7 @@ class FileWindow(Window):
 				self.moveFilecursorUp()
 			else:
 				self.filecursor[0] = 0
+		self.modified = True
 	def deleteTextAtFilecursor(self):
 		if self.filecursor[0]+1 <= len(self.fileLines[self.filecursor[1]]): # if there is text to the right of our self.filecursor
 			lineStringLeft = self.fileLines[self.filecursor[1]][:self.filecursor[0]]
@@ -194,4 +199,5 @@ class FileWindow(Window):
 			nextLine = self.fileLines[self.filecursor[1]+1] # append line below to current line
 			self.fileLines.pop(self.filecursor[1]+1)
 			self.fileLines[self.filecursor[1]] += nextLine
+		self.modified = True
 

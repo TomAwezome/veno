@@ -1,10 +1,26 @@
 import string
+##
+## @brief      Class for keyboard.
+##
 class Keyboard:
+	##
+	## @brief      Constructs the object.
+	##
+	## @param      self     The object
+	## @param      manager  The manager to allow scheduling actions in external Windows
+	##
 	def __init__(self, manager):
+		## The manager to allow scheduling actions in external Windows
 		self.manager = manager
+		## The binding dictionary. Bindings saved as "keyname"->function instance
 		self.bindings = {}
 		self.bind()
-	def update(self):	# grab key and do something with it
+	##
+	## @brief      Update. grab key and do something with it.
+	##
+	## @param      self  The object
+	##
+	def update(self):
 		c = self.manager.stdscr.getch()
 		if c == -1:
 			return
@@ -17,8 +33,18 @@ class Keyboard:
 				self.bindings[c]()
 		elif c in string.punctuation + string.digits + string.ascii_letters + " \t":
 			self.bindings["printable-character"](c)
+	##
+	## @brief      Terminate Keyboard Manager
+	##
+	## @param      self  The object
+	##
 	def terminate(self):
 		pass
+	##
+	## @brief      Binds all keybindings to binding dictionary. Saved as "keyname"->function instance
+	##
+	## @param      self  The object
+	##
 	def bind(self):
 		self.bindings["KEY_UP"] = self.manager.Windows["fileWindow"].moveFilecursorUp
 		self.bindings["KEY_DOWN"] = self.manager.Windows["fileWindow"].moveFilecursorDown
@@ -37,3 +63,4 @@ class Keyboard:
 		self.bindings["^J"] = self.manager.Windows["fileWindow"].newLineAtFilecursor
 		self.bindings["^W"] = self.manager.Windows["fileWindow"].saveFile
 		self.bindings["^I"] = self.manager.Windows["fileWindow"].enterTextAtFilecursor
+		self.bindings["^F"] = self.manager.Windows["magicBar"].search
