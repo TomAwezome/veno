@@ -79,16 +79,16 @@ class MagicBar(Window):
 			if self.searchCursorX <= self.window.getmaxyx()[1]-2 and self.searchCursorX >= 0:
 				self.window.chgat(0,self.searchCursorX, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 			self.manager.update()
-			pattern = self.re.compile(self.searchString)
-			patternMatches = pattern.finditer(self.manager.Windows["fileWindow"].file.contents)
-			try:
-				nextMatch = next(patternMatches)
-				searchIndexY = self.manager.Windows["fileWindow"].file.contents[:nextMatch.start()].count('\n')
-				searchLines = self.manager.Windows["fileWindow"].file.contents[:nextMatch.start()].split('\n')
-				if len(searchLines) > 0:
-					searchIndexX = len(searchLines[len(searchLines)-1])
-			except StopIteration:
-				pass
+		pattern = self.re.compile(self.searchString)
+		patternMatches = pattern.finditer(self.manager.Windows["fileWindow"].file.contents)
+		try:
+			nextMatch = next(patternMatches)
+			searchIndexY = self.manager.Windows["fileWindow"].file.contents[:nextMatch.start()].count('\n')
+			searchLines = self.manager.Windows["fileWindow"].file.contents[:nextMatch.start()].split('\n')
+			if len(searchLines) > 0:
+				searchIndexX = len(searchLines[len(searchLines)-1])
+		except StopIteration:
+			pass
 		try:
 			while searchIndexY < self.cursor[1]:
 				try:
@@ -119,7 +119,7 @@ class MagicBar(Window):
 			while self.cursor[0] < searchIndexX:
 				self.manager.Windows["fileWindow"].moveFilecursorRight()
 
-
+			self.update()
 			keepWindowInMainScreen()
 		except NameError:
 			pass
