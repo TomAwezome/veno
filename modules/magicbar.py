@@ -485,7 +485,7 @@ class MagicBar(Window):
 					except StopIteration:
 						break
 
-				while searchIndexY == self.cursor[1] and searchIndexX < self.cursor[0]:
+				while searchIndexY == self.cursor[1] and searchIndexX <= self.cursor[0]:
 					try:
 						nextMatch = next(self.patternMatches)
 						searchIndexY = self.manager.Windows["fileWindow"].file.contents[:nextMatch.start()].count('\n')
