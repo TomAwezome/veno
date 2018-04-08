@@ -15,7 +15,7 @@ class MagicBar(Window):
 		gotoLineCursorX = 0
 		gotoLineString = ""
 		use = ""
-		patternMatches = None
+		self.patternMatches = None
 		# standardscreen = self.manager.stdscr
 		self.panel.top()
 		self.panel.hide()
@@ -80,9 +80,9 @@ class MagicBar(Window):
 				self.window.chgat(0,self.searchCursorX, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 			self.manager.update()
 		pattern = self.re.compile(self.searchString)
-		patternMatches = pattern.finditer(self.manager.Windows["fileWindow"].file.contents)
+		self.patternMatches = pattern.finditer(self.manager.Windows["fileWindow"].file.contents)
 		try:
-			nextMatch = next(patternMatches)
+			nextMatch = next(self.patternMatches)
 			searchIndexY = self.manager.Windows["fileWindow"].file.contents[:nextMatch.start()].count('\n')
 			searchLines = self.manager.Windows["fileWindow"].file.contents[:nextMatch.start()].split('\n')
 			if len(searchLines) > 0:
@@ -92,7 +92,7 @@ class MagicBar(Window):
 		try:
 			while searchIndexY < self.cursor[1]:
 				try:
-					nextMatch = next(patternMatches)
+					nextMatch = next(self.patternMatches)
 					searchIndexY = self.manager.Windows["fileWindow"].file.contents[:nextMatch.start()].count('\n')
 					searchLines = self.manager.Windows["fileWindow"].file.contents[:nextMatch.start()].split('\n')
 					if len(searchLines) > 0:
@@ -102,7 +102,7 @@ class MagicBar(Window):
 
 			while searchIndexY == self.cursor[1] and searchIndexX <= self.cursor[0]:
 				try:
-					nextMatch = next(patternMatches)
+					nextMatch = next(self.patternMatches)
 					searchIndexY = self.manager.Windows["fileWindow"].file.contents[:nextMatch.start()].count('\n')
 					searchLines = self.manager.Windows["fileWindow"].file.contents[:nextMatch.start()].split('\n')
 					if len(searchLines) > 0:
@@ -188,69 +188,50 @@ class MagicBar(Window):
 
 		self.keepWindowInMainScreen()
 
-		# self.manager.Windows["fileWindow"].loop(venicGlobals) # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
-		# venicGlobals["modules"]["syntaxHighlighting"].loop(venicGlobals)
-		# venicGlobals["modules"]["lineNumbers"].loop(venicGlobals)
+	def searchNext(self):
+		self.panel.show()
+		self.panel.top()
+		self.intendedX = 0
+		self.intendedY = self.manager.stdscr.getmaxyx()[0]
+		self.intendedWidth = self.manager.stdscr.getmaxyx()[1]-1
+		self.intendedHeight = 1
+		self.keepWindowInMainScreen()
 
-		# use = ""
+#		if patternMatches == None:
+	#		try:
+#		patternMatches = pattern.finditer(self.manager.Windows["fileWindow"].file.contents[patternMatch.end():])
+		#	except: 
+			#	return
+#		try:
+		#if patternMatches != None:
+		try:
+			try:
+				nextMatch = next(self.patternMatches) # next operates to go down iterator, in this case if hitting first instance of given string, next() will start at that first index and continue through matches
+			except TypeError:
+				return
+			searchIndexY = self.manager.Windows["fileWindow"].file.contents[:nextMatch.start()].count('\n')
+			searchLines = self.manager.Windows["fileWindow"].file.contents[:nextMatch.start()].split('\n')
+			if len(searchLines) > 0:
+				searchIndexX = len(searchLines[len(searchLines)-1])
+#		except:
+#			exit()
+			while self.cursor[1] > searchIndexY:
+				self.manager.Windows["fileWindow"].moveFilecursorUp()
+			while self.cursor[1] < searchIndexY:
+				self.manager.Windows["fileWindow"].moveFilecursorDown()
+			while self.cursor[0] > searchIndexX:
+				self.manager.Windows["fileWindow"].moveFilecursorLeft()
+			while self.cursor[0] < searchIndexX:
+				self.manager.Windows["fileWindow"].moveFilecursorRight()
+		except StopIteration:
+			pass
 
-# 	elif use == "searchNext":
-# 		magicBarPanel.show()
-# 		magicBarPanel.top()
-# 		intendedX = 0
-# 		intendedY = self.manager.stdscr.getmaxyx()[0]
-# 		intendedWidth = self.manager.stdscr.getmaxyx()[1]-1
-# 		intendedHeight = 1
-# 		keepWindowInMainScreen(intendedHeight, intendedWidth, intendedY, intendedX, magicBarWindow)
-
-# #		if patternMatches == None:
-# 	#		try:
-# #		patternMatches = pattern.finditer(venicGlobals["venicFile"][patternMatch.end():])
-# 		#	except: 
-# 			#	return
-# #		try:
-# 		#if patternMatches != None:
-# 		try:
-# 			try:
-# 				nextMatch = next(patternMatches) # next operates to go down iterator, in this case if hitting first instance of given string, next() will start at that first index and continue through matches
-# 			except TypeError:
-# 				return
-# 			searchIndexY = venicGlobals["venicFile"][:nextMatch.start()].count('\n')
-# 			searchLines = venicGlobals["venicFile"][:nextMatch.start()].split('\n')
-# 			if len(searchLines) > 0:
-# 				searchIndexX = len(searchLines[len(searchLines)-1])
-# #		except:
-# #			exit()
-# 			while cursor[1] > searchIndexY:
-# 				venicGlobals["modules"]["fileWindow"].moveFilecursorUp()
-# 			while cursor[1] < searchIndexY:
-# 				venicGlobals["modules"]["fileWindow"].moveFilecursorDown()
-# 			while cursor[0] > searchIndexX:
-# 				venicGlobals["modules"]["fileWindow"].moveFilecursorLeft()
-# 			while cursor[0] < searchIndexX:
-# 				venicGlobals["modules"]["fileWindow"].moveFilecursorRight()
-# 		except StopIteration:
-# 			pass
-
-# 		keepWindowInMainScreen(intendedHeight, intendedWidth, intendedY, intendedX, magicBarWindow)
-# 		venicGlobals["modules"]["fileWindow"].loop(venicGlobals) # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
+# 		self.keepWindowInMainScreen()
+# 		self.manager.Windows["fileWindow"].loop(venicGlobals) # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
 # 		venicGlobals["modules"]["syntaxHighlighting"].loop(venicGlobals)
 # 		venicGlobals["modules"]["lineNumbers"].loop(venicGlobals)
 
 # 		use = ""
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

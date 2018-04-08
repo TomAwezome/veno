@@ -65,3 +65,4 @@ class Keyboard:
 		self.bindings["^I"] = self.manager.Windows["fileWindow"].enterTextAtFilecursor
 		self.bindings["^F"] = self.manager.Windows["magicBar"].search
 		self.bindings["^L"] = self.manager.Windows["magicBar"].gotoLine
+		self.bindings["^G"] = self.manager.Windows["magicBar"].searchNext
