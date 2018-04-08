@@ -13,6 +13,7 @@ class Engine():
 		from modules.fileWindow import FileWindow								# Submodules->Window
 		from modules.keybindings import Keyboard								#
 		from modules.syntaxhighlighting import Highlighter 						#
+		from modules.magicbar import MagicBar
 		## File instance to be used in editor.
 		self.venicFile = File(self.parseArgs().filename)						# Load file provided as only arg.
 		## Panel Manager instance for modules
@@ -24,6 +25,7 @@ class Engine():
 		self.highlighter = Highlighter(self.panels)
 		self.panels.update()													# Update Panel (Manager) contents.
 		## Keyboard Manager instance to interpret key input
+		self.magicbar = MagicBar(self.panels, "magicBar")
 		self.keys = Keyboard(self.panels)										# Load Keyboard module.
 	##
 	## @brief      Turn the engine once.
@@ -31,6 +33,7 @@ class Engine():
 	## @param      self  The object
 	##
 	def turn(self):																# Run this method while Engine is running.
+		self.magicbar.update()
 		self.fileWindow.update()
 		self.highlighter.update()												#
 		self.panels.update()													#
