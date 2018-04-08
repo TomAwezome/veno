@@ -19,6 +19,7 @@ class Manager:
 		self.panel = panel
 		## Dictionary of Window instances
 		self.Windows = {}
+		self.Objects = {}
 		curses.start_color()
 		curses.use_default_colors()
 		for i in range(0,curses.COLORS):
