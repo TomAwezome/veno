@@ -64,3 +64,4 @@ class Keyboard:
 		self.bindings["^W"] = self.manager.Windows["fileWindow"].saveFile
 		self.bindings["^I"] = self.manager.Windows["fileWindow"].enterTextAtFilecursor
 		self.bindings["^F"] = self.manager.Windows["magicBar"].search
+		self.bindings["^L"] = self.manager.Windows["magicBar"].gotoLine

@@ -124,130 +124,75 @@ class MagicBar(Window):
 		except NameError:
 			pass
 
+	def gotoLine(self):
+		self.panel.show()
+		self.panel.top()
+		self.intendedX = 0
+		self.intendedY = self.manager.stdscr.getmaxyx()[0]
+		self.intendedWidth = self.manager.stdscr.getmaxyx()[1]-1
+		self.intendedHeight = 1
+		self.keepWindowInMainScreen()
 
-# 	if use == "search":
+		self.manager.update()# 		keepWindowInMainScreen(self.intendedHeight, self.intendedWidth, self.intendedY, self.intendedX, self.window)
+		gotoLineString = ""
+		gotoLineCursorX = 0
+		self.window.addnstr(0,0,gotoLineString, self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
+		if gotoLineCursorX <= self.window.getmaxyx()[1]-2 and gotoLineCursorX >= 0:
+			self.window.chgat(0,gotoLineCursorX, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+		self.manager.update()
+		while True: # break out of this loop with enter key
+			self.window.erase()
+			try:
+				c = self.manager.stdscr.getch()
+			except KeyboardInterrupt:
+				break
+			if c == -1:
+				continue
+			c = self.manager.curses.keyname(c)
+			c = c.decode("utf-8")
 
-# 		try:
-# 			while searchIndexY < cursor[1]:
-# 				try:
-# 					nextMatch = next(patternMatches)
-# 					searchIndexY = venicGlobals["venicFile"][:nextMatch.start()].count('\n')
-# 					searchLines = venicGlobals["venicFile"][:nextMatch.start()].split('\n')
-# 					if len(searchLines) > 0:
-# 						searchIndexX = len(searchLines[len(searchLines)-1])
-# 				except StopIteration:
-# 					break
+			if c in self.string.punctuation + self.string.digits + self.string.ascii_letters + self.string.whitespace:
+				searchStringLeft = gotoLineString[:gotoLineCursorX]+c
+				searchStringRight = gotoLineString[gotoLineCursorX:]
+				gotoLineString = searchStringLeft + searchStringRight
+				gotoLineCursorX += 1
+			elif c == "KEY_LEFT" and gotoLineCursorX > 0:
+				gotoLineCursorX -= 1
+			elif c == "KEY_RIGHT" and gotoLineCursorX < len(gotoLineString): # later deal with offscreen typing
+				gotoLineCursorX += 1
+			elif c == "KEY_BACKSPACE":
+				if gotoLineCursorX > 0:
+					searchStringLeft = gotoLineString[:gotoLineCursorX-1]
+					searchStringRight = gotoLineString[gotoLineCursorX:]
+					gotoLineString = searchStringLeft + searchStringRight
+					gotoLineCursorX -= 1
+			elif c == "KEY_DC":
+				if gotoLineCursorX+1 <= len(gotoLineString): # if there is text to the right of our cursor
+					searchStringLeft = gotoLineString[:gotoLineCursorX]
+					searchStringRight = gotoLineString[gotoLineCursorX+1:]
+					gotoLineString = searchStringLeft+searchStringRight
+			elif c == "^J":
+				break
 
-# 			while searchIndexY == cursor[1] and searchIndexX <= cursor[0]:
-# 				try:
-# 					nextMatch = next(patternMatches)
-# 					searchIndexY = venicGlobals["venicFile"][:nextMatch.start()].count('\n')
-# 					searchLines = venicGlobals["venicFile"][:nextMatch.start()].split('\n')
-# 					if len(searchLines) > 0:
-# 						searchIndexX = len(searchLines[len(searchLines)-1])
-# 				except StopIteration:
-# 					break
+			self.keepWindowInMainScreen()
+			self.window.addnstr(0,0,gotoLineString, self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
+			if gotoLineCursorX <= self.window.getmaxyx()[1]-2 and gotoLineCursorX >= 0:
+				self.window.chgat(0,gotoLineCursorX, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+			self.manager.update()
+		try:
+			lineNumber = int(gotoLineString)
+			if lineNumber > 0:
+				self.manager.Windows["fileWindow"].gotoLine(lineNumber - 1)
+		except:
+			pass
 
-# 			while cursor[1] > searchIndexY:
-# 				venicGlobals["modules"]["fileWindow"].moveFilecursorUp()
-# 			while cursor[1] < searchIndexY:
-# 				venicGlobals["modules"]["fileWindow"].moveFilecursorDown()
-# 			while cursor[0] > searchIndexX:
-# 				venicGlobals["modules"]["fileWindow"].moveFilecursorLeft()
-# 			while cursor[0] < searchIndexX:
-# 				venicGlobals["modules"]["fileWindow"].moveFilecursorRight()
+		self.keepWindowInMainScreen()
 
+		# self.manager.Windows["fileWindow"].loop(venicGlobals) # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
+		# venicGlobals["modules"]["syntaxHighlighting"].loop(venicGlobals)
+		# venicGlobals["modules"]["lineNumbers"].loop(venicGlobals)
 
-# 			keepWindowInMainScreen(intendedHeight, intendedWidth, intendedY, intendedX, magicBarWindow)
-# 		except NameError:
-# 			pass
-		
-# 		venicGlobals["modules"]["fileWindow"].loop(venicGlobals) # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
-# 		venicGlobals["modules"]["syntaxHighlighting"].loop(venicGlobals)
-# 		venicGlobals["modules"]["lineNumbers"].loop(venicGlobals)
-
-# 		use = ""
-	
-
-
-
-
-
-
-
-
-
-
-
-# 	elif use == "gotoLine":
-# 		magicBarPanel.show()
-# 		magicBarPanel.top()
-# 		intendedX = 0
-# 		intendedY = self.manager.stdscr.getmaxyx()[0]
-# 		intendedWidth = self.manager.stdscr.getmaxyx()[1]-1
-# 		intendedHeight = 1
-# 		keepWindowInMainScreen(intendedHeight, intendedWidth, intendedY, intendedX, magicBarWindow)
-
-# 		venicGlobals["modules"]["MainWindow"].loop(venicGlobals)
-# 		keepWindowInMainScreen(intendedHeight, intendedWidth, intendedY, intendedX, magicBarWindow)
-# 		gotoLineString = ""
-# 		gotoLineCursorX = 0
-# 		magicBarWindow.addnstr(0,0,gotoLineString, magicBarWindow.getmaxyx()[1]-1, venicGlobals["curses"].A_REVERSE)
-# 		if gotoLineCursorX <= magicBarWindow.getmaxyx()[1]-2 and gotoLineCursorX >= 0:
-# 			magicBarWindow.chgat(0,gotoLineCursorX, 1, venicGlobals["curses"].color_pair(2) | venicGlobals["curses"].A_REVERSE)
-# 		venicGlobals["modules"]["MainWindow"].loop(venicGlobals)
-
-# 		while True: # break out of this loop with enter key
-# 			magicBarWindow.erase()
-# 			try:
-# 				c = venicGlobals["stdscr"].getch()
-# 			except KeyboardInterrupt:
-# 				break
-# 			if c == -1:
-# 				continue
-# 			c = venicGlobals["curses"].keyname(c)
-# 			c = c.decode("utf-8")
-
-# 			if c in self.string.punctuation + self.string.digits + self.string.ascii_letters + self.string.whitespace:
-# 				searchStringLeft = gotoLineString[:gotoLineCursorX]+c
-# 				searchStringRight = gotoLineString[gotoLineCursorX:]
-# 				gotoLineString = searchStringLeft + searchStringRight
-# 				gotoLineCursorX += 1
-# 			elif c == "KEY_LEFT" and gotoLineCursorX > 0:
-# 				gotoLineCursorX -= 1
-# 			elif c == "KEY_RIGHT" and gotoLineCursorX < len(gotoLineString): # later deal with offscreen typing
-# 				gotoLineCursorX += 1
-# 			elif c == "KEY_BACKSPACE":
-# 				if gotoLineCursorX > 0:
-# 					searchStringLeft = gotoLineString[:gotoLineCursorX-1]
-# 					searchStringRight = gotoLineString[gotoLineCursorX:]
-# 					gotoLineString = searchStringLeft + searchStringRight
-# 					gotoLineCursorX -= 1
-# 			elif c == "KEY_DC":
-# 				if gotoLineCursorX+1 <= len(gotoLineString): # if there is text to the right of our cursor
-# 					searchStringLeft = gotoLineString[:gotoLineCursorX]
-# 					searchStringRight = gotoLineString[gotoLineCursorX+1:]
-# 					gotoLineString = searchStringLeft+searchStringRight
-# 			elif c == "^J":
-# 				break
-
-# 			keepWindowInMainScreen(intendedHeight, intendedWidth, intendedY, intendedX, magicBarWindow)
-# 			magicBarWindow.addnstr(0,0,gotoLineString, magicBarWindow.getmaxyx()[1]-1, venicGlobals["curses"].A_REVERSE)
-# 			if gotoLineCursorX <= magicBarWindow.getmaxyx()[1]-2 and gotoLineCursorX >= 0:
-# 				magicBarWindow.chgat(0,gotoLineCursorX, 1, venicGlobals["curses"].color_pair(2) | venicGlobals["curses"].A_REVERSE)
-# 			venicGlobals["modules"]["MainWindow"].loop(venicGlobals)
-
-# 		lineNumber = int(gotoLineString)
-# 		if lineNumber > 0:
-# 			venicGlobals["modules"]["fileWindow"].gotoLine(lineNumber - 1)
-
-# 		keepWindowInMainScreen(intendedHeight, intendedWidth, intendedY, intendedX, magicBarWindow)
-
-# 		venicGlobals["modules"]["fileWindow"].loop(venicGlobals) # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
-# 		venicGlobals["modules"]["syntaxHighlighting"].loop(venicGlobals)
-# 		venicGlobals["modules"]["lineNumbers"].loop(venicGlobals)
-
-# 		use = ""
+		# use = ""
 
 # 	elif use == "searchNext":
 # 		magicBarPanel.show()
