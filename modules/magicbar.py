@@ -382,6 +382,7 @@ class MagicBar(Window):
 		except NameError:
 			pass
 
+		self.manager.Windows["fileWindow"].modified = True
 		self.manager.Windows["fileWindow"].update() # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
 		self.manager.Objects["highlighter"].update()
 		# venicGlobals["modules"]["lineNumbers"].loop(venicGlobals)
@@ -512,8 +513,10 @@ class MagicBar(Window):
 #			self.window.addnstr(0,0,self.searchString, self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
 #			if self.searchCursorX <= self.window.getmaxyx()[1]-2 and self.searchCursorX >= 0:
 #				self.window.chgat(0,self.searchCursorX, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+			self.manager.Windows["fileWindow"].modified = True
 			self.manager.Windows["fileWindow"].update() # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
 			self.manager.Objects["highlighter"].update()
+
 			# venicGlobals["modules"]["lineNumbers"].loop(venicGlobals)
 			self.manager.update()
 
@@ -527,8 +530,11 @@ class MagicBar(Window):
 
 		self.window.erase()
 		self.keepWindowInMainScreen()
+		self.manager.Windows["fileWindow"].modified = True
 		self.manager.Windows["fileWindow"].update() # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
 		self.manager.Objects["highlighter"].update()
+		self.manager.update()
+
 		# venicGlobals["modules"]["lineNumbers"].loop(venicGlobals)
 
 #		if useSwapped == False:
