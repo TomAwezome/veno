@@ -416,7 +416,8 @@ class MagicBar(Window):
 			except NameError:
 				break
 			self.window.erase()
-			self.window.addnstr(0, 0, "Replace? (y/n/a) ['a' = All]", self.window.getmaxyx()[1] - 1, self.manager.curses.A_REVERSE)	
+			self.window.addnstr(0, 0, "Replace? (y/n/a) ['a' = All]", self.window.getmaxyx()[1] - 1, self.manager.curses.A_REVERSE)
+			self.manager.Windows["lineNumbers"].update()
 			self.manager.update()
 			try:
 				c = self.manager.stdscr.getch()
