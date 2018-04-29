@@ -34,9 +34,10 @@ class MagicBar(Window):
 		self.keepWindowInMainScreen()
 		self.manager.update()
 		self.keepWindowInMainScreen()
-		self.window.addnstr(0,0,self.searchString, self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
-		if self.searchCursorX <= self.window.getmaxyx()[1]-2 and self.searchCursorX >= 0:
-			self.window.chgat(0,self.searchCursorX, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+		self.window.addnstr(0,0,self.searchString.expandtabs(4), self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
+		tabDiff = len(self.searchString[:self.searchCursorX].expandtabs(4))-len(self.searchString[:self.searchCursorX])
+		if self.searchCursorX+tabDiff <= self.window.getmaxyx()[1]-2 and self.searchCursorX >= 0:
+			self.window.chgat(0,self.searchCursorX+tabDiff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 		self.manager.update()
 		while True: # break out of this loop with enter key
 			self.window.erase()
@@ -232,9 +233,10 @@ class MagicBar(Window):
 
 		self.manager.update()
 		self.keepWindowInMainScreen()
-		self.window.addnstr(0,0,self.searchString, self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
-		if self.searchCursorX <= self.window.getmaxyx()[1]-2 and self.searchCursorX >= 0:
-			self.window.chgat(0,self.searchCursorX, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+		self.window.addnstr(0,0,self.searchString.expandtabs(4), self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
+		tabDiff = len(self.searchString[:self.searchCursorX].expandtabs(4))-len(self.searchString[:self.searchCursorX])
+		if self.searchCursorX+tabDiff <= self.window.getmaxyx()[1]-2 and self.searchCursorX >= 0:
+			self.window.chgat(0,self.searchCursorX+tabDiff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 		self.manager.update()
 
 
@@ -256,56 +258,8 @@ class MagicBar(Window):
 				searchStringRight = self.searchString[self.searchCursorX:]
 				self.searchString = searchStringLeft + searchStringRight
 				self.searchCursorX += 1
-			elif c == "KEY_LEFT" and self.searchCursorX > 0:
-				self.searchCursorX -= 1
-			elif c == "KEY_RIGHT" and self.searchCursorX < len(self.searchString): # later deal with offscreen typing
-				self.searchCursorX += 1
-			elif c == "KEY_BACKSPACE":
-				if self.searchCursorX > 0:
-					searchStringLeft = self.searchString[:self.searchCursorX-1]
-					searchStringRight = self.searchString[self.searchCursorX:]
-					self.searchString = searchStringLeft + searchStringRight
-					self.searchCursorX -= 1
-			elif c == "KEY_DC":
-				if self.searchCursorX+1 <= len(self.searchString): # if there is text to the right of our cursor
-					searchStringLeft = self.searchString[:self.searchCursorX]
-					searchStringRight = self.searchString[self.searchCursorX+1:]
-					self.searchString = searchStringLeft+searchStringRight
-			elif c == "^J":
-				break
-			
-			self.keepWindowInMainScreen()
-			self.window.addnstr(0,0,self.searchString, self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
-			if self.searchCursorX <= self.window.getmaxyx()[1]-2 and self.searchCursorX >= 0:
-				self.window.chgat(0,self.searchCursorX, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
-			self.manager.update()
-		
-		firstString = self.searchString
-		
-	## replacement string
-	# keypress loop: begin catching characters
-		self.searchString = ""
-		self.searchCursorX = 0
-		self.manager.update()
-		self.keepWindowInMainScreen()
-		self.window.addnstr(0,0,self.searchString, self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
-		if self.searchCursorX <= self.window.getmaxyx()[1]-2 and self.searchCursorX >= 0:
-			self.window.chgat(0,self.searchCursorX, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
-		self.manager.update()
-
-		while True: # break out of this loop with enter key
-			self.window.erase()
-			try:
-				c = self.manager.stdscr.getch()
-			except KeyboardInterrupt:
-				break
-			if c == -1:
-				continue
-			c = self.manager.curses.keyname(c)
-			c = c.decode("utf-8")
-			
-			if c in self.string.punctuation + self.string.digits + self.string.ascii_letters + self.string.whitespace:
-				searchStringLeft = self.searchString[:self.searchCursorX]+c
+			elif c == "^I":
+				searchStringLeft = self.searchString[:self.searchCursorX]+'\t'
 				searchStringRight = self.searchString[self.searchCursorX:]
 				self.searchString = searchStringLeft + searchStringRight
 				self.searchCursorX += 1
@@ -328,9 +282,70 @@ class MagicBar(Window):
 				break
 			
 			self.keepWindowInMainScreen()
-			self.window.addnstr(0,0,self.searchString, self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
-			if self.searchCursorX <= self.window.getmaxyx()[1]-2 and self.searchCursorX >= 0:
-				self.window.chgat(0,self.searchCursorX, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+			self.window.addnstr(0,0,self.searchString.expandtabs(4), self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
+			tabDiff = len(self.searchString[:self.searchCursorX].expandtabs(4))-len(self.searchString[:self.searchCursorX])
+			if self.searchCursorX+tabDiff <= self.window.getmaxyx()[1]-2 and self.searchCursorX >= 0:
+				self.window.chgat(0,self.searchCursorX+tabDiff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+			self.manager.update()
+		
+		firstString = self.searchString
+		
+	## replacement string
+	# keypress loop: begin catching characters
+		self.searchString = ""
+		self.searchCursorX = 0
+		self.manager.update()
+		self.keepWindowInMainScreen()
+		self.window.addnstr(0,0,self.searchString.expandtabs(4), self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
+		tabDiff = len(self.searchString[:self.searchCursorX].expandtabs(4))-len(self.searchString[:self.searchCursorX])
+		if self.searchCursorX+tabDiff <= self.window.getmaxyx()[1]-2 and self.searchCursorX >= 0:
+			self.window.chgat(0,self.searchCursorX+tabDiff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+		self.manager.update()
+
+		while True: # break out of this loop with enter key
+			self.window.erase()
+			try:
+				c = self.manager.stdscr.getch()
+			except KeyboardInterrupt:
+				break
+			if c == -1:
+				continue
+			c = self.manager.curses.keyname(c)
+			c = c.decode("utf-8")
+			
+			if c in self.string.punctuation + self.string.digits + self.string.ascii_letters + self.string.whitespace:
+				searchStringLeft = self.searchString[:self.searchCursorX]+c
+				searchStringRight = self.searchString[self.searchCursorX:]
+				self.searchString = searchStringLeft + searchStringRight
+				self.searchCursorX += 1
+			elif c == "^I":
+				searchStringLeft = self.searchString[:self.searchCursorX]+'\t'
+				searchStringRight = self.searchString[self.searchCursorX:]
+				self.searchString = searchStringLeft + searchStringRight
+				self.searchCursorX += 1
+			elif c == "KEY_LEFT" and self.searchCursorX > 0:
+				self.searchCursorX -= 1
+			elif c == "KEY_RIGHT" and self.searchCursorX < len(self.searchString): # later deal with offscreen typing
+				self.searchCursorX += 1
+			elif c == "KEY_BACKSPACE":
+				if self.searchCursorX > 0:
+					searchStringLeft = self.searchString[:self.searchCursorX-1]
+					searchStringRight = self.searchString[self.searchCursorX:]
+					self.searchString = searchStringLeft + searchStringRight
+					self.searchCursorX -= 1
+			elif c == "KEY_DC":
+				if self.searchCursorX+1 <= len(self.searchString): # if there is text to the right of our cursor
+					searchStringLeft = self.searchString[:self.searchCursorX]
+					searchStringRight = self.searchString[self.searchCursorX+1:]
+					self.searchString = searchStringLeft+searchStringRight
+			elif c == "^J":
+				break
+			
+			self.keepWindowInMainScreen()
+			self.window.addnstr(0,0,self.searchString.expandtabs(4), self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
+			tabDiff = len(self.searchString[:self.searchCursorX].expandtabs(4))-len(self.searchString[:self.searchCursorX])
+			if self.searchCursorX+tabDiff <= self.window.getmaxyx()[1]-2 and self.searchCursorX >= 0:
+				self.window.chgat(0,self.searchCursorX+tabDiff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 			self.manager.update()
 			
 		secondString = self.searchString
