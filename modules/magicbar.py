@@ -12,6 +12,7 @@ class MagicBar(Window):
 # 		global standardscreen, intendedX, intendedY, intendedWidth, intendedHeight, magicBarWindow, magicBarPanel, use, patternMatches, self.searchString, self.searchCursorX, gotoLineString, gotoLineCursorX
 		self.searchCursorX = 0
 		self.searchString = ""
+		self.saveString = self.manager.Windows["fileWindow"].file.source
 		gotoLineCursorX = 0
 		gotoLineString = ""
 		use = ""
@@ -540,6 +541,84 @@ class MagicBar(Window):
 
 #		if useSwapped == False:
 		# use = ""
+
+
+	def save(self):
+		self.panel.show()
+		self.panel.top()
+		self.intendedX = 0
+		self.intendedY = self.manager.stdscr.getmaxyx()[0]
+		self.intendedWidth = self.manager.stdscr.getmaxyx()[1]-1
+		self.intendedHeight = 1
+		self.keepWindowInMainScreen()
+		self.manager.update()
+		self.keepWindowInMainScreen()
+		self.window.addnstr(0,0,"Filename?", self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
+		self.manager.update()
+		while True:
+			kill = False
+			try:
+				c = self.manager.stdscr.getch()
+			except KeyboardInterrupt:
+				kill = True
+				break
+			if c == -1:
+				continue
+			c = self.manager.curses.keyname(c)
+			c = c.decode("utf-8")
+			if c == "^J":
+				break
+		if kill == True:
+			self.window.erase()
+			return
+	## savefile string
+	# keypress loop: begin catching characters
+		self.window.erase()
+		self.window.addnstr(0,0,self.saveString, self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
+		if self.searchCursorX <= self.window.getmaxyx()[1]-2 and self.searchCursorX >= 0:
+			self.window.chgat(0,self.searchCursorX, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+		self.manager.update()
+		while True: # break out of this loop with enter key
+			self.window.erase()
+			try:
+				c = self.manager.stdscr.getch()
+			except KeyboardInterrupt:
+				break
+			if c == -1:
+				continue
+			c = self.manager.curses.keyname(c)
+			c = c.decode("utf-8")
+			
+			if c in self.string.punctuation + self.string.digits + self.string.ascii_letters + self.string.whitespace:
+				saveStringLeft = self.saveString[:self.searchCursorX]+c
+				saveStringRight = self.saveString[self.searchCursorX:]
+				self.saveString = saveStringLeft + saveStringRight
+				self.searchCursorX += 1
+			elif c == "KEY_LEFT" and self.searchCursorX > 0:
+				self.searchCursorX -= 1
+			elif c == "KEY_RIGHT" and self.searchCursorX < len(self.saveString): # later deal with offscreen typing
+				self.searchCursorX += 1
+			elif c == "KEY_BACKSPACE":
+				if self.searchCursorX > 0:
+					saveStringLeft = self.saveString[:self.searchCursorX-1]
+					saveStringRight = self.saveString[self.searchCursorX:]
+					self.saveString = saveStringLeft + saveStringRight
+					self.searchCursorX -= 1
+			elif c == "KEY_DC":
+				if self.searchCursorX+1 <= len(self.saveString): # if there is text to the right of our cursor
+					saveStringLeft = self.saveString[:self.searchCursorX]
+					saveStringRight = self.saveString[self.searchCursorX+1:]
+					self.saveString = saveStringLeft+saveStringRight
+			elif c == "^J":
+				if self.saveString != "":
+					break
+			
+			self.keepWindowInMainScreen()
+			self.window.addnstr(0,0,self.saveString, self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
+			if self.searchCursorX <= self.window.getmaxyx()[1]-2 and self.searchCursorX >= 0:
+				self.window.chgat(0,self.searchCursorX, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+			self.manager.update()
+		self.manager.Windows["fileWindow"].file.source = self.saveString
 
 	def terminate(self):
 		pass
