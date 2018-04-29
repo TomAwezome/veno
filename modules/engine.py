@@ -8,6 +8,7 @@ class Engine():
 	## @param      self  The object
 	##
 	def __init__(self):
+		from modules.config import Config
 		from modules.file import File 											#
 		from modules.panels import Manager										# Modules being used: File, Manager, fileWindow, Keyboard
 		from modules.fileWindow import FileWindow								# Submodules->Window
@@ -15,10 +16,13 @@ class Engine():
 		from modules.syntaxhighlighting import Highlighter 						#
 		from modules.magicbar import MagicBar
 		from modules.linenumbers import LineNumbersWindow
+		## Config instance for editor.
+		self.config = Config()
 		## File instance to be used in editor.
 		self.venicFile = File(self.parseArgs().filename)						# Load file provided as only arg.
 		## Panel Manager instance for modules
-		self.panels = Manager()													# Load Manager.
+		self.panels = Manager()												# Load Manager.
+		self.panels.Objects["config"] = self.config
 		## FileWindow instance using File to begin editor
 		self.fileWindow = FileWindow(self.panels, "fileWindow", self.venicFile)	# Create fileWindow.
 		self.fileWindow.update()												# Update fileWindow contents.

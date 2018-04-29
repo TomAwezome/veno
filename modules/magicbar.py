@@ -34,8 +34,8 @@ class MagicBar(Window):
 		self.keepWindowInMainScreen()
 		self.manager.update()
 		self.keepWindowInMainScreen()
-		self.window.addnstr(0,0,self.searchString.expandtabs(4), self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
-		tabDiff = len(self.searchString[:self.searchCursorX].expandtabs(4))-len(self.searchString[:self.searchCursorX])
+		self.window.addnstr(0,0,self.searchString.expandtabs(self.manager.Objects["config"].options["TabExpandSize"]), self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
+		tabDiff = len(self.searchString[:self.searchCursorX].expandtabs(self.manager.Objects["config"].options["TabExpandSize"]))-len(self.searchString[:self.searchCursorX])
 		if self.searchCursorX+tabDiff <= self.window.getmaxyx()[1]-2 and self.searchCursorX >= 0:
 			self.window.chgat(0,self.searchCursorX+tabDiff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 		self.manager.update()
@@ -77,8 +77,8 @@ class MagicBar(Window):
 			elif c == "^J":
 				break
 			self.keepWindowInMainScreen()
-			self.window.addnstr(0,0,self.searchString.expandtabs(4), self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
-			tabDiff = len(self.searchString[:self.searchCursorX].expandtabs(4))-len(self.searchString[:self.searchCursorX])
+			self.window.addnstr(0,0,self.searchString.expandtabs(self.manager.Objects["config"].options["TabExpandSize"]), self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
+			tabDiff = len(self.searchString[:self.searchCursorX].expandtabs(self.manager.Objects["config"].options["TabExpandSize"]))-len(self.searchString[:self.searchCursorX])
 			if self.searchCursorX+tabDiff <= self.window.getmaxyx()[1]-2 and self.searchCursorX >= 0:
 				self.window.chgat(0,self.searchCursorX+tabDiff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 			self.manager.update()
@@ -233,8 +233,8 @@ class MagicBar(Window):
 
 		self.manager.update()
 		self.keepWindowInMainScreen()
-		self.window.addnstr(0,0,self.searchString.expandtabs(4), self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
-		tabDiff = len(self.searchString[:self.searchCursorX].expandtabs(4))-len(self.searchString[:self.searchCursorX])
+		self.window.addnstr(0,0,self.searchString.expandtabs(self.manager.Objects["config"].options["TabExpandSize"]), self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
+		tabDiff = len(self.searchString[:self.searchCursorX].expandtabs(self.manager.Objects["config"].options["TabExpandSize"]))-len(self.searchString[:self.searchCursorX])
 		if self.searchCursorX+tabDiff <= self.window.getmaxyx()[1]-2 and self.searchCursorX >= 0:
 			self.window.chgat(0,self.searchCursorX+tabDiff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 		self.manager.update()
@@ -282,8 +282,8 @@ class MagicBar(Window):
 				break
 			
 			self.keepWindowInMainScreen()
-			self.window.addnstr(0,0,self.searchString.expandtabs(4), self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
-			tabDiff = len(self.searchString[:self.searchCursorX].expandtabs(4))-len(self.searchString[:self.searchCursorX])
+			self.window.addnstr(0,0,self.searchString.expandtabs(self.manager.Objects["config"].options["TabExpandSize"]), self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
+			tabDiff = len(self.searchString[:self.searchCursorX].expandtabs(self.manager.Objects["config"].options["TabExpandSize"]))-len(self.searchString[:self.searchCursorX])
 			if self.searchCursorX+tabDiff <= self.window.getmaxyx()[1]-2 and self.searchCursorX >= 0:
 				self.window.chgat(0,self.searchCursorX+tabDiff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 			self.manager.update()
@@ -296,8 +296,8 @@ class MagicBar(Window):
 		self.searchCursorX = 0
 		self.manager.update()
 		self.keepWindowInMainScreen()
-		self.window.addnstr(0,0,self.searchString.expandtabs(4), self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
-		tabDiff = len(self.searchString[:self.searchCursorX].expandtabs(4))-len(self.searchString[:self.searchCursorX])
+		self.window.addnstr(0,0,self.searchString.expandtabs(self.manager.Objects["config"].options["TabExpandSize"]), self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
+		tabDiff = len(self.searchString[:self.searchCursorX].expandtabs(self.manager.Objects["config"].options["TabExpandSize"]))-len(self.searchString[:self.searchCursorX])
 		if self.searchCursorX+tabDiff <= self.window.getmaxyx()[1]-2 and self.searchCursorX >= 0:
 			self.window.chgat(0,self.searchCursorX+tabDiff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 		self.manager.update()
@@ -342,8 +342,8 @@ class MagicBar(Window):
 				break
 			
 			self.keepWindowInMainScreen()
-			self.window.addnstr(0,0,self.searchString.expandtabs(4), self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
-			tabDiff = len(self.searchString[:self.searchCursorX].expandtabs(4))-len(self.searchString[:self.searchCursorX])
+			self.window.addnstr(0,0,self.searchString.expandtabs(self.manager.Objects["config"].options["TabExpandSize"]), self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
+			tabDiff = len(self.searchString[:self.searchCursorX].expandtabs(self.manager.Objects["config"].options["TabExpandSize"]))-len(self.searchString[:self.searchCursorX])
 			if self.searchCursorX+tabDiff <= self.window.getmaxyx()[1]-2 and self.searchCursorX >= 0:
 				self.window.chgat(0,self.searchCursorX+tabDiff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 			self.manager.update()

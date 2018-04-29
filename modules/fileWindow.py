@@ -13,7 +13,7 @@ class FileWindow(Window):
 		self.fileLines = self.file.contents.splitlines()
 		windowY = 0
 		for line in self.fileLines[self.viewport[1]:self.viewport[1]+self.window.getmaxyx()[0]]:
-			self.window.addnstr(windowY,0,line.expandtabs(4)[self.viewport[0]:],self.window.getmaxyx()[1]-1)
+			self.window.addnstr(windowY,0,line.expandtabs(self.manager.Objects["config"].options["TabExpandSize"])[self.viewport[0]:],self.window.getmaxyx()[1]-1)
 			windowY += 1
 		self.modified = True ## i.e. Modified since last highlight. Variable used for speed optimization of syntax highlighting algorithm.
 	def update(self):
@@ -24,14 +24,14 @@ class FileWindow(Window):
 		# self.window.box()
 		windowY = 0
 		for line in self.fileLines[self.viewport[1]:self.viewport[1]+self.window.getmaxyx()[0]]:
-			self.window.addnstr(windowY,0,line.expandtabs(4)[self.viewport[0]:],self.window.getmaxyx()[1]-1,self.manager.curses.color_pair(0))
+			self.window.addnstr(windowY,0,line.expandtabs(self.manager.Objects["config"].options["TabExpandSize"])[self.viewport[0]:],self.window.getmaxyx()[1]-1,self.manager.curses.color_pair(0))
 			windowY += 1
 		self.drawCursor()
 	def drawCursor(self):
 		if self.filecursor[1] >= self.viewport[1] and self.filecursor[1] <= self.viewport[1]+self.window.getmaxyx()[0]-1:
 			if len(self.fileLines) == 0:
 				self.fileLines.append("")
-			tabDiff = len(self.fileLines[self.filecursor[1]][:self.filecursor[0]].expandtabs(4)) - len(self.fileLines[self.filecursor[1]][:self.filecursor[0]])
+			tabDiff = len(self.fileLines[self.filecursor[1]][:self.filecursor[0]].expandtabs(self.manager.Objects["config"].options["TabExpandSize"])) - len(self.fileLines[self.filecursor[1]][:self.filecursor[0]])
 			if self.filecursor[0]-self.viewport[0]+tabDiff <= self.window.getmaxyx()[1]-2 and self.filecursor[0]-self.viewport[0]+tabDiff >= 0:
 				self.window.chgat(self.filecursor[1]-self.viewport[1],self.filecursor[0]-self.viewport[0]+tabDiff,1,self.manager.curses.color_pair(3) | self.manager.curses.A_REVERSE)
 
@@ -82,7 +82,7 @@ class FileWindow(Window):
 			self.moveFilecursorDown()
 			self.gotoStartOfLine()
 	def moveViewportToCursorX(self):
-		tabDiff = len(self.fileLines[self.filecursor[1]][:self.filecursor[0]].expandtabs(4)) - len(self.fileLines[self.filecursor[1]][:self.filecursor[0]])
+		tabDiff = len(self.fileLines[self.filecursor[1]][:self.filecursor[0]].expandtabs(self.manager.Objects["config"].options["TabExpandSize"])) - len(self.fileLines[self.filecursor[1]][:self.filecursor[0]])
 		cursorX = self.filecursor[0] + tabDiff
 		viewportWidth = self.window.getmaxyx()[1] - 2
 		if self.viewport[0] > cursorX:

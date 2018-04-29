@@ -145,7 +145,7 @@ class Highlighter:
 					#			   if there's no number sequence AFTER STARTING WITH A SEQUENCE: that is the point IN THE STRING DATA that our coloring stops
 					# how to convert DATA index into TABBED index? after all, that's what's being tossed to the window we are changing the attributes of!
 					# ... oh, do i need to subtract from the formatted string? given that its internal character indexes are technically being changed by the presence of ^C characters...
-					if (colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(4))-len(windowCodeLines[windowY][:colorIndex]))-fileViewport[0] > windowSize[1]: # if color is offscreen right
+					if (colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(self.manager.Objects["config"].options["TabExpandSize"]))-len(windowCodeLines[windowY][:colorIndex]))-fileViewport[0] > windowSize[1]: # if color is offscreen right
 						#if colorData != []:
 						if closer == True and colorData[colorDataRowIndex][1]-fileViewport[0] < windowSize[1]-1:	# if closer and opener is on screen
 							colorData[colorDataRowIndex][1] = max(colorData[colorDataRowIndex][1]-fileViewport[0],0)
@@ -162,14 +162,14 @@ class Highlighter:
 							opener = True
 					if closer == True:
 						if colorData[colorDataRowIndex][1]-fileViewport[0] < 0:	# if opener is offscreen
-							if (colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(4))-len(windowCodeLines[windowY][:colorIndex]))-fileViewport[0] > 0: # if closer is on screen
+							if (colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(self.manager.Objects["config"].options["TabExpandSize"]))-len(windowCodeLines[windowY][:colorIndex]))-fileViewport[0] > 0: # if closer is on screen
 								colorData[colorDataRowIndex][1] = 0
-								colorData[colorDataRowIndex].append((colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(4))-len(windowCodeLines[windowY][:colorIndex]))-fileViewport[0])
+								colorData[colorDataRowIndex].append((colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(self.manager.Objects["config"].options["TabExpandSize"]))-len(windowCodeLines[windowY][:colorIndex]))-fileViewport[0])
 							else: # if closer is not on screen
 								colorData.pop()
 								colorDataRowIndex -= 1
 						else:
-							colorData[colorDataRowIndex].append((colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(4))-len(windowCodeLines[windowY][:colorIndex]))-colorData[colorDataRowIndex][1])
+							colorData[colorDataRowIndex].append((colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(self.manager.Objects["config"].options["TabExpandSize"]))-len(windowCodeLines[windowY][:colorIndex]))-colorData[colorDataRowIndex][1])
 							colorData[colorDataRowIndex][1] = colorData[colorDataRowIndex][1]-fileViewport[0]
 						colorDataRowIndex += 1
 						closerCount += 1
@@ -177,7 +177,7 @@ class Highlighter:
 						colorData.append([])
 					if opener == True:
 						colorData[colorDataRowIndex].append(properLine[colorIndex+1:colorIndex+3])
-						colorData[colorDataRowIndex].append((colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(4))-len(windowCodeLines[windowY][:colorIndex])))
+						colorData[colorDataRowIndex].append((colorIndex-(openerCount*3)-(closerCount*1))+(len(windowCodeLines[windowY][:colorIndex].expandtabs(self.manager.Objects["config"].options["TabExpandSize"]))-len(windowCodeLines[windowY][:colorIndex])))
 						openerCount += 1
 						opener = False
 						closer = True
