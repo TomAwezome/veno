@@ -53,6 +53,11 @@ class MagicBar(Window):
 				searchStringRight = self.searchString[self.searchCursorX:]
 				self.searchString = searchStringLeft + searchStringRight
 				self.searchCursorX += 1
+			elif c == "^I":
+				searchStringLeft = self.searchString[:self.searchCursorX]+'\t'
+				searchStringRight = self.searchString[self.searchCursorX:]
+				self.searchString = searchStringLeft + searchStringRight
+				self.searchCursorX += 1
 			elif c == "KEY_LEFT" and self.searchCursorX > 0:
 				self.searchCursorX -= 1
 			elif c == "KEY_RIGHT" and self.searchCursorX < len(self.searchString): # later deal with offscreen typing
@@ -71,9 +76,10 @@ class MagicBar(Window):
 			elif c == "^J":
 				break
 			self.keepWindowInMainScreen()
-			self.window.addnstr(0,0,self.searchString, self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
-			if self.searchCursorX <= self.window.getmaxyx()[1]-2 and self.searchCursorX >= 0:
-				self.window.chgat(0,self.searchCursorX, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+			self.window.addnstr(0,0,self.searchString.expandtabs(4), self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
+			tabDiff = len(self.searchString[:self.searchCursorX].expandtabs(4))-len(self.searchString[:self.searchCursorX])
+			if self.searchCursorX+tabDiff <= self.window.getmaxyx()[1]-2 and self.searchCursorX >= 0:
+				self.window.chgat(0,self.searchCursorX+tabDiff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 			self.manager.update()
 		pattern = self.re.compile(self.searchString)
 		self.patternMatches = pattern.finditer(self.manager.Windows["fileWindow"].file.contents)
