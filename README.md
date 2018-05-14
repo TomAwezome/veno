@@ -11,6 +11,17 @@
 ```
 Multi-purpose text/code editor meant for easy and vast expandability.
 
+## Usage
+
+Uses external libraries. Requires Python3.
+Prerequisites: Pygments, Curses. Install these for Python3 if not currently on system.
+
+
+To run, execute `python3 veno [filename]` Filename optional. 
+
+
+Runs in a terminal window. GUI not yet implemented.
+
 ## Keybindings
 
  - **Arrow Keys** -- move cursor in file
