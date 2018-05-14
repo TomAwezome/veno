@@ -74,6 +74,10 @@ class MagicBar(Window):
 					searchStringLeft = self.searchString[:self.searchCursorX]
 					searchStringRight = self.searchString[self.searchCursorX+1:]
 					self.searchString = searchStringLeft+searchStringRight
+			elif c == "KEY_HOME" and self.searchCursorX > 0:
+				self.searchCursorX = 0
+			elif c == "KEY_END" and self.searchCursorX < len(self.searchString):
+				self.searchCursorX = len(self.searchString)
 			elif c == "^J":
 				break
 			self.keepWindowInMainScreen()
@@ -174,6 +178,10 @@ class MagicBar(Window):
 					searchStringLeft = gotoLineString[:gotoLineCursorX]
 					searchStringRight = gotoLineString[gotoLineCursorX+1:]
 					gotoLineString = searchStringLeft+searchStringRight
+			elif c == "KEY_HOME" and gotoLineCursorX > 0:
+				gotoLineCursorX = 0
+			elif c == "KEY_END" and gotoLineCursorX < len(gotoLineString):
+				gotoLineCursorX = len(gotoLineString)
 			elif c == "^J":
 				break
 
@@ -278,6 +286,10 @@ class MagicBar(Window):
 					searchStringLeft = self.searchString[:self.searchCursorX]
 					searchStringRight = self.searchString[self.searchCursorX+1:]
 					self.searchString = searchStringLeft+searchStringRight
+			elif c == "KEY_HOME" and self.searchCursorX > 0:
+				self.searchCursorX = 0
+			elif c == "KEY_END" and self.searchCursorX < len(self.searchString):
+				self.searchCursorX = len(self.searchString)
 			elif c == "^J":
 				break
 			
@@ -338,6 +350,10 @@ class MagicBar(Window):
 					searchStringLeft = self.searchString[:self.searchCursorX]
 					searchStringRight = self.searchString[self.searchCursorX+1:]
 					self.searchString = searchStringLeft+searchStringRight
+			elif c == "KEY_HOME" and self.searchCursorX > 0:
+				self.searchCursorX = 0
+			elif c == "KEY_END" and self.searchCursorX < len(self.searchString):
+				self.searchCursorX = len(self.searchString)
 			elif c == "^J":
 				break
 			
@@ -630,6 +646,10 @@ class MagicBar(Window):
 					saveStringLeft = self.saveString[:self.searchCursorX]
 					saveStringRight = self.saveString[self.searchCursorX+1:]
 					self.saveString = saveStringLeft+saveStringRight
+			elif c == "KEY_HOME" and self.searchCursorX > 0:
+				self.searchCursorX = 0
+			elif c == "KEY_END" and self.searchCursorX < len(self.saveString):
+				self.searchCursorX = len(self.saveString)
 			elif c == "^J":
 				if self.saveString != "":
 					break
