@@ -19,6 +19,9 @@ class File:
 			self.contents = ""
 			self.source = ""
 			self.exists = False
+		except FileNotFoundError:
+			self.contents = ""
+			self.exists = False
 
 	def save(self, fileString):
 		# if self.exists:

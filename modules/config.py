@@ -26,29 +26,12 @@ class Config:
 			file.close()
 		except FileNotFoundError:
 			# make json text for config options
-			self.text = ""
-			self.exists = False
 			self.options = self.defaultOptions
 			self.text = json.dumps(self.options, sort_keys=True, indent=4, separators=(',', ': '))
 			home = str(Path.home())
 			file = open(home+'/.veno', "w")
 			file.write(self.text)
 			file.close()
-
-
-	def save(self):
-		pass
-		# if self.exists:
-		# if self.source != "":
-		# 	file = open(self.source, "w")
-		# 	file.write(fileString)
-		# 	file.close()
-		# else:
-		# 	# magic Bar request filename
-		# 	file = open(self.source, "w")
-		# 	file.write(fileString)
-		# 	file.close()
-
 
 	## @brief      terminates Config
 	##
