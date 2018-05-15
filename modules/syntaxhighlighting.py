@@ -47,24 +47,7 @@ class Highlighter:
 		# }
 
 		## colorMap dictionary with format of {"highlighterColorCode":RenderedColorCode}
-		self.colorMap = {
-		"0":9,
-		"1":9,
-		"2":10,#class,def,try,if,break,while,for,ints,pass
-		"3":9,
-		"4":9,
-		"5":11,#quotes
-		"6":10,#in,and,or
-		"7":11,#class/function name, 
-		"8":9,
-		"9":9,
-		"10":4,#self,modules,literals
-		"11":9,
-		"12":9,
-		"13":9,
-		"14":9,
-		"15":9 # Comments. This color.
-		}
+		self.colorMap = self.manager.Objects["config"].options["ColorMap"]
 		
 		## Lexer for filetype
 		self.lexer = None
