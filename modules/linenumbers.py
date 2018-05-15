@@ -22,7 +22,6 @@ class LineNumbersWindow(Window):
 		self.intendedWidth = len(str(totalLines))+2
 		self.intendedX = self.manager.Windows["fileWindow"].window.getbegyx()[1] - self.intendedWidth+1
 		self.intendedHeight = self.manager.Windows["fileWindow"].window.getmaxyx()[0]
-		self.manager.Windows["fileWindow"].intendedX = len(str(len(self.manager.Windows["fileWindow"].fileLines)))+1
 		self.keepWindowInMainScreen()
 		if self.intendedX >= 0:
 			self.window.mvwin(self.intendedY, self.intendedX)
@@ -30,10 +29,12 @@ class LineNumbersWindow(Window):
 			self.window.mvwin(self.intendedY,0)
 		windowY = 0
 		currentLine = self.manager.Windows["fileWindow"].viewport[1]
-		if self.intendedX >= 0:
-			while windowY < self.window.getmaxyx()[0] and windowY+currentLine < totalLines:
-				self.window.addstr(windowY,0,str(currentLine+windowY+1)+(" "*(len(str(totalLines))-len(str(currentLine+windowY+1))))+"┃")
-				windowY += 1
+#		if self.intendedX >= 0:
+		#self.panel.top()
+		self.manager.Windows["fileWindow"].intendedX = len(str(len(self.manager.Windows["fileWindow"].fileLines)))+1
+		while windowY < self.window.getmaxyx()[0] and windowY+currentLine < totalLines:
+			self.window.addstr(windowY,0,str(currentLine+windowY+1)+(" "*(len(str(totalLines))-len(str(currentLine+windowY+1))))+"┃")
+			windowY += 1
 		# self.manager.Windows["fileWindow"].update()
 		# self.manager.Windows["fileWindow"].panel.top()
 		# self.manager.update()
