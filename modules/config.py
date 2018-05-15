@@ -15,22 +15,22 @@ class Config:
 							   "UseLineWrap": False,
 							   "LineWrapLength": 100,
 							   "ColorMap": {
-											"0":9,
-											"1":9,
-											"2":10,#class,def,try,if,break,while,for,ints,pass
-											"3":9,
-											"4":9,
-											"5":11,#quotes
-											"6":10,#in,and,or
-											"7":11,#class/function name, 
-											"8":9,
-											"9":9,
+											"0":8,
+											"1":8,
+											"2":2,#class,def,try,if,break,while,for,ints,pass
+											"3":8,
+											"4":8,
+											"5":3,#quotes
+											"6":2,#in,and,or
+											"7":3,#class/function name, 
+											"8":8,
+											"9":8,
 											"10":4,#self,modules,literals
-											"11":9,
-											"12":9,
-											"13":9,
-											"14":9,
-											"15":9 # Comments. This color.
+											"11":8,
+											"12":8,
+											"13":8,
+											"14":8,
+											"15":1 # Comments. This color.
 											}
 		}
 		try:
