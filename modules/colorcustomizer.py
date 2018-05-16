@@ -21,7 +21,7 @@ class ColorCustomizerWindow(Window):
 			self.panel.hide()
 		else:
 			self.panel.top()
-		self.panel.hide()
+#		self.panel.hide()
 		self.currentOption = 0
 	def update(self):
 		self.window.erase()
@@ -43,7 +43,8 @@ class ColorCustomizerWindow(Window):
 #		if self.intendedX >= 0:
 		self.window.box()
 		if self.isOpen == False:
-			self.panel.hide()
+			if self.panel.hidden == False:
+				self.panel.hide()
 		else:
 			self.panel.top()
 			self.window.addnstr(1,1,"Customize Highlight Colors", self.window.getmaxyx()[1]-1, self.manager.curses.color_pair(0))
