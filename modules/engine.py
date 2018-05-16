@@ -16,6 +16,7 @@ class Engine():
 		from modules.syntaxhighlighting import Highlighter 						#
 		from modules.magicbar import MagicBar
 		from modules.linenumbers import LineNumbersWindow
+		from modules.colorcustomizer import ColorCustomizerWindow
 		## Config instance for editor.
 		self.config = Config()
 		## File instance to be used in editor.
@@ -33,6 +34,7 @@ class Engine():
 		## Keyboard Manager instance to interpret key input
 		self.magicbar = MagicBar(self.panels, "magicBar")
 		self.linenumbers = LineNumbersWindow(self.panels, "lineNumbers")
+		self.colorCustomizer = ColorCustomizerWindow(self.panels, "colorCustomizer")
 		self.keys = Keyboard(self.panels)										# Load Keyboard module.
 	##
 	## @brief      Turn the engine once.
@@ -44,6 +46,7 @@ class Engine():
 		self.fileWindow.update()
 		self.linenumbers.update()
 		self.highlighter.update()												#
+		self.colorCustomizer.update()
 		self.panels.update()													#
 		self.keys.update()														# Grab key input and interpret through bindings.
 	##

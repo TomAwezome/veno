@@ -51,6 +51,12 @@ class Config:
 			file = open(home+'/.veno', "w")
 			file.write(self.text)
 			file.close()
+	def save(self):
+		self.text = json.dumps(self.options, sort_keys=True, indent=4, separators=(',', ': '))
+		home = str(Path.home())
+		file = open(home+'/.veno',"w")
+		file.write(self.text)
+		file.close()
 
 	## @brief      terminates Config
 	##

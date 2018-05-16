@@ -67,3 +67,4 @@ class Keyboard:
 		self.bindings["^L"] = self.manager.Windows["magicBar"].gotoLine
 		self.bindings["^G"] = self.manager.Windows["magicBar"].searchNext
 		self.bindings["^H"] = self.manager.Windows["magicBar"].replace
+		self.bindings["^_"] = self.manager.Windows["colorCustomizer"].toggle
