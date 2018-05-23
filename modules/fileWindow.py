@@ -18,6 +18,7 @@ class FileWindow(Window):
 		self.modified = True ## i.e. Modified since last highlight. Variable used for speed optimization of syntax highlighting algorithm.
 		self.selectPosition = []
 		self.selectOn = False
+		self.quoteOnce = True
 	def update(self):
 		self.window.erase()
 		self.intendedHeight = self.manager.stdscr.getmaxyx()[0] - self.intendedY - 1
@@ -183,6 +184,20 @@ class FileWindow(Window):
 		self.fileLines[self.filecursor[1]] = lineStringLeft + lineStringRight
 		self.moveFilecursorRight()
 		self.modified = True
+		if text == "[":
+			self.enterTextAtFilecursor("]")
+			self.moveFilecursorLeft()
+		elif text == "(":
+			self.enterTextAtFilecursor(")")
+			self.moveFilecursorLeft()
+		elif text == "{":
+			self.enterTextAtFilecursor("}")
+			self.moveFilecursorLeft()
+		elif text == "\"" and self.quoteOnce == True:
+			self.quoteOnce = False
+			self.enterTextAtFilecursor("\"")
+			self.moveFilecursorLeft()
+			self.quoteOnce = True
 	def newLineAtFilecursor(self):
 		lineStringLeft = self.fileLines[self.filecursor[1]][:self.filecursor[0]]
 		lineStringRight = self.fileLines[self.filecursor[1]][self.filecursor[0]:]
