@@ -11,11 +11,13 @@ for i in range(0,curses.COLORS):
 def run(self):
 	while True:
 		c = stdscr.getch()
+		old = c
 		c = curses.keyname(c)
 		stdscr.clear()
 
 		stdscr.addstr(0,0,c)
 		stdscr.addstr(1,0,str(len(c)))
+		stdscr.addstr(2,0,str(old))
 
 		stdscr.refresh()
 
