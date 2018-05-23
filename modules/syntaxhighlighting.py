@@ -171,7 +171,9 @@ class Highlighter:
 			windowY += 1
 			if windowY > fileViewport[1] + windowSize[0]-1:
 				break
+		self.drawSelect()
 		self.manager.Windows["fileWindow"].drawCursor()
+
 # #	where are we getting the string from? the active string... but we would only want the part that the user sees.
 # #		we would need filewindow module variables: fileLines?, viewport, window size xy, 
 # #	before we get there... how to color the screen? does it have to be character by character?
@@ -186,7 +188,51 @@ class Highlighter:
 		pass
 # def kill(venicGlobals):
 # 	pass
-
+	def drawSelect(self):
+		if self.manager.Windows["fileWindow"].selectOn == True:
+			if self.manager.Windows["fileWindow"].filecursor[1] > self.manager.Windows["fileWindow"].selectPosition[1]:	  # if cursor below selectStart. 
+				start = [self.manager.Windows["fileWindow"].selectPosition[0],self.manager.Windows["fileWindow"].selectPosition[1]]
+				end = [self.manager.Windows["fileWindow"].filecursor[0],self.manager.Windows["fileWindow"].filecursor[1]]
+#				tabDiff = len(self.manager.Windows["fileWindow"].fileLines[self.manager.Windows["fileWindow"].selectPosition[1]][:self.manager.Windows["fileWindow"].selectPosition[0]].expandtabs(self.manager.Windows["fileWindow"].manager.Objects["config"].options["TabExpandSize"])) - len(self.manager.Windows["fileWindow"].fileLines[self.manager.Windows["fileWindow"].selectPosition[1]][:self.manager.Windows["fileWindow"].selectPosition[0]])
+			elif self.manager.Windows["fileWindow"].filecursor[1] < self.manager.Windows["fileWindow"].selectPosition[1]: # if selectStart below cursor.
+				start = [self.manager.Windows["fileWindow"].filecursor[0],self.manager.Windows["fileWindow"].filecursor[1]]
+				end = [self.manager.Windows["fileWindow"].selectPosition[0],self.manager.Windows["fileWindow"].selectPosition[1]]
+#				tabDiff = len(self.manager.Windows["fileWindow"].fileLines[self.manager.Windows["fileWindow"].selectPosition[1]][:self.manager.Windows["fileWindow"].selectPosition[0]].expandtabs(self.manager.Windows["fileWindow"].manager.Objects["config"].options["TabExpandSize"])) - len(self.manager.Windows["fileWindow"].fileLines[self.manager.Windows["fileWindow"].selectPosition[1]][:self.manager.Windows["fileWindow"].selectPosition[0]])
+			elif self.manager.Windows["fileWindow"].filecursor[1] == self.manager.Windows["fileWindow"].selectPosition[1]: # if they're the same row.
+				if self.manager.Windows["fileWindow"].filecursor[0] == self.manager.Windows["fileWindow"].selectPosition[0]:
+					start = [self.manager.Windows["fileWindow"].selectPosition[0],self.manager.Windows["fileWindow"].selectPosition[1]] # if x index same on each
+					end = start
+				elif self.manager.Windows["fileWindow"].filecursor[0] < self.manager.Windows["fileWindow"].selectPosition[0]: # if cursor index before selection index. 
+					start = [self.manager.Windows["fileWindow"].filecursor[0],self.manager.Windows["fileWindow"].filecursor[1]]
+					end = [self.manager.Windows["fileWindow"].selectPosition[0],self.manager.Windows["fileWindow"].selectPosition[1]]
+				elif self.manager.Windows["fileWindow"].filecursor[0] > self.manager.Windows["fileWindow"].selectPosition[0]: # if cursor index after selection index. 
+					start = [self.manager.Windows["fileWindow"].selectPosition[0],self.manager.Windows["fileWindow"].selectPosition[1]]
+					end = [self.manager.Windows["fileWindow"].filecursor[0],self.manager.Windows["fileWindow"].filecursor[1]]
+					
+			yOffset = 0
+			# for each line of window contents
+			for line in self.manager.Windows["fileWindow"].fileLines[self.manager.Windows["fileWindow"].viewport[1]:self.manager.Windows["fileWindow"].viewport[1]+self.manager.Windows["fileWindow"].window.getmaxyx()[0]]:
+				# if selection on screen
+				if self.manager.Windows["fileWindow"].viewport[1]+yOffset in range(start[1],end[1]+1):
+					# if start and end on same line
+					if start[1] == end[1]:
+						# chgat blue from extendTabString[start[0]:end[0]]
+						tabDiff = len(line[:start[0]].expandtabs(self.manager.Objects["config"].options["TabExpandSize"])) - len(line[:start[0]])
+						self.manager.Windows["fileWindow"].window.chgat(start[1]-self.manager.Windows["fileWindow"].viewport[1],start[0]-self.manager.Windows["fileWindow"].viewport[0]+tabDiff,len(line[start[0]:end[0]].expandtabs(self.manager.Objects["config"].options["TabExpandSize"])),self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
+					# elif line is line that select starts on
+					elif start[1] == self.manager.Windows["fileWindow"].viewport[1]+yOffset:
+						tabDiff = len(line[:start[0]].expandtabs(self.manager.Objects["config"].options["TabExpandSize"])) - len(line[:start[0]])
+						self.manager.Windows["fileWindow"].window.chgat(yOffset,start[0]-self.manager.Windows["fileWindow"].viewport[0]+tabDiff,len(line[start[0]:].expandtabs(self.manager.Objects["config"].options["TabExpandSize"])),self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
+						# chgat blue from start[0] to end of line
+					# elif line is line that select ends on
+					elif end[1] == self.manager.Windows["fileWindow"].viewport[1]+yOffset:
+						self.manager.Windows["fileWindow"].window.chgat(yOffset,0,len(line[:end[0]].expandtabs(self.manager.Objects["config"].options["TabExpandSize"])),self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
+						# chgat blue from start to end[0] of line
+					# elif line is between start and end
+					else:
+						self.manager.Windows["fileWindow"].window.chgat(yOffset,0,len(line.expandtabs(self.manager.Objects["config"].options["TabExpandSize"])),self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
+						# chgat blue whole line
+				yOffset += 1
 
 
 

@@ -16,6 +16,8 @@ class FileWindow(Window):
 			self.window.addnstr(windowY,0,line.expandtabs(self.manager.Objects["config"].options["TabExpandSize"])[self.viewport[0]:],self.window.getmaxyx()[1]-1)
 			windowY += 1
 		self.modified = True ## i.e. Modified since last highlight. Variable used for speed optimization of syntax highlighting algorithm.
+		self.selectPosition = []
+		self.selectOn = False
 	def update(self):
 		self.window.erase()
 		self.intendedHeight = self.manager.stdscr.getmaxyx()[0] - self.intendedY - 1
@@ -26,6 +28,7 @@ class FileWindow(Window):
 		for line in self.fileLines[self.viewport[1]:self.viewport[1]+self.window.getmaxyx()[0]]:
 			self.window.addnstr(windowY,0,line.expandtabs(self.manager.Objects["config"].options["TabExpandSize"])[self.viewport[0]:],self.window.getmaxyx()[1]-1,self.manager.curses.color_pair(0))
 			windowY += 1
+		# self.drawSelect()
 		self.drawCursor()
 	def drawCursor(self):
 		if self.filecursor[1] >= self.viewport[1] and self.filecursor[1] <= self.viewport[1]+self.window.getmaxyx()[0]-1:
@@ -34,10 +37,54 @@ class FileWindow(Window):
 			tabDiff = len(self.fileLines[self.filecursor[1]][:self.filecursor[0]].expandtabs(self.manager.Objects["config"].options["TabExpandSize"])) - len(self.fileLines[self.filecursor[1]][:self.filecursor[0]])
 			if self.filecursor[0]-self.viewport[0]+tabDiff <= self.window.getmaxyx()[1]-2 and self.filecursor[0]-self.viewport[0]+tabDiff >= 0:
 				self.window.chgat(self.filecursor[1]-self.viewport[1],self.filecursor[0]-self.viewport[0]+tabDiff,1,self.manager.curses.color_pair(3) | self.manager.curses.A_REVERSE)
-
+# 	def drawSelect(self):
+# 		if self.selectOn == True:
+# 			if self.filecursor[1] > self.selectPosition[1]:	  # if cursor below selectStart. 
+# 				start = [self.selectPosition[0],self.selectPosition[1]]
+# 				end = [self.filecursor[0],self.filecursor[1]]
+# #				tabDiff = len(self.fileLines[self.selectPosition[1]][:self.selectPosition[0]].expandtabs(self.manager.Objects["config"].options["TabExpandSize"])) - len(self.fileLines[self.selectPosition[1]][:self.selectPosition[0]])
+# 			elif self.filecursor[1] < self.selectPosition[1]: # if selectStart below cursor.
+# 				start = [self.filecursor[0],self.filecursor[1]]
+# 				end = [self.selectPosition[0],self.selectPosition[1]]
+# #				tabDiff = len(self.fileLines[self.selectPosition[1]][:self.selectPosition[0]].expandtabs(self.manager.Objects["config"].options["TabExpandSize"])) - len(self.fileLines[self.selectPosition[1]][:self.selectPosition[0]])
+# 			elif self.filecursor[1] == self.selectPosition[1]: # if they're the same row.
+# 				if self.filecursor[0] == self.selectPosition[0]:
+# 					start = [self.selectPosition[0],self.selectPosition[1]] # if x index same on each
+# 					end = start
+# 				elif self.filecursor[0] < self.selectPosition[0]: # if cursor index before selection index. 
+# 					start = [self.filecursor[0],self.filecursor[1]]
+# 					end = [self.selectPosition[0],self.selectPosition[1]]
+# 				elif self.filecursor[0] > self.selectPosition[0]: # if cursor index after selection index. 
+# 					start = [self.selectPosition[0],self.selectPosition[1]]
+# 					end = [self.filecursor[0],self.filecursor[1]]
+					
+# 			yOffset = 0
+# 			# for each line of window contents
+# 			for line in self.fileLines[self.viewport[1]:self.viewport[1]+self.window.getmaxyx()[0]]:
+# 				# if selection on screen
+# 				if self.viewport[1]+yOffset in range(start[1],end[1]+1):
+# 					# if start and end on same line
+# 					if start[1] == end[1]:
+# 						# chgat blue from extendTabString[start[0]:end[0]]
+# 						tabDiff = len(line[:start[0]].expandtabs(self.manager.Objects["config"].options["TabExpandSize"])) - len(line[:start[0]])
+# 						self.window.chgat(start[1]-self.viewport[1],start[0]-self.viewport[0]+tabDiff,len(line[start[0]:end[0]].expandtabs(self.manager.Objects["config"].options["TabExpandSize"])),self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
+# 					# elif line is line that select starts on
+# 						# chgat blue from start[0] to end of line
+# 					# elif line is between start and end
+# 						# chgat blue whole line
+# 					# elif line is line that select ends on
+# 						# chgat blue from start to end[0] of line
+# 				yOffset += 1
 
 ##### FUNCTIONS TO BE CALLED EXTERNALLY
 
+	def toggleSelect(self):
+		if self.selectOn == False:
+			self.selectOn = True
+			self.selectPosition = [self.filecursor[0],self.filecursor[1]]
+		else:
+			self.selectOn = False
+			self.selectPosition = []
 
 	def moveViewportDown(self):
 		self.viewport[1] += 1
