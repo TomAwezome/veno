@@ -198,6 +198,11 @@ class FileWindow(Window):
 			self.enterTextAtFilecursor("\"")
 			self.moveFilecursorLeft()
 			self.quoteOnce = True
+		elif text == "'" and self.quoteOnce == True:
+			self.quoteOnce = False
+			self.enterTextAtFilecursor("'")
+			self.moveFilecursorLeft()
+			self.quoteOnce = True
 	def newLineAtFilecursor(self):
 		lineStringLeft = self.fileLines[self.filecursor[1]][:self.filecursor[0]]
 		lineStringRight = self.fileLines[self.filecursor[1]][self.filecursor[0]:]
