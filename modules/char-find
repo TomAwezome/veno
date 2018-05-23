@@ -4,6 +4,7 @@ import curses   # our friendly painter
 stdscr = curses.initscr()       # give us a WindowObject to work with.
 curses.start_color()
 curses.curs_set(0)
+curses.noecho()
 curses.use_default_colors()
 for i in range(0,curses.COLORS):
         curses.init_pair(i+1,i,-1)
