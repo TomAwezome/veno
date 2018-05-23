@@ -69,4 +69,4 @@ class Keyboard:
 		self.bindings["^H"] = self.manager.Windows["magicBar"].replace
 		self.bindings["^_"] = self.manager.Windows["colorCustomizer"].toggle
 		self.bindings["^B"] = self.manager.Windows["fileWindow"].toggleSelect
-		self.bindings["^?"] = self.manager.Windows["fileWindow"].backspaceTextAtFilecursor()
+		self.bindings["^?"] = self.manager.Windows["fileWindow"].backspaceTextAtFilecursor
