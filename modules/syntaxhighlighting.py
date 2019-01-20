@@ -81,30 +81,37 @@ class Highlighter:
 			highlightedCodeString = self.pygments.highlight(windowCodeString,self.lexer,self.irc())
 			## **Highlighted** code lines from windowCodeLines (which is default defined as fileLines[viewport[1]:viewport[1]+windowSize[0]])
 			self.highlightedCodeLines = highlightedCodeString.split('\n')
+			leadingNewlines = 0
+			for line in windowCodeLines:
+				if line == '':
+					leadingNewlines += 1
+				else:
+					break
+			windowCodeLines.reverse()
+			trailingNewlines = 0
+			for line in windowCodeLines:
+				if line == '':
+					trailingNewlines += 1
+				else:
+					break
+			windowCodeLines.reverse()
+			if trailingNewlines > 0:
+				self.highlightedCodeLines.extend(['']*trailingNewlines)
+			if leadingNewlines > 0:
+				self.highlightedCodeLines.reverse()
+				self.highlightedCodeLines.extend(['']*leadingNewlines)
+				self.highlightedCodeLines.reverse()
+
 			self.manager.Windows["fileWindow"].modified = False
 		elif self.lexer == None:
 			highlightedCodeString = windowCodeString
 			self.highlightedCodeLines = highlightedCodeString.split('\n')
-		leadingNewlines = 0
-		for line in windowCodeLines:
-			if line == '':
-				leadingNewlines += 1
-			else:
-				break
-		windowCodeLines.reverse()
-		trailingNewlines = 0
-		for line in windowCodeLines:
-			if line == '':
-				trailingNewlines += 1
-			else:
-				break
-		windowCodeLines.reverse()
-		if trailingNewlines > 0:
-			self.highlightedCodeLines.extend(['']*trailingNewlines)
-		if leadingNewlines > 0:
-			self.highlightedCodeLines.reverse()
-			self.highlightedCodeLines.extend(['']*leadingNewlines)
-			self.highlightedCodeLines.reverse()
+
+
+
+
+
+
 		windowY = fileViewport[1]
 		for line in self.highlightedCodeLines[windowY:windowY+windowSize[0]]:
 			properLine = line
