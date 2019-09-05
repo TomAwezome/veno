@@ -225,19 +225,59 @@ class Highlighter:
 					if start[1] == end[1]:
 						# chgat blue from extendTabString[start[0]:end[0]]
 						tabDiff = len(line[:start[0]].expandtabs(self.manager.Objects["config"].options["TabExpandSize"])) - len(line[:start[0]])
-						self.manager.Windows["fileWindow"].window.chgat(start[1]-self.manager.Windows["fileWindow"].viewport[1],start[0]-self.manager.Windows["fileWindow"].viewport[0]+tabDiff,len(line[start[0]:end[0]].expandtabs(self.manager.Objects["config"].options["TabExpandSize"])),self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
+						if start[0]-self.manager.Windows["fileWindow"].viewport[0]+tabDiff < 0: # if start is off screen
+							chgx = 0 # start blue from left edge of window.
+							chgl = end[0]-self.manager.Windows["fileWindow"].viewport[0] #this should work. but. end[0] doesn't care if tabs are before it, spacing bugged. need new/same tabdiff?
+							tabDiffEnd = len(line[:end[0]].expandtabs(self.manager.Objects["config"].options["TabExpandSize"])) - len(line[:end[0]]) # similar tab difference but based on sel ends
+							chgl+= tabDiffEnd
+							if chgl < 0: # as viewport scrolls right, highlight length calculation dips into negative once start and end are both off screen.
+								chgl = 0 # this nulls the length argument of the chgat function, so anything from here is ensured not to change any characters.
+						else: # start is on screen
+							chgx = start[0]-self.manager.Windows["fileWindow"].viewport[0]+tabDiff
+							chgl = len(line[start[0]:end[0]].expandtabs(self.manager.Objects["config"].options["TabExpandSize"]))
+						self.manager.Windows["fileWindow"].window.chgat(
+																		start[1]-self.manager.Windows["fileWindow"].viewport[1],
+																		chgx,
+																		chgl,
+																		self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
 					# elif line is line that select starts on
 					elif start[1] == self.manager.Windows["fileWindow"].viewport[1]+yOffset:
 						tabDiff = len(line[:start[0]].expandtabs(self.manager.Objects["config"].options["TabExpandSize"])) - len(line[:start[0]])
-						self.manager.Windows["fileWindow"].window.chgat(yOffset,start[0]-self.manager.Windows["fileWindow"].viewport[0]+tabDiff,len(line[start[0]:].expandtabs(self.manager.Objects["config"].options["TabExpandSize"])),self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
+						if start[0]-self.manager.Windows["fileWindow"].viewport[0]+tabDiff < 0: # if start is off screen
+							chgx = 0
+							chgl = len(line.expandtabs(self.manager.Objects["config"].options["TabExpandSize"]))-self.manager.Windows["fileWindow"].viewport[0]
+							if chgl < 0: # as viewport scrolls right, highlight length calculation dips into negative once start and end are both off screen.
+								chgl = 0 # this nulls the length argument of the chgat function, so anything from here is ensured not to change any characters.
+						else: # start is on screen
+							chgx = start[0]-self.manager.Windows["fileWindow"].viewport[0]+tabDiff
+							chgl = len(line[start[0]:].expandtabs(self.manager.Objects["config"].options["TabExpandSize"]))
+						self.manager.Windows["fileWindow"].window.chgat(
+																		yOffset,
+																		chgx,
+																		chgl,
+																		self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
 						# chgat blue from start[0] to end of line
 					# elif line is line that select ends on
 					elif end[1] == self.manager.Windows["fileWindow"].viewport[1]+yOffset:
-						self.manager.Windows["fileWindow"].window.chgat(yOffset,0,len(line[:end[0]].expandtabs(self.manager.Objects["config"].options["TabExpandSize"])),self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
+						chgl = len(line[:end[0]].expandtabs(self.manager.Objects["config"].options["TabExpandSize"]))-self.manager.Windows["fileWindow"].viewport[0]
+						if chgl < 0: # as viewport scrolls right, highlight length calculation dips into negative once start and end are both off screen.
+							chgl = 0 # this nulls the length argument of the chgat function, so anything from here is ensured not to change any characters.
+						self.manager.Windows["fileWindow"].window.chgat(
+																		yOffset,
+																		0,
+																		chgl,
+																		self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
 						# chgat blue from start to end[0] of line
 					# elif line is between start and end
 					else:
-						self.manager.Windows["fileWindow"].window.chgat(yOffset,0,len(line.expandtabs(self.manager.Objects["config"].options["TabExpandSize"])),self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
+						chgl = len(line.expandtabs(self.manager.Objects["config"].options["TabExpandSize"]))-self.manager.Windows["fileWindow"].viewport[0]
+						if chgl < 0: # as viewport scrolls right, highlight length calculation dips into negative once start and end are both off screen.
+							chgl = 0 # this nulls the length argument of the chgat function, so anything from here is ensured not to change any characters.
+						self.manager.Windows["fileWindow"].window.chgat(
+																		yOffset,
+																		0,
+																		chgl,
+																		self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
 						# chgat blue whole line
 				yOffset += 1
 
