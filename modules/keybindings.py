@@ -70,3 +70,10 @@ class Keyboard:
 		self.bindings["^_"] = self.manager.Windows["colorCustomizer"].toggle
 		self.bindings["^B"] = self.manager.Windows["fileWindow"].toggleSelect
 		self.bindings["^?"] = self.manager.Windows["fileWindow"].backspaceTextAtFilecursor
+		self.bindings["^K"] = self.manager.Windows["fileWindow"].copySelect
+		self.bindings["^V"] = self.manager.Windows["fileWindow"].pasteAtFilecursor
+		self.bindings["^X"] = self.manager.Windows["fileWindow"].cutSelect
+#		self.bindings["kRIT5"] = self.manager.Windows["fileWindow"].moveViewportRight
+#		self.bindings["kLFT5"] = self.manager.Windows["fileWindow"].moveViewportLeft
+#		self.bindings["kUP5"] = self.manager.Windows["fileWindow"].moveViewportUp
+#		self.bindings["kDN5"] = self.manager.Windows["fileWindow"].moveViewportDown

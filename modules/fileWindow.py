@@ -19,6 +19,7 @@ class FileWindow(Window):
 		self.selectPosition = []
 		self.selectOn = False
 		self.quoteOnce = True
+		self.copyLines = []
 	def update(self):
 		self.window.erase()
 		self.intendedHeight = self.manager.stdscr.getmaxyx()[0] - self.intendedY - 1
@@ -87,6 +88,116 @@ class FileWindow(Window):
 			self.selectOn = False
 			self.selectPosition = []
 
+	def copySelect(self, toggle=True):
+		if self.selectOn == True:
+			self.copyLines = []
+			# copy. so i need to store (RAM, variable :/ ) text between filecursor and select
+			# store as list or string? well. selection<--filecursor<--fileLines<--list of strings. so list it is.
+			# how to copy? work out start and end maybe mimic drawSelect logic. line by line or all at once?
+			# tbh line by line likely better. easier to break down code to parse states of start line, middle lines, and end line.
+			if self.filecursor[1] > self.selectPosition[1]:	  # if cursor below selectStart. 
+				start = [self.selectPosition[0],self.selectPosition[1]]
+				end = [self.filecursor[0],self.filecursor[1]]
+			elif self.filecursor[1] < self.selectPosition[1]: # if selectStart below cursor.
+				start = [self.filecursor[0],self.filecursor[1]]
+				end = [self.selectPosition[0],self.selectPosition[1]]
+			elif self.filecursor[1] == self.selectPosition[1]: # if they're the same row.
+				if self.filecursor[0] == self.selectPosition[0]:
+					start = [self.selectPosition[0],self.selectPosition[1]] # if x index same on each
+					end = start
+				elif self.filecursor[0] < self.selectPosition[0]: # if cursor index before selection index. 
+					start = [self.filecursor[0],self.filecursor[1]]
+					end = [self.selectPosition[0],self.selectPosition[1]]
+				elif self.filecursor[0] > self.selectPosition[0]: # if cursor index after selection index. 
+					start = [self.selectPosition[0],self.selectPosition[1]]
+					end = [self.filecursor[0],self.filecursor[1]]
+			index = 0
+			yOffset = len(self.fileLines[:start[1]])
+			# for each line of file, from startY to endY
+			for line in self.fileLines[start[1]:end[1]+1]: # +1 to grab line select ends on and not stop one before it
+				# if start and end on same line (means only one line to process.)
+				if start[1] == end[1]:
+					self.copyLines = [self.fileLines[index+yOffset][start[0]:end[0]]]
+					#self.toggleSelect()
+					break
+				# elif line is line that select starts on
+				elif start[1] == index+yOffset:
+					self.copyLines.append(self.fileLines[index+yOffset][start[0]:])
+				# elif line is line that select ends on
+				elif end[1] == index+yOffset:
+					self.copyLines.append(self.fileLines[index+yOffset][:end[0]])
+				# elif line is between start and end
+				else:
+					self.copyLines.append(self.fileLines[index+yOffset])
+
+				index += 1
+			if toggle:
+				self.toggleSelect()
+
+	def cutSelect(self):
+		if self.selectOn == True:
+			self.copySelect(False) # select text copied; toggle arg set to false so select attributes still populated
+			if self.filecursor[1] > self.selectPosition[1]:	  # if cursor below selectStart. 
+				start = [self.selectPosition[0],self.selectPosition[1]]
+				end = [self.filecursor[0],self.filecursor[1]]
+			elif self.filecursor[1] < self.selectPosition[1]: # if selectStart below cursor.
+				start = [self.filecursor[0],self.filecursor[1]]
+				end = [self.selectPosition[0],self.selectPosition[1]]
+			elif self.filecursor[1] == self.selectPosition[1]: # if they're the same row.
+				if self.filecursor[0] == self.selectPosition[0]:
+					start = [self.selectPosition[0],self.selectPosition[1]] # if x index same on each
+					end = start
+				elif self.filecursor[0] < self.selectPosition[0]: # if cursor index before selection index. 
+					start = [self.filecursor[0],self.filecursor[1]]
+					end = [self.selectPosition[0],self.selectPosition[1]]
+				elif self.filecursor[0] > self.selectPosition[0]: # if cursor index after selection index. 
+					start = [self.selectPosition[0],self.selectPosition[1]]
+					end = [self.filecursor[0],self.filecursor[1]]
+			last = len(self.copyLines)-1 # index of last line in copy lines.
+			i = 0
+			for line in self.copyLines: # now to delete lines and correct filecursor position
+				if i == 0 and i == last: # if BOTH first and last cut line (copyLines length 1, start[1]&end[1] are ==), same line cut
+					if start[1] != end[1] or len(self.copyLines) != 1:
+						exit("Debug! Assumption Wrong!"+str(start[1] != end[1])+str(len(self.copyLines) != 1))
+					lineStringLeft = self.fileLines[start[1]][:start[0]]
+					lineStringRight = self.fileLines[end[1]][end[0]:]
+					self.fileLines[start[1]] = lineStringLeft + lineStringRight
+					if self.filecursor != start: # filecursor after select start, select dragged left->right
+						self.filecursor = start # move filecursor back to select start
+						self.moveViewportToCursor()
+				elif i == 0: # if first cut line, retain text from beginning to start[]
+					lineStringLeft = self.fileLines[start[1]][:start[0]]
+					self.fileLines[start[1]] = lineStringLeft
+				elif i == last: # if last cut line, retain text from end[] to end of string
+					lineStringRight = self.fileLines[start[1]+1][end[0]:] # +1 since reading line ahead of start at this point
+					self.fileLines.pop(start[1]+1) # delete line one ahead of start
+					self.fileLines[start[1]] += lineStringRight
+					if self.filecursor != start:
+						self.filecursor = start
+						self.moveViewportToCursor()
+				else:
+					self.fileLines.pop(start[1]+1) # delete line one ahead of start
+				i += 1
+			self.modified = True
+
+			self.toggleSelect()
+
+	def pasteAtFilecursor(self):
+		if self.copyLines != []:
+			last = len(self.copyLines)-1 # index of last line in copy lines. this is to not add an unessecary newline at the end
+			i = 0
+			for line in self.copyLines:
+				lineStringLeft = self.fileLines[self.filecursor[1]][:self.filecursor[0]]
+				lineStringRight = self.fileLines[self.filecursor[1]][self.filecursor[0]:]
+				lineStringLeft += line
+				self.fileLines[self.filecursor[1]] = lineStringLeft + lineStringRight
+				self.modified = True
+				for ch in line:
+					self.moveFilecursorRight()
+				if i != last: #   ^ to not add unneeded newline
+					self.newLineAtFilecursor()
+				i += 1
+			
 	def moveViewportDown(self):
 		self.viewport[1] += 1
 	def moveViewportUp(self):
