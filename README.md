@@ -33,10 +33,12 @@ Runs in a terminal window. GUI not yet implemented.
  - **Ctrl-W** -- save file
  - **Home Key** -- go to start of line in file
  - **End Key** -- go to end of line in file
+ - **F3** -- go to start of file
+ - **F4** -- go to end of file
  - **Ctrl-F** -- find regex string in file
  - **Ctrl-G** -- find next match in file
  - **Ctrl-H** -- find and replace all
  - **Ctrl-B** -- select text
  - **Ctrl-K** -- copy selection
  - **Ctrl-X** -- cut selection
- - **Ctrl-V** -- paste
+ - **Ctrl-V** -- paste selection
