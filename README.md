@@ -26,6 +26,7 @@ Runs in a terminal window. GUI not yet implemented.
 
 ## Keybindings
 
+ - **Ctrl-C** -- cancel/quit
  - **Arrow Keys** -- move cursor in file
  - **PageUp, PageDown** -- scroll screen up/down
  - **Ctrl-Arrow Keys** -- move viewport in file
@@ -35,3 +36,7 @@ Runs in a terminal window. GUI not yet implemented.
  - **Ctrl-F** -- find regex string in file
  - **Ctrl-G** -- find next match in file
  - **Ctrl-H** -- find and replace all
+ - **Ctrl-B** -- select text
+ - **Ctrl-K** -- copy selection
+ - **Ctrl-X** -- cut selection
+ - **Ctrl-V** -- paste
