@@ -30,12 +30,12 @@ class Engine():
 		## Highlighter instance to colorize FileWindow contents
 		self.highlighter = Highlighter(self.panels)
 		self.panels.Objects["highlighter"] = self.highlighter
-		self.panels.update()													# Update Panel (Manager) contents.
-		## Keyboard Manager instance to interpret key input
 		self.magicbar = MagicBar(self.panels, "magicBar")
 		self.linenumbers = LineNumbersWindow(self.panels, "lineNumbers")
 		self.colorCustomizer = ColorCustomizerWindow(self.panels, "colorCustomizer")
+		## Keyboard Manager instance to interpret key input
 		self.keys = Keyboard(self.panels)										# Load Keyboard module.
+		self.panels.update()													# Update Panel (Manager) contents.
 	##
 	## @brief      Turn the engine once.
 	##

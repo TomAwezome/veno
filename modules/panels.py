@@ -28,6 +28,7 @@ class Manager:
 		curses.cbreak()
 		stdscr.keypad(True)
 		curses.curs_set(0)
+		stdscr.timeout(30)
 	##
 	## @brief      Update Panel Manager
 	##

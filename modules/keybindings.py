@@ -22,17 +22,22 @@ class Keyboard:
 	##
 	def update(self):
 		c = self.manager.stdscr.getch()
+		while c != -1:
+#		if c == -1:
+#			return
+			self.manager.stdscr.timeout(30)
+			c = self.manager.curses.keyname(c)
+			c = c.decode("utf-8")
+			if c in self.bindings:
+				if c == "^I":
+					self.bindings[c]("\t")
+				else:
+					self.bindings[c]()
+			elif c in string.punctuation + string.digits + string.ascii_letters + " \t":
+				self.bindings["printable-character"](c)
+			c = self.manager.stdscr.getch()
 		if c == -1:
-			return
-		c = self.manager.curses.keyname(c)
-		c = c.decode("utf-8")
-		if c in self.bindings:
-			if c == "^I":
-				self.bindings[c]("\t")
-			else:
-				self.bindings[c]()
-		elif c in string.punctuation + string.digits + string.ascii_letters + " \t":
-			self.bindings["printable-character"](c)
+			self.manager.stdscr.timeout(-1)
 	##
 	## @brief      Terminate Keyboard Manager
 	##
