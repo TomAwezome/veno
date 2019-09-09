@@ -326,8 +326,7 @@ class FileWindow(Window):
 		self.fileLines.insert(self.filecursor[1]+1,"")
 		self.moveFilecursorDown()
 		self.fileLines[self.filecursor[1]] = lineStringRight
-		for _ in range(indentSize):
-			self.moveFilecursorRight()
+		self.moveFilecursorRight(indentSize)
 		self.modified = True
 	def backspaceTextAtFilecursor(self):
 		if self.filecursor[0] == 0:
