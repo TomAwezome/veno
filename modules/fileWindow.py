@@ -319,7 +319,7 @@ class FileWindow(Window):
 		lineStringLeft = self.fileLines[self.filecursor[1]][:self.filecursor[0]]
 		lineStringRight = self.fileLines[self.filecursor[1]][self.filecursor[0]:]
 		indentSize = 0
-		if self.manager.Objects["config"].options["AutoIndent"]:
+		if self.config["AutoIndent"]:
 			indentSize = len(lineStringLeft) - len(lineStringLeft.lstrip())
 			lineStringRight = lineStringLeft[:indentSize] + lineStringRight
 		self.fileLines[self.filecursor[1]] = lineStringLeft
