@@ -12,6 +12,7 @@ class Config:
 	##
 	def __init__(self):
 		self.defaultOptions = {"TabExpandSize": 4,
+							   "AutoIndent": True,
 							   "UseLineWrap": False,
 							   "LineWrapLength": 100,
 							   "ColorMap": {

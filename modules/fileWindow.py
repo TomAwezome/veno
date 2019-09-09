@@ -317,10 +317,16 @@ class FileWindow(Window):
 	def newLineAtFilecursor(self):
 		lineStringLeft = self.fileLines[self.filecursor[1]][:self.filecursor[0]]
 		lineStringRight = self.fileLines[self.filecursor[1]][self.filecursor[0]:]
+		indentSize = 0
+		if self.manager.Objects["config"].options["AutoIndent"]:
+			indentSize = len(lineStringLeft) - len(lineStringLeft.lstrip())
+			lineStringRight = lineStringLeft[:indentSize] + lineStringRight
 		self.fileLines[self.filecursor[1]] = lineStringLeft
 		self.fileLines.insert(self.filecursor[1]+1,"")
 		self.moveFilecursorDown()
 		self.fileLines[self.filecursor[1]] = lineStringRight
+		for _ in range(indentSize):
+			self.moveFilecursorRight()
 		self.modified = True
 	def backspaceTextAtFilecursor(self):
 		if self.filecursor[0] == 0:
