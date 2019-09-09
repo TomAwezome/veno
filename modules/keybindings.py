@@ -78,7 +78,7 @@ class Keyboard:
 		self.bindings["^K"] = self.manager.Windows["fileWindow"].copySelect
 		self.bindings["^V"] = self.manager.Windows["fileWindow"].pasteAtFilecursor
 		self.bindings["^X"] = self.manager.Windows["fileWindow"].cutSelect
-#		self.bindings["kRIT5"] = self.manager.Windows["fileWindow"].moveViewportRight
-#		self.bindings["kLFT5"] = self.manager.Windows["fileWindow"].moveViewportLeft
-#		self.bindings["kUP5"] = self.manager.Windows["fileWindow"].moveViewportUp
-#		self.bindings["kDN5"] = self.manager.Windows["fileWindow"].moveViewportDown
+		self.bindings["kRIT5"] = self.manager.Windows["fileWindow"].moveViewportRight
+		self.bindings["kLFT5"] = self.manager.Windows["fileWindow"].moveViewportLeft
+		self.bindings["kUP5"] = self.manager.Windows["fileWindow"].moveViewportUp
+		self.bindings["kDN5"] = self.manager.Windows["fileWindow"].moveViewportDown
