@@ -17,10 +17,11 @@ class Engine():
 		from modules.magicbar import MagicBar
 		from modules.linenumbers import LineNumbersWindow
 		from modules.colorcustomizer import ColorCustomizerWindow
+		filename = self.parseArgs().filename or "untitled.txt"
 		## Config instance for editor.
-		self.config = Config()
+		self.config = Config(filename)
 		## File instance to be used in editor.
-		self.venicFile = File(self.parseArgs().filename)						# Load file provided as only arg.
+		self.venicFile = File(filename)						# Load file provided as only arg.
 		## Panel Manager instance for modules
 		self.panels = Manager()												# Load Manager.
 		self.panels.Objects["config"] = self.config
