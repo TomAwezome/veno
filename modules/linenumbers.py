@@ -21,6 +21,7 @@ class LineNumbersWindow(Window):
 		totalLines = len(self.manager.Windows["fileWindow"].fileLines)
 		self.intendedWidth = len(str(totalLines))+2
 		self.manager.Windows["fileWindow"].intendedX = len(str(len(self.manager.Windows["fileWindow"].fileLines)))+1
+		self.manager.Windows["fileWindow"].intendedWidth = self.manager.stdscr.getmaxyx()[1] - self.manager.Windows["fileWindow"].intendedX - 1
 		self.manager.Windows["fileWindow"].keepWindowInMainScreen()
 		self.intendedX = self.manager.Windows["fileWindow"].window.getbegyx()[1] - self.intendedWidth+1
 		self.intendedHeight = self.manager.Windows["fileWindow"].window.getmaxyx()[0]
