@@ -1,4 +1,3 @@
-# import time
 # # file window covers everything about a file and seeing it visually
 # # filecursor (current location in file), viewport? (what YOU're seeing), screenCursor (wherever you are has to visible _somehow_).
 
@@ -26,12 +25,10 @@ class FileWindow(Window):
 		self.intendedHeight = self.manager.stdscr.getmaxyx()[0] - self.intendedY - 1
 		self.intendedWidth = self.manager.stdscr.getmaxyx()[1] - self.intendedX - 1
 		self.keepWindowInMainScreen()
-		# self.window.box()
 		windowY = 0
 		for line in self.fileLines[self.viewport[1]:self.viewport[1]+self.window.getmaxyx()[0]]:
 			self.window.addnstr(windowY,0,line.expandtabs(self.config["TabExpandSize"])[self.viewport[0]:],self.window.getmaxyx()[1]-1,self.manager.curses.color_pair(0))
 			windowY += 1
-		# self.drawSelect()
 		self.drawCursor()
 	def drawCursor(self):
 		if self.filecursor[1] >= self.viewport[1] and self.filecursor[1] <= self.viewport[1]+self.window.getmaxyx()[0]-1:
@@ -40,44 +37,6 @@ class FileWindow(Window):
 			tabDiff = len(self.fileLines[self.filecursor[1]][:self.filecursor[0]].expandtabs(self.config["TabExpandSize"])) - len(self.fileLines[self.filecursor[1]][:self.filecursor[0]])
 			if self.filecursor[0]-self.viewport[0]+tabDiff <= self.window.getmaxyx()[1]-2 and self.filecursor[0]-self.viewport[0]+tabDiff >= 0:
 				self.window.chgat(self.filecursor[1]-self.viewport[1],self.filecursor[0]-self.viewport[0]+tabDiff,1,self.manager.curses.color_pair(3) | self.manager.curses.A_REVERSE)
-# 	def drawSelect(self):
-# 		if self.selectOn == True:
-# 			if self.filecursor[1] > self.selectPosition[1]:	  # if cursor below selectStart. 
-# 				start = [self.selectPosition[0],self.selectPosition[1]]
-# 				end = [self.filecursor[0],self.filecursor[1]]
-# #				tabDiff = len(self.fileLines[self.selectPosition[1]][:self.selectPosition[0]].expandtabs(self.config["TabExpandSize"])) - len(self.fileLines[self.selectPosition[1]][:self.selectPosition[0]])
-# 			elif self.filecursor[1] < self.selectPosition[1]: # if selectStart below cursor.
-# 				start = [self.filecursor[0],self.filecursor[1]]
-# 				end = [self.selectPosition[0],self.selectPosition[1]]
-# #				tabDiff = len(self.fileLines[self.selectPosition[1]][:self.selectPosition[0]].expandtabs(self.config["TabExpandSize"])) - len(self.fileLines[self.selectPosition[1]][:self.selectPosition[0]])
-# 			elif self.filecursor[1] == self.selectPosition[1]: # if they're the same row.
-# 				if self.filecursor[0] == self.selectPosition[0]:
-# 					start = [self.selectPosition[0],self.selectPosition[1]] # if x index same on each
-# 					end = start
-# 				elif self.filecursor[0] < self.selectPosition[0]: # if cursor index before selection index. 
-# 					start = [self.filecursor[0],self.filecursor[1]]
-# 					end = [self.selectPosition[0],self.selectPosition[1]]
-# 				elif self.filecursor[0] > self.selectPosition[0]: # if cursor index after selection index. 
-# 					start = [self.selectPosition[0],self.selectPosition[1]]
-# 					end = [self.filecursor[0],self.filecursor[1]]
-					
-# 			yOffset = 0
-# 			# for each line of window contents
-# 			for line in self.fileLines[self.viewport[1]:self.viewport[1]+self.window.getmaxyx()[0]]:
-# 				# if selection on screen
-# 				if self.viewport[1]+yOffset in range(start[1],end[1]+1):
-# 					# if start and end on same line
-# 					if start[1] == end[1]:
-# 						# chgat blue from extendTabString[start[0]:end[0]]
-# 						tabDiff = len(line[:start[0]].expandtabs(self.config["TabExpandSize"])) - len(line[:start[0]])
-# 						self.window.chgat(start[1]-self.viewport[1],start[0]-self.viewport[0]+tabDiff,len(line[start[0]:end[0]].expandtabs(self.config["TabExpandSize"])),self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
-# 					# elif line is line that select starts on
-# 						# chgat blue from start[0] to end of line
-# 					# elif line is between start and end
-# 						# chgat blue whole line
-# 					# elif line is line that select ends on
-# 						# chgat blue from start to end[0] of line
-# 				yOffset += 1
 
 ##### FUNCTIONS TO BE CALLED EXTERNALLY
 
@@ -268,14 +227,6 @@ class FileWindow(Window):
 						self.filecursor[0] = 0
 			else:
 				self.filecursor[0] = 0
-	#	elif lineNum > len(self.fileLines) and lineNum > -1:
-	#		self.filecursor[1] = len(self.fileLines) - 1
-	#		if (preserveX):
-	#			if self.filecursor[0] > len(self.fileLines[self.filecursor[1]]):
-	#				if len(self.fileLines[self.filecursor[1]]) > 0:
-	#					self.filecursor[0] = len(self.fileLines[self.filecursor[1]])
-	#				elif len(self.fileLines[self.filecursor[1]]) == 0:
-	#					self.filecursor[0] = 0
 			self.moveViewportToCursor()
 	def gotoStartOfFile(self):
 		self.gotoLine(0)
@@ -342,7 +293,6 @@ class FileWindow(Window):
 			self.fileLines[self.filecursor[1]] = lineStringLeft+lineStringRight
 			self.moveFilecursorLeft()
 		self.modified = True
-		# self.window.mvwin(0,0)
 	def saveFile(self):
 		fileString = ""
 		linesRow = 0
@@ -350,9 +300,6 @@ class FileWindow(Window):
 			fileString += line+"\n"
 		self.manager.Windows["magicBar"].save()
 		self.file.save(fileString)
-	#	fileString = fileString[:-1]
-		# file.write(fileString)
-		# file.close()
 	def searchForText(self):
 		pass
 	def scrollDown(self):
@@ -385,4 +332,3 @@ class FileWindow(Window):
 			self.fileLines.pop(self.filecursor[1]+1)
 			self.fileLines[self.filecursor[1]] += nextLine
 		self.modified = True
-

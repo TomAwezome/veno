@@ -9,7 +9,6 @@ class MagicBar(Window):
 		import re
 		self.re = re
 		self.string = string
-# 		global standardscreen, intendedX, intendedY, intendedWidth, intendedHeight, magicBarWindow, magicBarPanel, use, patternMatches, self.searchString, self.searchCursorX, gotoLineString, gotoLineCursorX
 		self.searchCursorX = 0
 		self.searchString = ""
 		self.saveString = self.manager.Windows["fileWindow"].file.source
@@ -17,7 +16,6 @@ class MagicBar(Window):
 		gotoLineString = ""
 		use = ""
 		self.patternMatches = None
-		# standardscreen = self.manager.stdscr
 		self.panel.top()
 		self.panel.hide()
 
@@ -236,9 +234,6 @@ class MagicBar(Window):
 		self.intendedHeight = 1
 		self.keepWindowInMainScreen()
 	
-#		self.window.box()
-#	self.window.addstr(0, 0, "222")
-
 		self.manager.update()
 		self.keepWindowInMainScreen()
 		self.window.addnstr(0,0,self.searchString.expandtabs(self.manager.Objects["config"].options["TabExpandSize"]), self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
@@ -373,11 +368,9 @@ class MagicBar(Window):
 		# next we'll find the first occurence (relative to our cursor) of our to-be-replaced string, and move the file cursor there and have our current nexMatch be that occurence
 
 		pattern = self.re.compile(firstString)
-#		patternMatch = pattern.search(self.manager.Windows["fileWindow"].file.contents)
 		self.patternMatches = pattern.finditer(self.manager.Windows["fileWindow"].file.contents)
 		try:
 			nextMatch = next(self.patternMatches)
-#		if patternMatch is not None:
 			searchIndexY = self.manager.Windows["fileWindow"].file.contents[:nextMatch.start()].count('\n')
 			searchLines = self.manager.Windows["fileWindow"].file.contents[:nextMatch.start()].split('\n')
 			if len(searchLines) > 0:
@@ -423,31 +416,8 @@ class MagicBar(Window):
 		self.manager.Windows["fileWindow"].modified = True
 		self.manager.Windows["fileWindow"].update() # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
 		self.manager.Objects["highlighter"].update()
-		# venicGlobals["modules"]["lineNumbers"].loop(venicGlobals)
 		self.manager.update()
 
-
-		# now we need to use .start() and .end() of match to chop and glue self.string. together, and self.re.sub the matching indices, and after replacing instance, repeat process again (using modified file, to adjust for differences in the indices after splicing replacement in)
-		# while we do this, we need to factor in keypresses, so that users can enter 'y' or 'n' to replace match, and can use either ESC or ctrl-C to cancel this use of magicBar module
-
-		# start while loop for keypresses (perhaps update window contents before this to show position at first instance)
-			# if 'y':
-				# replacedString = self.re.sub(firstString, secondString, fileString[start:end])
-				# left = fileString[:start]
-				# right = fileString[end:]
-				# combined = left + replacedString + right
-				# windowCodeLines = combined.splitlines()
-				#? self.manager.Windows["fileWindow"].file.contents = combined
-			# if 'n':
-				# pass
-			# if 'esc'
-				# break
-
-			# self.patternMatches = pattern.finditer(self.manager.Windows["fileWindow"].file.contents)
-			# nextMatch = next(self.patternMatches) # break if except StopIteration:
-			# adjust cursor
-
-#		useSwapped = False
 		while True: # break out of this loop with enter key
 			try:
 				nextMatch
@@ -479,26 +449,12 @@ class MagicBar(Window):
 			elif c == "n":
 				pass
 			elif c == "a":
-#				use = "replaceAll"
-#				useSwapped = True
 				fileLines = self.manager.Windows["fileWindow"].fileLines
 				fileString = '\n'.join(fileLines)
 				replacedString = self.re.sub(firstString, secondString, fileString)
 				self.manager.Windows["fileWindow"].file.contents = replacedString
 				self.manager.Windows["fileWindow"].fileLines = replacedString.splitlines()
 				break
-
-#				self.searchCursorX += 1
-#			elif c == "KEY_LEFT" and self.searchCursorX > 0:
-#				self.searchCursorX -= 1
-#			elif c == "KEY_RIGHT" and self.searchCursorX < len(self.searchString): # later deal with offscreen typing
-#				self.searchCursorX += 1
-#			elif c == "KEY_BACKSPACE":
-#				if self.searchCursorX > 0:
-#					searchStringLeft = self.searchString[:self.searchCursorX-1]
-#					searchStringRight = self.searchString[self.searchCursorX:]
-#					self.searchString = searchStringLeft + searchStringRight
-#					self.searchCursorX -= 1
 			elif c == "^J":
 				break
 
@@ -549,23 +505,10 @@ class MagicBar(Window):
 				pass
 
 			self.keepWindowInMainScreen()
-#			self.window.addnstr(0,0,self.searchString, self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
-#			if self.searchCursorX <= self.window.getmaxyx()[1]-2 and self.searchCursorX >= 0:
-#				self.window.chgat(0,self.searchCursorX, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 			self.manager.Windows["fileWindow"].modified = True
 			self.manager.Windows["fileWindow"].update() # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
 			self.manager.Objects["highlighter"].update()
-
-			# venicGlobals["modules"]["lineNumbers"].loop(venicGlobals)
 			self.manager.update()
-
-
-
-#		fileLines = venicGlobals["modules"]["fileWindow"].fileLines
-#		fileString = '\n'.join(fileLines)
-#		replacedString = self.re.sub(firstString, secondString, fileString)
-#		self.manager.Windows["fileWindow"].file.contents = replacedString
-#		venicGlobals["modules"]["fileWindow"].fileLines = replacedString.splitlines()		
 
 		self.window.erase()
 		self.keepWindowInMainScreen()
@@ -573,12 +516,6 @@ class MagicBar(Window):
 		self.manager.Windows["fileWindow"].update() # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
 		self.manager.Objects["highlighter"].update()
 		self.manager.update()
-
-		# venicGlobals["modules"]["lineNumbers"].loop(venicGlobals)
-
-#		if useSwapped == False:
-		# use = ""
-
 
 	def save(self):
 		self.panel.show()
@@ -608,8 +545,8 @@ class MagicBar(Window):
 		if kill == True:
 			self.window.erase()
 			return
-	## savefile string
-	# keypress loop: begin catching characters
+		## savefile string
+		# keypress loop: begin catching characters
 		self.window.erase()
 		self.window.addnstr(0,0,self.saveString, self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
 		if self.searchCursorX <= self.window.getmaxyx()[1]-2 and self.searchCursorX >= 0:
@@ -663,21 +600,3 @@ class MagicBar(Window):
 
 	def terminate(self):
 		pass
-
-# # search functions, ctrl-F, ctrl-G
-
-# def search():
-# 	global use
-# 	use = "search"
-
-# def searchNext():
-# 	global use
-# 	use = "searchNext"
-
-# def replace():
-# 	global use
-# 	use = "replace"
-
-# def gotoLine():
-# 	global use
-# 	use = "gotoLine"

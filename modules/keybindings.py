@@ -23,8 +23,6 @@ class Keyboard:
 	def update(self):
 		c = self.manager.stdscr.getch()
 		while c != -1:
-#		if c == -1:
-#			return
 			self.manager.stdscr.timeout(30)
 			c = self.manager.curses.keyname(c)
 			c = c.decode("utf-8")
