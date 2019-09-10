@@ -196,7 +196,7 @@ class FileWindow(Window):
 				for ch in line:
 					self.moveFilecursorRight()
 				if i != last: #   ^ to not add unneeded newline
-					self.newLineAtFilecursor()
+					self.newLineAtFilecursor(autoIndentOverride=False)
 				i += 1
 			
 	def moveViewportDown(self):
@@ -315,11 +315,11 @@ class FileWindow(Window):
 			self.enterTextAtFilecursor("'")
 			self.moveFilecursorLeft()
 			self.quoteOnce = True
-	def newLineAtFilecursor(self):
+	def newLineAtFilecursor(self,autoIndentOverride=True):
 		lineStringLeft = self.fileLines[self.filecursor[1]][:self.filecursor[0]]
 		lineStringRight = self.fileLines[self.filecursor[1]][self.filecursor[0]:]
 		indentSize = 0
-		if self.config["AutoIndent"]:
+		if self.config["AutoIndent"] and autoIndentOverride:
 			indentSize = len(lineStringLeft) - len(lineStringLeft.lstrip())
 			lineStringRight = lineStringLeft[:indentSize] + lineStringRight
 		self.fileLines[self.filecursor[1]] = lineStringLeft
