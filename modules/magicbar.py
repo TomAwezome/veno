@@ -61,7 +61,7 @@ class MagicBar(Window):
 				self.searchCursorX -= 1
 			elif c == "KEY_RIGHT" and self.searchCursorX < len(self.searchString): # later deal with offscreen typing
 				self.searchCursorX += 1
-			elif c == "KEY_BACKSPACE":
+			elif c == "KEY_BACKSPACE" or c == "^?": # ^? reported on some macOS / other terms
 				if self.searchCursorX > 0:
 					searchStringLeft = self.searchString[:self.searchCursorX-1]
 					searchStringRight = self.searchString[self.searchCursorX:]
@@ -165,7 +165,7 @@ class MagicBar(Window):
 				gotoLineCursorX -= 1
 			elif c == "KEY_RIGHT" and gotoLineCursorX < len(gotoLineString): # later deal with offscreen typing
 				gotoLineCursorX += 1
-			elif c == "KEY_BACKSPACE":
+			elif c == "KEY_BACKSPACE" or c == "^?": # ^? reported on some macOS / other terms
 				if gotoLineCursorX > 0:
 					searchStringLeft = gotoLineString[:gotoLineCursorX-1]
 					searchStringRight = gotoLineString[gotoLineCursorX:]
@@ -270,7 +270,7 @@ class MagicBar(Window):
 				self.searchCursorX -= 1
 			elif c == "KEY_RIGHT" and self.searchCursorX < len(self.searchString): # later deal with offscreen typing
 				self.searchCursorX += 1
-			elif c == "KEY_BACKSPACE":
+			elif c == "KEY_BACKSPACE" or c == "^?": # ^? reported on some macOS / other terms
 				if self.searchCursorX > 0:
 					searchStringLeft = self.searchString[:self.searchCursorX-1]
 					searchStringRight = self.searchString[self.searchCursorX:]
@@ -334,7 +334,7 @@ class MagicBar(Window):
 				self.searchCursorX -= 1
 			elif c == "KEY_RIGHT" and self.searchCursorX < len(self.searchString): # later deal with offscreen typing
 				self.searchCursorX += 1
-			elif c == "KEY_BACKSPACE":
+			elif c == "KEY_BACKSPACE" or c == "^?": # ^? reported on some macOS / other terms
 				if self.searchCursorX > 0:
 					searchStringLeft = self.searchString[:self.searchCursorX-1]
 					searchStringRight = self.searchString[self.searchCursorX:]
@@ -572,7 +572,7 @@ class MagicBar(Window):
 				self.searchCursorX -= 1
 			elif c == "KEY_RIGHT" and self.searchCursorX < len(self.saveString): # later deal with offscreen typing
 				self.searchCursorX += 1
-			elif c == "KEY_BACKSPACE":
+			elif c == "KEY_BACKSPACE" or c == "^?": # ^? reported on some macOS / other terms
 				if self.searchCursorX > 0:
 					saveStringLeft = self.saveString[:self.searchCursorX-1]
 					saveStringRight = self.saveString[self.searchCursorX:]
