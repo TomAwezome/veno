@@ -23,6 +23,12 @@ class File:
 			self.contents = ""
 			self.exists = False
 
+	##
+	## @brief      save altered contents to File
+	##
+	## @param      self        The object
+	## @param      fileString  The altered contents
+	##
 	def save(self, fileString):
 		# if self.exists:
 		if self.source != "":
@@ -34,17 +40,12 @@ class File:
 		# 	file = open(self.source, "w")
 		# 	file.write(fileString)
 		# 	file.close()
-	##
-	## @brief      save altered contents to File
-	##
-	## @param      self        The object
-	## @param      fileString  The altered contents
-	##
 
 	# def save(self, fileString):
 	# 	file = open(self.source, "w")
 	# 	file.write(fileString)
 	# 	file.close()
+
 	##
 	## @brief      terminates File
 	##

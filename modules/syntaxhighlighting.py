@@ -195,6 +195,12 @@ class Highlighter:
 		pass
 # def kill(venicGlobals):
 # 	pass
+
+	##
+	## @brief      Highlight text between filecursor and selectPosition, this allows onscreen coloration to show what text is currently being selected.
+	##
+	## @param      self  The object
+	##
 	def drawSelect(self):
 		if self.manager.Windows["fileWindow"].selectOn == True:
 			if self.manager.Windows["fileWindow"].filecursor[1] > self.manager.Windows["fileWindow"].selectPosition[1]:	  # if cursor below selectStart. 
