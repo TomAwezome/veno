@@ -10,7 +10,6 @@ class Window:
 		self.window.erase()
 		self.keepWindowInMainScreen()
 		self.panel = self.manager.addPanel(self, self.name)
-		#self.panel.top()
 	def update(self):
 		self.window.erase()
 		self.keepWindowInMainScreen()

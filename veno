@@ -1,11 +1,6 @@
 #!/usr/bin/env python3
 ### statistics on programs
 
-#import cProfile
-#from pstats import Stats
-#prof = cProfile.Profile()
-#prof.enable()
-
 ### legacy from venic
 import traceback
 from modules.engine import Engine
@@ -15,8 +10,5 @@ while True:
 		scheduler.turn()
 	except:
 		scheduler.terminate()
-#		prof.print_stats(sort="cumulative")
 		str(traceback.print_exc())  # Print the exception
 		break
-#root_dir = os.path.dirname(os.path.realpath(__file__))
-#prof.print_stats(sort="cumulative")

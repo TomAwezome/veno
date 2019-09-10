@@ -1,4 +1,3 @@
-# import time
 # # file window covers everything about a file and seeing it visually
 # # filecursor (current location in file), viewport? (what YOU're seeing), screenCursor (wherever you are has to visible _somehow_).
 
@@ -34,14 +33,9 @@ class LineNumbersWindow(Window):
 			self.manager.Windows["fileWindow"].keepWindowInMainScreen()
 		windowY = 0
 		currentLine = self.manager.Windows["fileWindow"].viewport[1]
-#		if self.intendedX >= 0:
-		#self.panel.top()
 		self.manager.Windows["fileWindow"].intendedX = len(str(len(self.manager.Windows["fileWindow"].fileLines)))+1
 		while windowY < self.window.getmaxyx()[0] and windowY+currentLine < totalLines:
 			self.window.addstr(windowY,0,str(currentLine+windowY+1)+(" "*(len(str(totalLines))-len(str(currentLine+windowY+1))))+"┃")
 			windowY += 1
-		# self.manager.Windows["fileWindow"].update()
-		# self.manager.Windows["fileWindow"].panel.top()
-		# self.manager.update()
 	def terminate(self):
  		pass

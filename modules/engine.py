@@ -67,8 +67,6 @@ class Engine():
 	##
 	def terminate(self):														# Terminate all modules in reverse order of initialization.
 		self.keys.terminate()
-#		debug = self.highlighter.highlightedCodeLines
 		self.fileWindow.terminate()
 		self.panels.terminate()
 		self.venicFile.terminate()
-#		print(debug)

@@ -1,4 +1,3 @@
-# import time
 
 ##
 ## @brief      Class for highlighter.
@@ -22,29 +21,6 @@ class Highlighter:
 		from pygments.formatters import IRCFormatter
 		## Pygments formatter IRCFormatter
 		self.irc = IRCFormatter
-# def start(venicGlobals):
-# #	import pygments
-# #	import pygments.lexers as lexers
-# 	fileContents = venicGlobals["venicFile"]
-# 	lexer = self.lexer
-		# self.colorMap = {
-		# "0":0,
-		# "1":1,
-		# "2":5,
-		# "3":3,
-		# "4":2,
-		# "5":4,
-		# "6":6,
-		# "7":4,
-		# "8":4,
-		# "9":3,
-		# "10":7,
-		# "11":5,
-		# "12":5,
-		# "13":2,
-		# "14":8,
-		# "15":9 # Comments. This color.
-		# }
 
 		## colorMap dictionary with format of {"highlighterColorCode":RenderedColorCode}
 		self.colorMap = self.manager.Objects["config"].options["ColorMap"]
@@ -74,7 +50,6 @@ class Highlighter:
 	def update(self):
 		fileViewport = self.manager.Windows["fileWindow"].viewport
 		windowSize = self.manager.Windows["fileWindow"].window.getmaxyx()
-		# windowCodeLines = self.manager.Windows["fileWindow"].fileLines[fileViewport[1]:fileViewport[1]+windowSize[0]]
 		windowCodeLines = self.manager.Windows["fileWindow"].fileLines
 		windowCodeString = '\n'.join(windowCodeLines)
 		if self.lexer != None and self.manager.Windows["fileWindow"].modified == True:
@@ -193,18 +168,15 @@ class Highlighter:
 	##
 	def terminate(self):
 		pass
-# def kill(venicGlobals):
-# 	pass
+
 	def drawSelect(self):
 		if self.manager.Windows["fileWindow"].selectOn == True:
 			if self.manager.Windows["fileWindow"].filecursor[1] > self.manager.Windows["fileWindow"].selectPosition[1]:	  # if cursor below selectStart. 
 				start = [self.manager.Windows["fileWindow"].selectPosition[0],self.manager.Windows["fileWindow"].selectPosition[1]]
 				end = [self.manager.Windows["fileWindow"].filecursor[0],self.manager.Windows["fileWindow"].filecursor[1]]
-#				tabDiff = len(self.manager.Windows["fileWindow"].fileLines[self.manager.Windows["fileWindow"].selectPosition[1]][:self.manager.Windows["fileWindow"].selectPosition[0]].expandtabs(self.manager.Windows["fileWindow"].manager.Objects["config"].options["TabExpandSize"])) - len(self.manager.Windows["fileWindow"].fileLines[self.manager.Windows["fileWindow"].selectPosition[1]][:self.manager.Windows["fileWindow"].selectPosition[0]])
 			elif self.manager.Windows["fileWindow"].filecursor[1] < self.manager.Windows["fileWindow"].selectPosition[1]: # if selectStart below cursor.
 				start = [self.manager.Windows["fileWindow"].filecursor[0],self.manager.Windows["fileWindow"].filecursor[1]]
 				end = [self.manager.Windows["fileWindow"].selectPosition[0],self.manager.Windows["fileWindow"].selectPosition[1]]
-#				tabDiff = len(self.manager.Windows["fileWindow"].fileLines[self.manager.Windows["fileWindow"].selectPosition[1]][:self.manager.Windows["fileWindow"].selectPosition[0]].expandtabs(self.manager.Windows["fileWindow"].manager.Objects["config"].options["TabExpandSize"])) - len(self.manager.Windows["fileWindow"].fileLines[self.manager.Windows["fileWindow"].selectPosition[1]][:self.manager.Windows["fileWindow"].selectPosition[0]])
 			elif self.manager.Windows["fileWindow"].filecursor[1] == self.manager.Windows["fileWindow"].selectPosition[1]: # if they're the same row.
 				if self.manager.Windows["fileWindow"].filecursor[0] == self.manager.Windows["fileWindow"].selectPosition[0]:
 					start = [self.manager.Windows["fileWindow"].selectPosition[0],self.manager.Windows["fileWindow"].selectPosition[1]] # if x index same on each
@@ -280,44 +252,3 @@ class Highlighter:
 																		self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
 						# chgat blue whole line
 				yOffset += 1
-
-
-
-
-
-
-
-# get file viewport
-# get window size
-# get file lines corresponding to viewport
-# make code string
-# if there's a lexer
-# 	HIGHLIGHT code string
-# 	make highlightcode lines
-# else
-# 	code string->pretend highlight
-# leading/trailing lines shit?
-# WINDOWY=0
-# for each LINE in HIGHLIGHTED code 	# refer line 6
-# 	opener closer parser bullshit...
-# 	for each ROW of COLORDATA made PER LINE via HIGHLIGHTEDCODELINES:
-# 		change attribute at WINDOWY, indexX,length, color
-# 	WINDOWY ++
-# 	if WINDOWY > windowSize
-# 		break
-
-
-
-# ___Way I *should* do it____
-# get file viewport
-# get window size
-# get file lines of entire window
-# make code string
-# if there's a lexer
-# 	if we need to highlight all of the text again (if modified, if first run..)
-# 	HIGHLIGHT code string
-# 	make highlightcode lines
-# else
-# 	code string => pretend highlight
-# leading trailing lines shit?
-# WINDOWY=
