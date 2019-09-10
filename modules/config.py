@@ -15,6 +15,7 @@ class Config:
 		self.defaultOptions = {
 			"TabExpandSize": 4,
 			"TabLength": 4,
+    	"AutoIndent": True,
 			"UseLineWrap": False,
 			"LineWrapLength": 100,
 			"LanguageOverrides": {
