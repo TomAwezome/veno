@@ -23,6 +23,12 @@ class File:
 			self.contents = ""
 			self.exists = False
 
+	##
+	## @brief      save altered contents to File
+	##
+	## @param      self        The object
+	## @param      fileString  The altered contents
+	##
 	def save(self, fileString):
 		if self.source != "":
 			file = open(self.source, "w")
