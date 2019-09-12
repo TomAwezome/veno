@@ -44,9 +44,9 @@ Runs in a terminal window. GUI not yet implemented.
  - **Ctrl-L** - go to a line in file
  - **Ctrl-F** -- find regex string in file
  - **Ctrl-G** -- find next match in file
- - **Ctrl-H** -- find and replace all
+ - **Ctrl-R** -- find and replace string in file
  - **Ctrl-B** -- select text in file
  - **Ctrl-K** -- copy and store selection in file
  - **Ctrl-X** -- cut and store selection from file
  - **Ctrl-V** -- paste selection into file
- - **Ctrl-/** -- currently experimental module. toggle color customizer.
+ - **Ctrl-_** -- currently experimental module. toggle color customizer.
