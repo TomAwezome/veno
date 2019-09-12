@@ -195,8 +195,11 @@ class FileWindow(Window):
 			self.moveFilecursorUp()
 			self.gotoEndOfLine()
 		if self.filecursor[0] > len(self.fileLines[self.filecursor[1]]):
-			self.moveFilecursorDown()
-			self.gotoStartOfLine()
+			if self.filecursor[1] != len(self.fileLines)-1: # if filecursor not at last line
+				self.moveFilecursorDown()
+				self.gotoStartOfLine()
+			else: # filecursor on last line
+				self.gotoEndOfLine()
 		self.moveViewportToCursor()
 	def moveViewportToCursorX(self):
 		tabDiff = len(self.fileLines[self.filecursor[1]][:self.filecursor[0]].expandtabs(self.config["TabExpandSize"])) - len(self.fileLines[self.filecursor[1]][:self.filecursor[0]])
