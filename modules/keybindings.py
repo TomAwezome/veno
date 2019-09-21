@@ -70,7 +70,7 @@ class Keyboard:
 		self.bindings["^L"] = self.manager.Windows["magicBar"].gotoLine
 		self.bindings["^G"] = self.manager.Windows["magicBar"].searchNext
 		self.bindings["^R"] = self.manager.Windows["magicBar"].replace
-		self.bindings["^_"] = self.manager.Windows["colorCustomizer"].toggle
+		self.bindings["^_"] = self.manager.Windows["configCustomizer"].toggle
 		self.bindings["^B"] = self.manager.Windows["fileWindow"].toggleSelect
 		self.bindings["^?"] = self.manager.Windows["fileWindow"].backspaceTextAtFilecursor
 		self.bindings["^K"] = self.manager.Windows["fileWindow"].copySelect
