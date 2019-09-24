@@ -517,7 +517,36 @@ class MagicBar(Window):
 		self.manager.Objects["highlighter"].update()
 		self.manager.update()
 
+	def confirmExitSave(self):
+		self.panel.show()
+		self.panel.top()
+		self.intendedX = 0
+		self.intendedY = self.manager.stdscr.getmaxyx()[0]
+		self.intendedWidth = self.manager.stdscr.getmaxyx()[1]-1
+		self.intendedHeight = 1
+		self.keepWindowInMainScreen()
+		self.manager.update()
+		self.keepWindowInMainScreen()
+		self.window.addnstr(0,0,"Save before exit?", self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
+		while True:
+			self.keepWindowInMainScreen()
+			self.window.erase()
+			self.window.addnstr(0,0,"Save before exit?", self.window.getmaxyx()[1]-1, self.manager.curses.A_REVERSE)
+			self.manager.update()
+			c = self.manager.stdscr.getch() # (Ctrl-C to refuse exit save)
+			if c == -1:
+				continue
+			c = self.manager.curses.keyname(c)
+			c = c.decode("utf-8")
+			if c == "^J":
+				self.window.erase()
+				if self.manager.Windows["fileWindow"].saveFile() == 0: # successfully saved
+					exit("File saved, safe to exit")
+				else: # Ctrl-C to exit confirmExitSave and return to file
+					break
+
 	def save(self):
+		returnval = 0
 		self.panel.show()
 		self.panel.top()
 		self.intendedX = 0
@@ -544,7 +573,8 @@ class MagicBar(Window):
 				break
 		if kill == True:
 			self.window.erase()
-			return
+			returnval = 1
+			return returnval
 		## savefile string
 		# keypress loop: begin catching characters
 		self.window.erase()
@@ -557,6 +587,7 @@ class MagicBar(Window):
 			try:
 				c = self.manager.stdscr.getch()
 			except KeyboardInterrupt:
+				returnval = 1
 				break
 			if c == -1:
 				continue
@@ -597,6 +628,7 @@ class MagicBar(Window):
 				self.window.chgat(0,self.searchCursorX, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 			self.manager.update()
 		self.manager.Windows["fileWindow"].file.source = self.saveString
+		return returnval
 
 	def terminate(self):
 		pass

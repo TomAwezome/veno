@@ -301,8 +301,9 @@ class FileWindow(Window):
 		linesRow = 0
 		for line in self.fileLines:
 			fileString += line+"\n"
-		self.manager.Windows["magicBar"].save()
+		returnval = self.manager.Windows["magicBar"].save()
 		self.file.save(fileString)
+		return returnval
 	def searchForText(self):
 		pass
 	def scrollDown(self):

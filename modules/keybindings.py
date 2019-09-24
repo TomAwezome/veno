@@ -21,7 +21,11 @@ class Keyboard:
 	## @param      self  The object
 	##
 	def update(self):
-		c = self.manager.stdscr.getch()
+		try:
+			c = self.manager.stdscr.getch()
+		except KeyboardInterrupt:
+			c = -1
+			self.manager.Windows["magicBar"].confirmExitSave()
 		while c != -1:
 			self.manager.stdscr.timeout(30)
 			c = self.manager.curses.keyname(c)

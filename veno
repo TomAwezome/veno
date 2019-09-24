@@ -12,3 +12,4 @@ while True:
 		scheduler.terminate()
 		str(traceback.print_exc())  # Print the exception
 		break
+exit(0)
