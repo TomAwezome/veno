@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+### statistics on programs
+
+### legacy from venic
+import traceback
+from modules.engine import Engine
+scheduler = Engine()
+while True:
+	try:
+		scheduler.turn()
+	except:
+		scheduler.terminate()
+		str(traceback.print_exc())  # Print the exception
+		break
+exit(0)
