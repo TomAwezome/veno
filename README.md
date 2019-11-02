@@ -17,6 +17,8 @@ Uses external libraries. Requires Python3.
 Prerequisites: Pygments, Curses. Install these for Python3 if not currently on system.
 
 Run `pip3 install -r requirements.txt` in `veno` directory to install prerequisites.
+ - In case this does not successfully install Pygments, installing Pygments through a package manager may.
+   - On Ubuntu, try `sudo apt install python3-pygments`
 
 ## Usage
 
