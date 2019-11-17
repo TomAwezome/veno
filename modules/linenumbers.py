@@ -34,7 +34,7 @@ class LineNumbersWindow(Window):
 		windowY = 0
 		currentLine = self.manager.Windows["fileWindow"].viewport[1]
 		self.manager.Windows["fileWindow"].intendedX = len(str(len(self.manager.Windows["fileWindow"].fileLines)))+1
-		while windowY < self.window.getmaxyx()[0] and windowY+currentLine < totalLines:
+		while windowY < self.window.getmaxyx()[0] and windowY+currentLine < totalLines and self.intendedWidth <= self.window.getmaxyx()[1]:
 			self.window.addstr(windowY,0,str(currentLine+windowY+1)+(" "*(len(str(totalLines))-len(str(currentLine+windowY+1))))+"┃")
 			windowY += 1
 	def terminate(self):
