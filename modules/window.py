@@ -5,92 +5,124 @@ class Window:
 		self.intendedX = 0 			#<-- 
 		self.intendedY = 0			#<-- just some
 		self.intendedWidth = 1		#<-- default values
-		self.intendedHeight = 1	#<--
+		self.intendedHeight = 1		#<--
 		self.window = manager.curses.newwin(self.intendedHeight, self.intendedWidth, self.intendedY, self.intendedX)
 		self.window.erase()
 		self.keepWindowInMainScreen()
 		self.panel = self.manager.addPanel(self, self.name)
+
 	def update(self):
 		self.window.erase()
 		self.keepWindowInMainScreen()
 		self.window.box()
+
 	def terminate(self):
 		pass
+
+	def getWindowMaxY(self):
+		return self.window.getmaxyx()[0]
+
+	def getWindowMaxX(self):
+		return self.window.getmaxyx()[1]
+
+	def getWindowBegY(self):
+		return self.window.getbegyx()[0]
+
+	def getWindowBegX(self):
+		return self.window.getbegyx()[1]
+
 	def keepWindowInMainScreen(self):
 		offscreenY = 0
 		offscreenX = 0
 		offscreen = False
 		windowAltered = False
+		stdscrMaxX = self.manager.stdscr.getmaxyx()[1]
+		stdscrMaxY = self.manager.stdscr.getmaxyx()[0]
+
 		# if actual window does not fit in main screen
-		if self.manager.stdscr.getmaxyx()[0] <= self.window.getmaxyx()[0] + self.window.getbegyx()[0]:	# if screen size self.intendedX does not fit the window self.intendedX
+		if stdscrMaxY <= self.getWindowMaxY() + self.getWindowBegY():	# if screen size self.intendedX does not fit the window self.intendedX
 			offscreen = True
-			offscreenY = self.window.getbegyx()[0]+self.window.getmaxyx()[0]-self.manager.stdscr.getmaxyx()[0]
-			if self.window.getbegyx()[0]-offscreenY < 0:
-				self.window.resize(self.window.getmaxyx()[0]+(self.window.getbegyx()[0]-offscreenY),self.window.getmaxyx()[1])
+			offscreenY = self.getWindowBegY() + self.getWindowMaxY() - stdscrMaxY
+			if self.getWindowBegY() - offscreenY < 0:
+				self.window.resize(self.getWindowMaxY() + (self.getWindowBegY() - offscreenY), self.getWindowMaxX())
 				windowAltered = True
-				offscreenY = self.window.getbegyx()[0]+self.window.getmaxyx()[0]-self.manager.stdscr.getmaxyx()[0]
-		if self.manager.stdscr.getmaxyx()[1] <= self.window.getmaxyx()[1] + self.window.getbegyx()[1]:
+				offscreenY = self.getWindowBegY() + self.getWindowMaxY() - stdscrMaxY
+
+		if stdscrMaxX <= self.getWindowMaxX() + self.getWindowBegX():
 			offscreen = True
-			offscreenX = self.window.getbegyx()[1]+self.window.getmaxyx()[1]-self.manager.stdscr.getmaxyx()[1]
-			if self.window.getbegyx()[1]-offscreenX < 0:
-				self.window.resize(self.window.getmaxyx()[0],self.window.getmaxyx()[1]+(self.window.getbegyx()[1]-offscreenX))
+			offscreenX = self.getWindowBegX() + self.getWindowMaxX() - stdscrMaxX
+			if self.getWindowBegX() - offscreenX < 0:
+				self.window.resize(self.getWindowMaxY(), self.getWindowMaxX() + (self.getWindowBegX() - offscreenX))
 				windowAltered = True
-				offscreenX = self.window.getbegyx()[1]+self.window.getmaxyx()[1]-self.manager.stdscr.getmaxyx()[1]
+				offscreenX = self.getWindowBegX() + self.getWindowMaxX() - stdscrMaxX
+
 		if offscreen:
-			self.window.mvwin(self.window.getbegyx()[0]-offscreenY,self.window.getbegyx()[1]-offscreenX)
+			self.window.mvwin(self.getWindowBegY() - offscreenY, self.getWindowBegX() - offscreenX)
 			windowAltered = True
-		if self.manager.stdscr.getmaxyx()[0] == self.window.getmaxyx()[0]:
-			if self.window.getmaxyx()[0]-1 <= 0:
-				self.window.resize(1,self.window.getmaxyx()[1])
+
+		if stdscrMaxY == self.getWindowMaxY():
+			if self.getWindowMaxY() - 1 <= 0:
+				self.window.resize(1, self.getWindowMaxX())
 			else:
-				self.window.resize(self.window.getmaxyx()[0]-1,self.window.getmaxyx()[1])
+				self.window.resize(self.getWindowMaxY() - 1, self.getWindowMaxX())
 			windowAltered = True
-		if self.manager.stdscr.getmaxyx()[1] == self.window.getmaxyx()[1]:
-			if self.window.getmaxyx()[1]-1 <= 0:
-				self.window.resize(self.window.getmaxyx()[0], 1)
+
+		if stdscrMaxX == self.getWindowMaxX():
+			if self.getWindowMaxX() - 1 <= 0:
+				self.window.resize(self.getWindowMaxY(), 1)
 			else:
-				self.window.resize(self.window.getmaxyx()[0], self.window.getmaxyx()[1]-1)
+				self.window.resize(self.getWindowMaxY(), self.getWindowMaxX() - 1)
 			windowAltered = True
+
 		# if there is space available to resize window closer to intended dimensions
-		if self.intendedHeight > self.window.getmaxyx()[0] and self.manager.stdscr.getmaxyx()[0] > self.window.getmaxyx()[0]+self.window.getbegyx()[0]:
-			self.window.resize(self.window.getmaxyx()[0]+(self.manager.stdscr.getmaxyx()[0]-self.window.getmaxyx()[0]),self.window.getmaxyx()[1])
+		if self.intendedHeight > self.getWindowMaxY() and stdscrMaxY > self.getWindowMaxY() + self.getWindowBegY():
+			self.window.resize(self.getWindowMaxY() + (stdscrMaxY - self.getWindowMaxY()), self.getWindowMaxX())
 			windowAltered = True
-		if self.window.getmaxyx()[0] > self.intendedHeight:
+
+		if self.getWindowMaxY() > self.intendedHeight:
 			if self.intendedHeight <= 0:
 				self.intendedHeight = 1
-			self.window.resize(self.intendedHeight,self.window.getmaxyx()[1])
+			self.window.resize(self.intendedHeight, self.getWindowMaxX())
 			windowAltered = True
-		if self.intendedWidth > self.window.getmaxyx()[1] and self.manager.stdscr.getmaxyx()[1] > self.window.getmaxyx()[1]+self.window.getbegyx()[1]:
-			self.window.resize(self.window.getmaxyx()[0],self.window.getmaxyx()[1]+(self.manager.stdscr.getmaxyx()[1]-self.window.getmaxyx()[1]))
+
+		if self.intendedWidth > self.getWindowMaxX() and stdscrMaxX > self.getWindowMaxX() + self.getWindowBegX():
+			self.window.resize(self.getWindowMaxY(), self.getWindowMaxX() + (stdscrMaxX - self.getWindowMaxX()))
 			windowAltered = True
-		if self.window.getmaxyx()[1] > self.intendedWidth:
+
+		if self.getWindowMaxX() > self.intendedWidth:
 			if self.intendedWidth <= 0:
 				self.intendedWidth = 1
-			self.window.resize(self.window.getmaxyx()[0],self.intendedWidth)
+			self.window.resize(self.getWindowMaxY(), self.intendedWidth)
 			windowAltered = True
+
 		# if window can be moved closer to intended position
-		if self.intendedY > self.window.getbegyx()[0] and self.manager.stdscr.getmaxyx()[0] > self.window.getmaxyx()[0]:
-			if self.manager.stdscr.getmaxyx()[0] > self.intendedY+self.window.getmaxyx()[0]:
-				self.window.mvwin(self.intendedY,self.window.getbegyx()[1])
+		if self.intendedY > self.getWindowBegY() and stdscrMaxY > self.getWindowMaxY():
+			if stdscrMaxY > self.intendedY + self.getWindowMaxY():
+				self.window.mvwin(self.intendedY, self.getWindowBegX())
 				windowAltered = True
-			elif self.intendedY+self.window.getmaxyx()[0] > self.manager.stdscr.getmaxyx()[0]:
-				self.window.mvwin(self.manager.stdscr.getmaxyx()[0]-self.window.getmaxyx()[0],self.window.getbegyx()[1])
+			elif self.intendedY + self.getWindowMaxY() > stdscrMaxY:
+				self.window.mvwin(stdscrMaxY - self.getWindowMaxY(), self.getWindowBegX())
 				windowAltered = True
-		if self.intendedX > self.window.getbegyx()[1] and self.manager.stdscr.getmaxyx()[1] > self.window.getmaxyx()[1]:
-			if self.manager.stdscr.getmaxyx()[1] > self.intendedX+self.window.getmaxyx()[1]:
-				self.window.mvwin(self.window.getbegyx()[0],self.intendedX)
+
+		if self.intendedX > self.getWindowBegX() and stdscrMaxX > self.getWindowMaxX():
+			if stdscrMaxX > self.intendedX + self.getWindowMaxX():
+				self.window.mvwin(self.getWindowBegY(), self.intendedX)
 				windowAltered = True
-			elif self.intendedX+self.window.getmaxyx()[1] > self.manager.stdscr.getmaxyx()[1]:
-				self.window.mvwin(self.window.getbegyx()[0],self.manager.stdscr.getmaxyx()[1]-self.window.getmaxyx()[1])
+			elif self.intendedX + self.getWindowMaxX() > stdscrMaxX:
+				self.window.mvwin(self.getWindowBegY(), stdscrMaxX - self.getWindowMaxX())
 				windowAltered = True
-		changeX = self.window.getbegyx()[1]
-		changeY = self.window.getbegyx()[0]
-		if self.intendedX < self.window.getbegyx()[1] and self.intendedX > 0:
+
+		changeX = self.getWindowBegX()
+		changeY = self.getWindowBegY()
+		if self.intendedX < self.getWindowBegX() and self.intendedX > 0:
 			changeX = self.intendedX
-		if self.intendedY < self.window.getbegyx()[0] and self.intendedY > 0:
+
+		if self.intendedY < self.getWindowBegY() and self.intendedY > 0:
 			changeY = self.intendedY
-		if changeX != self.window.getbegyx()[1] or changeY != self.window.getbegyx()[0]:
+
+		if changeX != self.getWindowBegX() or changeY != self.getWindowBegY():
 			self.window.mvwin(changeY, changeX)
 			windowAltered = True
+
 		if windowAltered:
 			self.manager.stdscr.erase()
