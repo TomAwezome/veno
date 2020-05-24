@@ -31,6 +31,18 @@ class Window:
 	def getWindowBegX(self):
 		return self.window.getbegyx()[1]
 
+	def getStdscrMaxY(self):
+		return self.manager.stdscr.getmaxyx()[0]
+		
+	def getStdscrMaxX(self):
+		return self.manager.stdscr.getmaxyx()[1]
+
+	def getStdscrBegY(self):
+		return self.manager.stdscr.getbegyx()[0]
+		
+	def getStdscrBegX(self):
+		return self.manager.stdscr.getbegyx()[1]
+
 	def keepWindowInMainScreen(self):
 		offscreenY = 0
 		offscreenX = 0
