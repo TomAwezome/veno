@@ -55,8 +55,7 @@ class Keyboard:
 
 			c = self.manager.stdscr.getch()
 
-		if c == -1:
-			self.manager.stdscr.timeout(-1)
+		self.manager.stdscr.timeout(-1)
 	##
 	## @brief      Terminate Keyboard Manager
 	##
