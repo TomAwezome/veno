@@ -51,5 +51,5 @@ Runs in a terminal window. GUI not yet implemented.
  - **Ctrl-K** -- copy and store selection in file
  - **Ctrl-X** -- cut and store selection from file
  - **Ctrl-V** -- paste selection into file
- - **Ctrl-_** -- currently experimental module. toggle color customizer.
+ - **Ctrl-_** -- toggle config customizer.
 
