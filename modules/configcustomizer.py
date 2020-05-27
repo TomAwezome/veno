@@ -21,6 +21,10 @@ class ConfigCustomizerWindow(Window):
 		## Config instance.
 		self.config = self.manager.Objects["config"]
 
+		## ConfigCustomizer keybindings dictionary stores functions
+		self.bindings = {}
+		self.bind()
+
 	def update(self):
 		self.window.erase()
 		self.keepWindowInMainScreen()
@@ -32,6 +36,92 @@ class ConfigCustomizerWindow(Window):
 		else:
 			self.panel.top()
 			self.editDict(self.config.options, "Config Customizer")
+
+	def bind(self):
+		self.bindings["^_"] = self.closeCurrentCustomizer
+		self.bindings["KEY_LEFT"] = self.decrementConfigValue
+		self.bindings["KEY_RIGHT"] = self.incrementConfigValue
+		self.bindings["KEY_UP"] = self.moveCurrentOptionUp
+		self.bindings["KEY_DOWN"] = self.moveCurrentOptionDown
+		self.bindings["^J"] = self.descendIntoDict
+		self.bindings[" "] = self.descendIntoDict
+
+
+	def closeCurrentCustomizer(self, d, name): #d unused; passed to all customizer keybinding functions
+		if name == "Config Customizer":
+			self.toggle()
+			self.panel.hide()
+		elif name == "Color Customizer":
+			self.intendedX = 0
+			self.window.mvwin(0, 0) # for some reason, despite intendedX being 0, kWIMS() does not move it upon leaving a method...
+			#self.keepWindowInMainScreen()
+
+		self.currentOption = 0
+		self.viewportY = 0
+
+	def decrementConfigValue(self, d, name): #name unused; passed to all customizer keybinding functions
+		optionKeys = list(d.keys())
+		datatype = str(type(d[optionKeys[self.currentOption]])).split("'")[1]
+
+		if optionKeys[self.currentOption] == "TabLength":
+			# custom TabLength config logic
+			if datatype == "int": # if TabLength is currently already an integer
+				if d[optionKeys[self.currentOption]] > 1:
+					d[optionKeys[self.currentOption]] -= 1
+				else: # no TabLength zero, char instead
+					d[optionKeys[self.currentOption]] = "char"
+
+		elif datatype == "bool":
+			d[optionKeys[self.currentOption]] = not d[optionKeys[self.currentOption]]
+
+		elif datatype == "int":
+			if d[optionKeys[self.currentOption]] > 0:
+				d[optionKeys[self.currentOption]] -= 1
+
+	def incrementConfigValue(self, d, name): #name unused; passed to all customizer keybinding functions
+		optionKeys = list(d.keys())
+		datatype = str(type(d[optionKeys[self.currentOption]])).split("'")[1]
+
+		if optionKeys[self.currentOption] == "TabLength": # custom TabLength config logic
+			if d[optionKeys[self.currentOption]] == "char":
+				d[optionKeys[self.currentOption]] = 1
+			elif datatype == "int": # if TabLength is currently already an integer
+				d[optionKeys[self.currentOption]] += 1
+
+		elif datatype == "bool":
+			d[optionKeys[self.currentOption]] = not d[optionKeys[self.currentOption]]
+
+		elif datatype == "int":
+			d[optionKeys[self.currentOption]] += 1
+
+	def moveCurrentOptionUp(self, d, name): #d, name unused; passed to all customizer keybinding functions
+		if self.currentOption > 0:
+			self.currentOption -= 1
+			if self.currentOption < self.viewportY:
+				#self.viewportY-=1
+				self.viewportY -= self.viewportY - self.currentOption
+			if self.currentOption > self.getWindowMaxY() + self.viewportY - 4:
+				self.viewportY += self.currentOption - self.viewportY
+
+	def moveCurrentOptionDown(self, d, name): #name unused; passed to all customizer keybinding functions
+		optionKeys = list(d.keys())
+		if self.currentOption < len(optionKeys) - 1: 
+			self.currentOption += 1
+			#if self.getWindowMaxY() == 6:
+				#exit()
+			if self.currentOption > self.getWindowMaxY() + self.viewportY - 4:
+				self.viewportY += self.currentOption - self.viewportY
+
+	def descendIntoDict(self, d, name): #name unused; passed to all customizer keybinding functions
+		optionKeys = list(d.keys())
+		datatype = str(type(d[optionKeys[self.currentOption]])).split("'")[1]
+
+		if datatype == "dict":
+			if optionKeys[self.currentOption] == "ColorMap": # custom ColorMap config logic, window resizes to see color changes realtime
+				self.editDict(d[optionKeys[self.currentOption]], "Color Customizer")
+			else:
+				self.editDict(d[optionKeys[self.currentOption]])
+
 
 	def toggle(self):
 		if self.isOpen == True:
@@ -47,9 +137,11 @@ class ConfigCustomizerWindow(Window):
 		self.intendedHeight = self.getStdscrMaxY()
 		self.intendedX = 0
 
+		optionKeys = list(d.keys())
+
 		if name == "Color Customizer":
-			self.intendedHeight = len(d.keys()) + 3
-			self.intendedWidth = max(len(str(len(d.keys())) + "\t#"), len("Color Customizer") + 2)
+			self.intendedHeight = len(optionKeys) + 3
+			self.intendedWidth = max(len(str(len(optionKeys)) + "\t#"), len("Color Customizer") + 2)
 			# intendedWidth explained: d.keys will return a number with as many digits..
 			self.intendedX = int(self.getStdscrMaxX() / 2 - (self.intendedWidth / 2))
 		
@@ -63,9 +155,6 @@ class ConfigCustomizerWindow(Window):
 			return # window is too small to print anything so quit while we're ahead.
 
 		self.window.addnstr(1, 1, name, self.getWindowMaxX() - 2, self.manager.curses.A_STANDOUT)
-		optionKeys = []
-		for key in d:
-			optionKeys.append(key) # append each config dictionary key to a list. # turns out this was redundant, {}.keys exists woops
 			
 		# Explaining some possibly hard to read code;
 		# this for loop increments i over a range of 1...windowMaxY to do the following with i:
@@ -129,78 +218,11 @@ class ConfigCustomizerWindow(Window):
 				#self.panel.hide()
 				#break
 				continue
-			if c == "^_":
-				if name == "Config Customizer":
-					self.toggle()
-					self.panel.hide()
-				elif name == "Color Customizer":
-					self.intendedX = 0
-					self.window.mvwin(0, 0) # for some reason, despite intendedX being 0, kWIMS() does not move it upon leaving a method...
-					#self.keepWindowInMainScreen()
 
-				self.currentOption = 0
-				self.viewportY = 0
-				break
-			elif c == "KEY_LEFT":
-				datatype = str(type(d[optionKeys[self.currentOption]])).split("'")[1]
-
-				if optionKeys[self.currentOption] == "TabLength":
-					# custom TabLength config logic
-					if datatype == "int": # if TabLength is currently already an integer
-						if d[optionKeys[self.currentOption]] > 1:
-							d[optionKeys[self.currentOption]] -= 1
-						else: # no TabLength zero, char instead
-							d[optionKeys[self.currentOption]] = "char"
-
-				elif datatype == "dict":
-					if name != "Config Customizer":
-						#self.editDict(d[optionKeys[self.currentOption]]) # unintuitive, easier to press left to go back
-						break
-
-				elif datatype == "bool":
-					d[optionKeys[self.currentOption]] = not d[optionKeys[self.currentOption]]
-
-				elif datatype == "int":
-					if d[optionKeys[self.currentOption]] > 0:
-						d[optionKeys[self.currentOption]] -= 1
-
-			elif c == "KEY_RIGHT":
-				datatype = str(type(d[optionKeys[self.currentOption]])).split("'")[1]
-
-				if optionKeys[self.currentOption] == "TabLength": # custom TabLength config logic
-					if d[optionKeys[self.currentOption]] == "char":
-						d[optionKeys[self.currentOption]] = 1
-					elif datatype == "int": # if TabLength is currently already an integer
-						d[optionKeys[self.currentOption]] += 1
-
-				elif datatype == "dict":
-					if optionKeys[self.currentOption] == "ColorMap": # custom ColorMap config logic, window resizes to see color changes realtime
-						self.editDict(d[optionKeys[self.currentOption]], "Color Customizer")
-					else:
-						self.editDict(d[optionKeys[self.currentOption]])
-
-				elif datatype == "bool":
-					d[optionKeys[self.currentOption]] = not d[optionKeys[self.currentOption]]
-
-				elif datatype == "int":
-					d[optionKeys[self.currentOption]] += 1
-					
-			elif c == "KEY_UP":
-				if self.currentOption > 0:
-					self.currentOption -= 1
-					if self.currentOption < self.viewportY:
-						#self.viewportY-=1
-						self.viewportY -= self.viewportY - self.currentOption
-					if self.currentOption > self.getWindowMaxY() + self.viewportY - 4:
-						self.viewportY += self.currentOption - self.viewportY
-						
-			elif c == "KEY_DOWN":
-				if self.currentOption < len(optionKeys) - 1: 
-					self.currentOption += 1
-					#if self.getWindowMaxY() == 6:
-						#exit()
-					if self.currentOption > self.getWindowMaxY() + self.viewportY - 4:
-						self.viewportY += self.currentOption - self.viewportY
+			if c in self.bindings:
+				self.bindings[c](d, name)
+				if c == "^_":
+					break
 
 			self.intendedWidth = self.getStdscrMaxX()
 			self.intendedHeight = self.getStdscrMaxY()
