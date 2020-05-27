@@ -32,7 +32,7 @@ Runs in a terminal window. GUI not yet implemented.
  - **Printable characters** -- add character at cursor in file
  - **Enter Key, Ctrl-J** -- add newline at cursor in file
  - **Tab Key, Ctrl-I** -- add tab character or equivalent spaces at cursor in file
- - **Backspace Key, Ctrl-?** -- remove previous character at cursor from file
+ - **Backspace Key, Ctrl-?, Ctrl-H** -- remove previous character at cursor from file
  - **Delete Key** -- remove character at cursor from file
  - **Ctrl-D** -- remove line at cursor from file
  - **Arrow Keys** -- move cursor in file

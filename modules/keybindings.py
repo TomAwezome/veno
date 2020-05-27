@@ -40,7 +40,7 @@ class Keyboard:
 			self.magicBar.confirmExitSave()
 
 		while c != -1:
-			self.manager.stdscr.timeout(30)
+			self.manager.stdscr.timeout(20)
 			c = self.manager.curses.keyname(c)
 			c = c.decode("utf-8")
 
@@ -78,6 +78,8 @@ class Keyboard:
 
 		self.bindings["KEY_BACKSPACE"] = self.fileWindow.backspaceTextAtFilecursor
 		self.bindings["^H"] = self.fileWindow.backspaceTextAtFilecursor
+		self.bindings["^?"] = self.fileWindow.backspaceTextAtFilecursor
+
 		self.bindings["KEY_DC"] = self.fileWindow.deleteTextAtFilecursor
 
 		self.bindings["KEY_END"] = self.fileWindow.gotoEndOfLine
@@ -100,7 +102,6 @@ class Keyboard:
 		self.bindings["^_"] = self.configCustomizer.toggle
 
 		self.bindings["^B"] = self.fileWindow.toggleSelect
-		self.bindings["^?"] = self.fileWindow.backspaceTextAtFilecursor
 		self.bindings["^K"] = self.fileWindow.copySelect
 		self.bindings["^V"] = self.fileWindow.pasteAtFilecursor
 		self.bindings["^X"] = self.fileWindow.cutSelect

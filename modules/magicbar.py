@@ -43,6 +43,7 @@ class MagicBar(Window):
 		self.searchBindings["KEY_RIGHT"] = self.moveSearchCursorRight
 		self.searchBindings["KEY_BACKSPACE"] = self.backspaceAtSearchCursor
 		self.searchBindings["^?"] = self.backspaceAtSearchCursor
+		self.searchBindings["^H"] = self.backspaceAtSearchCursor
 		self.searchBindings["KEY_DC"] = self.deleteAtSearchCursor
 		self.searchBindings["KEY_HOME"] = self.moveSearchCursorToStart
 		self.searchBindings["KEY_END"] = self.moveSearchCursorToEnd
@@ -53,6 +54,7 @@ class MagicBar(Window):
 		self.gotoLineBindings["KEY_RIGHT"] = self.moveGotoLineCursorRight
 		self.gotoLineBindings["KEY_BACKSPACE"] = self.backspaceAtGotoLineCursor
 		self.gotoLineBindings["^?"] = self.backspaceAtGotoLineCursor
+		self.gotoLineBindings["^H"] = self.backspaceAtGotoLineCursor
 		self.gotoLineBindings["KEY_DC"] = self.deleteAtGotoLineCursor
 		self.gotoLineBindings["KEY_HOME"] = self.moveGotoLineCursorToStart
 		self.gotoLineBindings["KEY_END"] = self.moveGotoLineCursorToEnd
@@ -62,6 +64,7 @@ class MagicBar(Window):
 		self.saveBindings["KEY_RIGHT"] = self.moveSaveCursorRight
 		self.saveBindings["KEY_BACKSPACE"] = self.backspaceAtSaveCursor
 		self.saveBindings["^?"] = self.backspaceAtSaveCursor
+		self.saveBindings["^H"] = self.backspaceAtSaveCursor
 		self.saveBindings["KEY_DC"] = self.deleteAtSaveCursor
 		self.saveBindings["KEY_HOME"] = self.moveSaveCursorToStart
 		self.saveBindings["KEY_END"] = self.moveSaveCursorToEnd

@@ -11,16 +11,6 @@ class FileWindow(Window):
 		self.file = file
 		self.fileLines = self.file.contents.splitlines()
 		self.config = self.manager.Objects["config"].options
-		windowY = 0
-		tabExpandSize = self.config["TabExpandSize"]
-		viewportY = self.getViewportY()
-		windowMaxY = self.getWindowMaxY()
-		viewportX = self.getViewportX()
-		windowMaxX = self.getWindowMaxX()
-
-		for line in self.fileLines[viewportY:viewportY + windowMaxY]:
-			self.window.addnstr(windowY, 0, line.expandtabs(tabExpandSize)[viewportX:], windowMaxX - 1)
-			windowY += 1
 
 		self.modified = True ## i.e. Modified since last highlight. Variable used for speed optimization of syntax highlighting algorithm.
 		self.selectPosition = []
