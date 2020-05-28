@@ -15,7 +15,7 @@ class FileWindow(Window):
 		self.modified = True ## i.e. Modified since last highlight. Variable used for speed optimization of syntax highlighting algorithm.
 		self.selectPosition = []
 		self.selectOn = False
-		self.quoteOnce = True
+		self.isRepeatingQuote = False
 		self.copyLines = []
 
 	def update(self):
@@ -390,25 +390,23 @@ class FileWindow(Window):
 		self.fileLines[filecursorY] = lineStringLeft + lineStringRight
 		self.moveFilecursorRight(len(text))
 		self.modified = True
-		if text == "[":
-			self.enterTextAtFilecursor("]")
-			self.moveFilecursorLeft()
-		elif text == "(":
-			self.enterTextAtFilecursor(")")
-			self.moveFilecursorLeft()
-		elif text == "{":
-			self.enterTextAtFilecursor("}")
-			self.moveFilecursorLeft()
-		elif text == "\"" and self.quoteOnce == True:
-			self.quoteOnce = False
-			self.enterTextAtFilecursor("\"")
-			self.moveFilecursorLeft()
-			self.quoteOnce = True
-		elif text == "'" and self.quoteOnce == True:
-			self.quoteOnce = False
-			self.enterTextAtFilecursor("'")
-			self.moveFilecursorLeft()
-			self.quoteOnce = True
+		
+		if self.config["BracketMatching"]:
+			braceMatches = {
+					"[": "]",
+					"(": ")",
+					"{": "}",
+					}
+			if text in braceMatches.keys():
+				self.enterTextAtFilecursor(braceMatches[text])
+				self.moveFilecursorLeft()
+
+		if self.config["QuoteMatching"]:
+			if text in ["\"", "'"] and not self.isRepeatingQuote:
+				self.isRepeatingQuote = True
+				self.enterTextAtFilecursor(text)
+				self.moveFilecursorLeft()
+				self.isRepeatingQuote = False
 
 	def newLineAtFilecursor(self, autoIndentOverride=True):
 		filecursorX = self.getFilecursorX()

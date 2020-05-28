@@ -17,6 +17,8 @@ class Config:
 			"TabLength": 4,
 			"AutoIndent": True,
 			"UseLineWrap": False,
+			"BracketMatching": True,
+			"QuoteMatching": True,
 			"LineWrapLength": 100,
 			"LanguageOverrides": {
 				"py": {
@@ -49,12 +51,25 @@ class Config:
 			home = str(Path.home())
 			file = open(home + "/.veno")
 			self.text = file.read()
+			file.close()
+
 			# read json text for config options
 			try:
-				self.options = {**self.defaultOptions, **json.loads(self.text)}
+				options = {**self.defaultOptions, **json.loads(self.text)}
 			except:
-				self.options = self.defaultOptions
-			file.close()
+				options = self.defaultOptions
+				
+			# if stored config is missing any from defaults, put defaults there and save
+			missingKeys = []
+			for key in self.defaultOptions:
+				if key not in options:
+					missingKeys.append(key)
+			if len(missingKeys) > 0:
+				for key in missingKeys:
+					options[key] = self.defaultOptions[key]
+				self.save()
+
+			self.options = options
 		except FileNotFoundError:
 			home = str(Path.home())
 			file = open(home+'/.veno', "w")
