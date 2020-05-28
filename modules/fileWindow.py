@@ -397,7 +397,7 @@ class FileWindow(Window):
 					"(": ")",
 					"{": "}",
 					}
-			if text in braceMatches.keys():
+			if text in braceMatches:
 				self.enterTextAtFilecursor(braceMatches[text])
 				self.moveFilecursorLeft()
 
