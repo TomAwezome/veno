@@ -58,18 +58,18 @@ class Config:
 				options = {**self.defaultOptions, **json.loads(self.text)}
 			except:
 				options = self.defaultOptions
-				
+			self.options = options
+			
 			# if stored config is missing any from defaults, put defaults there and save
 			missingKeys = []
 			for key in self.defaultOptions:
-				if key not in options:
+				if key not in self.options:
 					missingKeys.append(key)
 			if len(missingKeys) > 0:
 				for key in missingKeys:
-					options[key] = self.defaultOptions[key]
+					self.options[key] = self.defaultOptions[key]
 				self.save()
 
-			self.options = options
 		except FileNotFoundError:
 			home = str(Path.home())
 			file = open(home+'/.veno', "w")
