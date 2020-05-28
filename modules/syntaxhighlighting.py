@@ -194,7 +194,6 @@ class Highlighter:
 	## @param      self  The object
 	##
 	def drawSelect(self):
-	#i see: filecursor, selectposition, viewport, fileWindowmaxyx, (start/end)
 		filecursorX = self.fileWindow.getFilecursorX()
 		filecursorY = self.fileWindow.getFilecursorY()
 		selectX = self.fileWindow.getSelectX()
@@ -204,32 +203,18 @@ class Highlighter:
 		windowMaxY = self.fileWindow.getWindowMaxY()
 		tabExpandSize = self.manager.Objects["config"].options["TabExpandSize"]
 		if self.fileWindow.selectOn == True:
-			if filecursorY > selectY:	  # if cursor below selectStart. 
-				startX = selectX
-				startY = selectY
-				endX = filecursorX
-				endY = filecursorY
-			elif filecursorY < selectY: # if selectStart below cursor.
+
+			startY = min(filecursorY, selectY)
+			endY = max(filecursorY, selectY)
+			if startY == endY:
+				startX = min(filecursorX, selectX)
+				endX = max(filecursorX, selectX)
+			elif startY == filecursorY:
 				startX = filecursorX
-				startY = filecursorY
 				endX = selectX
-				endY = selectY
-			elif filecursorY == selectY: # if they're the same row.
-				if filecursorX == selectX: # if x index same on each
-					startX = selectX
-					startY = selectY
-					endX = startX
-					endY = startY
-				elif filecursorX < selectX: # if cursor index before selection index. 
-					startX = filecursorX
-					startY = filecursorY
-					endX = selectX
-					endY = selectY
-				elif filecursorX > selectX: # if cursor index after selection index. 
-					startX = selectX
-					startY = selectY
-					endX = filecursorX
-					endY = filecursorY
+			elif startY == selectY:
+				startX = selectX
+				endX = filecursorX
 					
 			yOffset = 0
 			for line in self.fileWindow.fileLines[viewportY:viewportY + windowMaxY]: # for each line of window contents

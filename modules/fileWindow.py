@@ -108,32 +108,17 @@ class FileWindow(Window):
 			# store as list or string? well. selection<--filecursor<--fileLines<--list of strings. so list it is.
 			# how to copy? work out start and end maybe mimic drawSelect logic. line by line or all at once?
 			# tbh line by line likely better. easier to break down code to parse states of start line, middle lines, and end line.
-			if filecursorY > selectY:	  # if cursor below selectStart. 
-				startX = selectX
-				startY = selectY
-				endX = filecursorX
-				endY = filecursorY
-			elif filecursorY < selectY: # if selectStart below cursor.
+			startY = min(filecursorY, selectY)
+			endY = max(filecursorY, selectY)
+			if startY == endY:
+				startX = min(filecursorX, selectX)
+				endX = max(filecursorX, selectX)
+			elif startY == filecursorY:
 				startX = filecursorX
-				startY = filecursorY
 				endX = selectX
-				endY = selectY
-			elif filecursorY == selectY: # if they're the same row.
-				if filecursorX == selectX: # if x index same on each
-					startX = selectX
-					startY = selectY
-					endX = startX
-					endY = startY
-				elif filecursorX < selectX: # if cursor index before selection index. 
-					startX = filecursorX
-					startY = filecursorY
-					endX = selectX
-					endY = selectY
-				elif filecursorX > selectX: # if cursor index after selection index. 
-					startX = selectX
-					startY = selectY
-					endX = filecursorX
-					endY = filecursorY
+			elif startY == selectY:
+				startX = selectX
+				endX = filecursorX
 
 			index = 0
 			yOffset = len(self.fileLines[:startY])
@@ -166,32 +151,18 @@ class FileWindow(Window):
 
 		if self.selectOn == True:
 			self.copySelect(False) # select text copied; toggle arg set to false so select attributes still populated
-			if filecursorY > selectY:	  # if cursor below selectStart. 
-				startX = selectX
-				startY = selectY
-				endX = filecursorX
-				endY = filecursorY
-			elif filecursorY < selectY: # if selectStart below cursor.
+
+			startY = min(filecursorY, selectY)
+			endY = max(filecursorY, selectY)
+			if startY == endY:
+				startX = min(filecursorX, selectX)
+				endX = max(filecursorX, selectX)
+			elif startY == filecursorY:
 				startX = filecursorX
-				startY = filecursorY
 				endX = selectX
-				endY = selectY
-			elif filecursorY == selectY: # if they're the same row.
-				if filecursorX == selectX: # if x index same on each
-					startX = selectX
-					startY = selectY
-					endX = startX
-					endY = startY
-				elif filecursorX < selectX: # if cursor index before selection index. 
-					startX = filecursorX
-					startY = filecursorY
-					endX = selectX
-					endY = selectY
-				elif filecursorX > selectX: # if cursor index after selection index. 
-					startX = selectX
-					startY = selectY
-					endX = filecursorX
-					endY = filecursorY
+			elif startY == selectY:
+				startX = selectX
+				endX = filecursorX
 
 			last = len(self.copyLines) - 1 # index of last line in copy lines.
 			i = 0
