@@ -338,9 +338,10 @@ class MagicBar(Window):
 			self.manager.update()
 
 		if not wasInterrupted:
-			lineNumber = int(self.gotoLineString)
-			if lineNumber > 0:
-				self.fileWindow.gotoLine(lineNumber - 1)
+			if self.gotoLineString != "":
+				lineNumber = int(self.gotoLineString)
+				if lineNumber > 0:
+					self.fileWindow.gotoLine(lineNumber - 1)
 
 		self.keepWindowInMainScreen()
 
