@@ -76,6 +76,14 @@ class FileWindow(Window):
 		if self.selectPosition != []:
 			return self.selectPosition[1]
 
+	def setSelectX(self, x):
+		if self.selectPosition != []:
+			self.selectPosition[0] = x
+
+	def setSelectY(self, y):
+		if self.selectPosition != []:
+			self.selectPosition[1] = y
+
 	def setViewportX(self, x):
 		self.viewport[0] = x
 
@@ -349,11 +357,86 @@ class FileWindow(Window):
 		self.setFilecursorX(len(self.fileLines[self.getFilecursorY()]))
 		self.moveViewportToCursorX()
 
+	def indentSelectedLines(self, text):
+		filecursorY = self.getFilecursorY()
+		filecursorX = self.getFilecursorX()
+		selectY = self.getSelectY()
+		selectX = self.getSelectX()
+
+		startY = min(filecursorY, selectY)
+		endY = max(filecursorY, selectY)
+
+		if startY == endY: # if selection is on one line
+			startX = min(filecursorX, selectX)
+			endX = max(filecursorX, selectX)
+
+			lineStringLeft = self.fileLines[startY][:startX]
+			lineStringRight = self.fileLines[startY][startX:]
+			lineStringLeft += text
+
+			self.fileLines[startY] = lineStringLeft + lineStringRight
+			self.modified = True
+
+			self.moveFilecursorRight(len(text))
+			if startX == selectX: # if stored select value is start, set select to start + text length
+				self.setSelectX(startX + len(text))
+			elif startX == filecursorX: # if filecursor marks start, set select to end + text length
+				self.setSelectX(endX + len(text))
+
+			return
+
+		# selection is on different lines 
+		elif startY == filecursorY: # filecursor marks start
+			startX = filecursorX
+			endX = selectX
+		elif startY == selectY: # selectPosition marks start
+			startX = selectX
+			endX = filecursorX
+
+		for lineIndex in range(startY, endY + 1): # + 1 to end range on endY
+			line = self.fileLines[lineIndex]
+			if line == "": # don't tab empty lines 
+				continue
+
+			elif lineIndex == startY: # if current line is selection start
+				if startX == len(line): # if startX is at the end of the line, don't indent it
+					continue
+				elif startX == filecursorX and startY == filecursorY: # if filecursor is start, indent line and move filecursor right, continue to next line
+					line = text + line
+					self.fileLines[lineIndex] = line
+					if startX != 0: # don't move cursor if it's at the beginning of a line
+						self.moveFilecursorRight(len(text))
+					continue
+				elif startX == selectX and startY == selectY: # if select position is end, shift it by text length
+					if startX != 0: # don't move select if it's at beginning of a line
+						self.setSelectX(startX + len(text))
+
+			elif lineIndex == endY: # if current line is end
+				if endX == 0: # if endX is at start of the line, don't indent 
+					continue
+				elif endX == filecursorX and endY == filecursorY: # if filecursor is end, indent line and move filecursor right, continue to next line
+					line = text + line
+					self.fileLines[lineIndex] = line
+					self.moveFilecursorRight(len(text))
+					continue
+				elif endX == selectX and endY == selectY: # if select position is end, shift it by text length
+					self.setSelectX(endX + len(text))
+			
+			line = text + line
+			self.fileLines[lineIndex] = line
+
+		self.modified = True
+
 	def enterTextAtFilecursor(self, text):
+		if text == "\t":
+			if self.config["TabLength"] != "char":
+				text = " " * self.config["TabLength"]
+			if self.selectOn:
+				self.indentSelectedLines(text)
+				return
+
 		filecursorX = self.getFilecursorX()
 		filecursorY = self.getFilecursorY()
-		if text == "\t" and self.config["TabLength"] != "char":
-			text = " " * self.config["TabLength"]
 		lineStringLeft = self.fileLines[filecursorY][:filecursorX]
 		lineStringRight = self.fileLines[filecursorY][filecursorX:]
 		lineStringLeft += text
