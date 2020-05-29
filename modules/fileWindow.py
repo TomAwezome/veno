@@ -357,6 +357,87 @@ class FileWindow(Window):
 		self.setFilecursorX(len(self.fileLines[self.getFilecursorY()]))
 		self.moveViewportToCursorX()
 
+	def unindentSelectedLines(self):
+		filecursorY = self.getFilecursorY()
+		filecursorX = self.getFilecursorX()
+
+		indentText = "\t"
+		if self.config["TabLength"] != "char":
+			indentText = str(self.config["TabLength"])
+
+		if self.selectOn:
+			selectY = self.getSelectY()
+			selectX = self.getSelectX()
+			
+			startY = min(filecursorY, selectY)
+			endY = max(filecursorY, selectY)
+			if startY == endY:
+				startX = min(filecursorX, selectX)
+				endX = max(filecursorX, selectX)
+
+				line = self.fileLines[filecursorY]
+				if line.find(indentText) == 0: # if we find indentText at line start, remove it, skips removal if not found or at wrong spot in line
+					self.fileLines[filecursorY] = line.replace(indentText, "", 1) # 1 to only replace first occurence of indentText
+					self.modified = True
+					
+					self.setSelectX(selectX - len(indentText))
+					if filecursorX >= len(indentText): # if won't be pushed off line during moving, shift it back
+						self.moveFilecursorLeft(len(indentText))
+
+				return
+
+			if startY == filecursorY:
+				startX = filecursorX
+				endX = selectX
+			elif startY == selectY:
+				startX = selectX
+				endX = filecursorX
+
+			for lineIndex in range(startY, endY + 1): # + 1 to end range on endY
+				line = self.fileLines[lineIndex]
+				
+				if line.find(indentText) == 0: # if we find indentText at line start, remove it, skips removal if not found or at wrong spot in line
+					if lineIndex == startY and startX == len(line): # don't indent start line if selection starts at end of line
+						continue
+					if lineIndex == endY and endX == 0: # don't indent end line if selection ends at beginning of a line
+						continue
+					self.fileLines[lineIndex] = line.replace(indentText, "", 1) # 1 to only replace first occurence of indentText
+					
+					# if current line is selection start, move either cursor or select
+					if lineIndex == startY:
+						if self.fileLines[lineIndex][startX - len(indentText):startX] == indentText: # if select still at indentText after replace, keep it there
+							continue # since line was unindented and startX unchanged, subtracted indentText length to peek 
+
+						if startY == filecursorY and startX == filecursorX: # if start is filecursor
+							if filecursorX >= len(indentText): # if cursor won't be pushed off line during moving, shift it back
+								self.moveFilecursorLeft(len(indentText))
+
+						if startY == selectY and startX == selectX: # if start is selectPosition
+							if selectX >= len(indentText): # if selectPosition won't be pushed off line, shift back
+								self.setSelectX(selectX - len(indentText))
+
+					# if current line is selection end, move either cursor or select
+					elif lineIndex == endY:
+						if self.fileLines[lineIndex][endX - len(indentText):endX] == indentText: # if select still at indentText after replace, keep it there
+							continue # since line was unindented and endX unchanged, subtracted indentText length to peek 
+
+						if endY == filecursorY and endX == filecursorX: # if end is filecursor
+							if filecursorX >= len(indentText): # if cursor won't be pushed off line during moving, shift it back
+								self.moveFilecursorLeft(len(indentText))
+
+						if endY == selectY and endX == selectX: # if end is selectPosition
+							if selectX >= len(indentText): # if selectPosition won't be pushed off line, shift back
+								self.setSelectX(selectX - len(indentText))
+		else:
+			line = self.fileLines[filecursorY]
+			if line.find(indentText) == 0: # if we find indentText at line start, remove it, skips removal if not found or at wrong spot in line
+				self.fileLines[filecursorY] = line.replace(indentText, "", 1) # 1 to only replace first occurence of indentText
+				if filecursorX >= len(indentText): # if won't be pushed off line during moving, shift it back
+					self.moveFilecursorLeft(len(indentText))
+		
+		self.modified = True
+
+
 	def indentSelectedLines(self, text):
 		filecursorY = self.getFilecursorY()
 		filecursorX = self.getFilecursorX()

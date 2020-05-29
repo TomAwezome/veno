@@ -89,6 +89,8 @@ class Keyboard:
 		self.bindings["KEY_NPAGE"] = self.fileWindow.scrollDown
 		self.bindings["KEY_PPAGE"] = self.fileWindow.scrollUp
 
+		self.bindings["KEY_BTAB"] = self.fileWindow.unindentSelectedLines
+
 		self.bindings["^D"] = self.fileWindow.deleteLineAtFilecursor
 		self.bindings["^J"] = self.fileWindow.newLineAtFilecursor
 		self.bindings["^W"] = self.fileWindow.saveFile
