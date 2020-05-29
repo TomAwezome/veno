@@ -330,7 +330,10 @@ class FileWindow(Window):
 		filecursorX = self.getFilecursorX()
 		filecursorY = self.getFilecursorY()
 
-		if lineNum < len(self.fileLines) and lineNum > -1:
+		if lineNum >= len(self.fileLines): # if linenumber is greater than last line,
+			lineNum = len(self.fileLines) - 1 # goto last line
+
+		if lineNum > -1:
 			self.setFilecursorY(lineNum)
 			if (preserveX):
 				if filecursorX > len(self.fileLines[filecursorY]):
