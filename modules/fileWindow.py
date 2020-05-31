@@ -33,7 +33,9 @@ class FileWindow(Window):
 		windowMaxX = self.getWindowMaxX()
 
 		for line in self.fileLines[viewportY:viewportY + windowMaxY]:
-			self.window.addnstr(windowY, 0, line.expandtabs(tabExpandSize)[viewportX:], windowMaxX - 1, self.manager.curses.color_pair(0))
+			line = line.expandtabs(tabExpandSize)[viewportX:]
+
+			self.window.addnstr(windowY, 0, line, windowMaxX - 1, self.manager.curses.color_pair(0))
 			windowY += 1
 
 		self.drawCursor()
@@ -50,9 +52,15 @@ class FileWindow(Window):
 		if filecursorY >= viewportY and filecursorY <= viewportY + windowMaxY - 1:
 			if len(self.fileLines) == 0:
 				self.fileLines.append("")
-			tabDiff = len(self.fileLines[filecursorY][:filecursorX].expandtabs(tabExpandSize)) - len(self.fileLines[filecursorY][:filecursorX])
-			if filecursorX - viewportX + tabDiff <= windowMaxX - 2 and filecursorX - viewportX + tabDiff >= 0:
-				self.window.chgat(filecursorY - viewportY, filecursorX - viewportX + tabDiff, 1, self.manager.curses.color_pair(3) | self.manager.curses.A_REVERSE)
+
+			line = self.fileLines[filecursorY][:filecursorX]
+			expandedLine = line.expandtabs(tabExpandSize)
+			tabDiff = len(expandedLine) - len(line)
+			cursorX = filecursorX - viewportX + tabDiff
+			cursorY = filecursorY - viewportY
+
+			if cursorX <= windowMaxX - 2 and cursorX >= 0:
+				self.window.chgat(cursorY, cursorX, 1, self.manager.curses.color_pair(3) | self.manager.curses.A_REVERSE)
 
 # FUNCTIONS TO BE CALLED EXTERNALLY
 
