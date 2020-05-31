@@ -282,9 +282,12 @@ class FileWindow(Window):
 		filecursorX = self.getFilecursorX()
 
 		if filecursorX < 0:
-			self.setFilecursorX(0)
-			self.moveFilecursorUp()
-			self.gotoEndOfLine()
+			if filecursorY != 0: # if filecursor not at first line
+				self.setFilecursorX(0)
+				self.moveFilecursorUp()
+				self.gotoEndOfLine()
+			else: # filcursor on first line
+				self.gotoStartOfLine()
 
 		if filecursorX > len(self.fileLines[filecursorY]):
 			if filecursorY != len(self.fileLines) - 1: # if filecursor not at last line
