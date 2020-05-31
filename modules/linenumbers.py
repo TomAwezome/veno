@@ -48,7 +48,8 @@ class LineNumbersWindow(Window):
 		self.fileWindow.intendedX = len(str(totalLines)) + 1
 		if self.intendedWidth <= self.getWindowMaxX():
 			while windowY < self.getWindowMaxY() and windowY + currentLine < totalLines:
-				self.window.addstr(windowY, 0, str(currentLine + windowY + 1) + (" " * (len(str(totalLines)) - len(str(currentLine + windowY + 1)))) + "┃")
+				lineNumberString = str(currentLine + windowY + 1)
+				self.window.addstr(windowY, 0, lineNumberString + (" " * (len(str(totalLines)) - len(lineNumberString))) + "┃")
 				windowY += 1
 
 	def terminate(self):
