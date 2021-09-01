@@ -25,161 +25,149 @@ class Highlighter:
 		## Pygments formatter IRCFormatter
 		self.irc = IRCFormatter
 
-		## colorMap dictionary with format of {"highlighterColorCode":RenderedColorCode}
-		self.colorMap = self.manager.Objects["config"].options["ColorMap"]
+		## color_map dictionary with format of {"highlighterColorCode":RenderedColorCode}
+		self.color_map = self.manager.Objects["config"].options["ColorMap"]
 		
 		## Lexer for filetype
 		self.lexer = None
 		
 		## FileWindow highlighter is attached to.
-		self.fileWindow = self.manager.Windows["fileWindow"]
+		self.file_window = self.manager.Windows["fileWindow"]
 		
 		try:
 			try:
 				self.lexer = self.lexers.guess_lexer_for_filename(
-						self.fileWindow.file.source,
-						self.fileWindow.file.contents
+						self.file_window.file.source,
+						self.file_window.file.contents
 					)
 			except:
 				self.lexer = self.lexers.guess_lexer(
-						self.fileWindow.file.contents
+						self.file_window.file.contents
 					)
 			if self.lexer.name == "PHP":
 				self.lexer = self.lexers.PhpLexer(startinline=True)
 		except:
 			pass
-		self.fileWindow.modified = True
+		self.file_window.is_modified = True
 	##
 	## @brief      Update syntax highlighting on fileWindow
 	##
 	## @param      self  The object
 	##
 	def update(self):
-		viewportX = self.fileWindow.getViewportX()
-		viewportY = self.fileWindow.getViewportY()
-		windowMaxY = self.fileWindow.getWindowMaxY()
-		windowMaxX = self.fileWindow.getWindowMaxX()
-		windowCodeLines = self.fileWindow.fileLines
-		windowCodeString = '\n'.join(windowCodeLines)
-		tabExpandSize = self.manager.Objects["config"].options["TabExpandSize"]
+		viewport_x = self.file_window.getViewportX()
+		viewport_y = self.file_window.getViewportY()
+		window_max_y = self.file_window.getWindowMaxY()
+		window_max_x = self.file_window.getWindowMaxX()
+		window_code_lines = self.file_window.file_lines
+		window_code_string = '\n'.join(window_code_lines)
+		tab_expand_size = self.manager.Objects["config"].options["TabExpandSize"]
 
-		if self.lexer != None and self.fileWindow.modified == True:
-			highlightedCodeString = self.pygments.highlight(windowCodeString, self.lexer, self.irc())
-			## **Highlighted** code lines from windowCodeLines (which is default defined as fileLines[viewportY:viewportY + windowMaxY])
-			self.highlightedCodeLines = highlightedCodeString.split('\n')
-			leadingNewlines = 0
-			for line in windowCodeLines:
+		if self.lexer and self.file_window.is_modified:
+			highlighted_code_string = self.pygments.highlight(window_code_string, self.lexer, self.irc())
+			## **Highlighted** code lines from window_code_lines (which is default defined as file_lines[viewport_y:viewport_y + window_max_y])
+			self.highlighted_code_lines = highlighted_code_string.split('\n')
+			leading_newlines = 0
+			for line in window_code_lines:
 				if line == '':
-					leadingNewlines += 1
+					leading_newlines += 1
 				else:
 					break
-			windowCodeLines.reverse()
-			trailingNewlines = 0
-			for line in windowCodeLines:
+			window_code_lines.reverse()
+			trailing_newlines = 0
+			for line in window_code_lines:
 				if line == '':
-					trailingNewlines += 1
+					trailing_newlines += 1
 				else:
 					break
-			windowCodeLines.reverse()
-			if trailingNewlines > 0:
-				self.highlightedCodeLines.extend([''] * trailingNewlines)
-			if leadingNewlines > 0:
-				self.highlightedCodeLines.reverse()
-				self.highlightedCodeLines.extend([''] * leadingNewlines)
-				self.highlightedCodeLines.reverse()
+			window_code_lines.reverse()
+			if trailing_newlines > 0:
+				self.highlighted_code_lines.extend([''] * trailing_newlines)
+			if leading_newlines > 0:
+				self.highlighted_code_lines.reverse()
+				self.highlighted_code_lines.extend([''] * leading_newlines)
+				self.highlighted_code_lines.reverse()
 
-			self.fileWindow.modified = False
-		elif self.lexer == None:
-			highlightedCodeString = windowCodeString
-			self.highlightedCodeLines = highlightedCodeString.split('\n')
+			self.file_window.is_modified = False
+		elif not self.lexer:
+			highlighted_code_string = window_code_string
+			self.highlighted_code_lines = highlighted_code_string.split('\n')
 			
 			
-		windowY = viewportY
-		for line in self.highlightedCodeLines[windowY:windowY + windowMaxY]:
-			properLine = line
-			properLine = properLine.replace('\x1d', '')
-			lineIndex = 0
+		window_y = viewport_y
+		for line in self.highlighted_code_lines[window_y:window_y + window_max_y]:
+			proper_line = line
+			proper_line = proper_line.replace('\x1d', '')
+			line_index = 0
 			# at this point, each line is a string which has been colored, irregardless of the window x size
 			# tabs are a \t character, and ctrl-C is a \x03 character; not expanded for tabs
-			if '\x03' in properLine:
-				colorInstances = properLine.count('\x03')
-				opener = False
-				closer = False
-				openerCount = 0
-				closerCount = 0
-				colorData = [[]] # [[color, start, num]]
-				colorDataRowIndex = 0
-				while colorInstances > 0:
-					colorIndex = properLine.find('\x03', lineIndex)
-					lineIndex = colorIndex + 1
+			if '\x03' in proper_line:
+				color_instances = proper_line.count('\x03')
+				is_opener = is_closer = False
+				opener_count = closer_count = 0
+				color_data = [[]] # [[color, start, num]]
+				color_data_row_index = 0
+				while color_instances > 0:
+					colorIndex = proper_line.find('\x03', line_index)
+					line_index = colorIndex + 1
 					# so what we want is this: start by checking for numbers (I THINK that pygments is working such that colors are simply one number, which uses two digits (none of that 3,5 crap))
 					#			   if it's the number sequence we're expecting: that is now our point IN THE STRING DATA (NO TABS!) that our coloring begins
 					#			   if there's no number sequence AFTER STARTING WITH A SEQUENCE: that is the point IN THE STRING DATA that our coloring stops
 					# how to convert DATA index into TABBED index? after all, that's what's being tossed to the window we are changing the attributes of!
 					# ... oh, do i need to subtract from the formatted string? given that its internal character indexes are technically being changed by the presence of ^C characters...
-					if (colorIndex - (openerCount * 3) - closerCount) + \
-						(len(windowCodeLines[windowY][:colorIndex].expandtabs(tabExpandSize)) - \
-						len(windowCodeLines[windowY][:colorIndex])) - viewportX > windowMaxX: # if color is offscreen right
-						
-						if closer == True and colorData[colorDataRowIndex][1] - viewportX < windowMaxX - 1:	# if closer and opener is on screen
-							colorData[colorDataRowIndex][1] = max(colorData[colorDataRowIndex][1] - viewportX, 0)
-							colorData[colorDataRowIndex].append(windowMaxX + viewportX - colorData[colorDataRowIndex][1])
-							colorDataRowIndex += 1
-							closerCount += 1
-							closer = False
-							colorData.append([])
-						else:	# if opener is also offscreen right
-							colorData.pop()
-						break
-					if opener == False and closer == False:
-						if str.isdigit(properLine[colorIndex + 1:colorIndex + 3]):
-							opener = True
-					if closer == True:
-						if colorData[colorDataRowIndex][1] - viewportX < 0:	# if opener is offscreen
-							if (colorIndex - (openerCount * 3) - closerCount) + \
-								(len(windowCodeLines[windowY][:colorIndex].expandtabs(tabExpandSize)) - \
-								len(windowCodeLines[windowY][:colorIndex])) - viewportX > 0: # if closer is on screen
-								
-								colorData[colorDataRowIndex][1] = 0
-								colorData[colorDataRowIndex].append((colorIndex - (openerCount * 3) - closerCount) + \
-									(len(windowCodeLines[windowY][:colorIndex].expandtabs(tabExpandSize)) - \
-									len(windowCodeLines[windowY][:colorIndex])) - viewportX)
-							else: # if closer is not on screen
-								colorData.pop()
-								colorDataRowIndex -= 1
+					window_line = window_code_lines[window_y][:colorIndex]
+					if (colorIndex - (opener_count * 3) - closer_count) + (len(window_line.expandtabs(tab_expand_size)) - len(window_line)) - viewport_x > window_max_x:
+					# if color is offscreen right	
+						if is_closer and color_data[color_data_row_index][1] - viewport_x < window_max_x - 1:
+						# if closer and opener is on screen
+							color_data[color_data_row_index][1] = max(color_data[color_data_row_index][1] - viewport_x, 0)
+							color_data[color_data_row_index].append(window_max_x + viewport_x - color_data[color_data_row_index][1])
+							color_data_row_index += 1
+							closer_count += 1
+							is_closer = False
+							color_data.append([])
 						else:
-							colorData[colorDataRowIndex].append((colorIndex - (openerCount * 3) - closerCount) + \
-								(len(windowCodeLines[windowY][:colorIndex].expandtabs(tabExpandSize)) - \
-								len(windowCodeLines[windowY][:colorIndex]))-colorData[colorDataRowIndex][1])
-							colorData[colorDataRowIndex][1] = colorData[colorDataRowIndex][1] - viewportX
+						# else if opener is also offscreen right
+							color_data.pop()
+						break
+					if not is_opener and not is_closer:
+						if str.isdigit(proper_line[colorIndex + 1:colorIndex + 3]):
+							is_opener = True
+					if is_closer:
+						if color_data[color_data_row_index][1] - viewport_x < 0:
+						# if opener is offscreen
+							if (colorIndex - (opener_count * 3) - closer_count) + (len(window_line.expandtabs(tab_expand_size)) - len(window_line)) - viewport_x > 0:
+							# if closer is on screen
+								color_data[color_data_row_index][1] = 0
+								color_data[color_data_row_index].append((colorIndex - (opener_count * 3) - closer_count) + (len(window_line.expandtabs(tab_expand_size)) - len(window_line)) - viewport_x)
+							else:
+							# else if closer is not on screen
+								color_data.pop()
+								color_data_row_index -= 1
+						else:
+							color_data[color_data_row_index].append((colorIndex - (opener_count * 3) - closer_count) + (len(window_line.expandtabs(tab_expand_size)) - len(window_line)) - color_data[color_data_row_index][1])
+							color_data[color_data_row_index][1] = color_data[color_data_row_index][1] - viewport_x
 
-						colorDataRowIndex += 1
-						closerCount += 1
-						closer = False
-						colorData.append([])
-					if opener == True:
-						colorData[colorDataRowIndex].append(properLine[colorIndex + 1:colorIndex + 3])
-						colorData[colorDataRowIndex].append((colorIndex - (openerCount * 3) - closerCount) + \
-							(len(windowCodeLines[windowY][:colorIndex].expandtabs(tabExpandSize)) - \
-							len(windowCodeLines[windowY][:colorIndex])))
-						openerCount += 1
-						opener = False
-						closer = True
-					colorInstances -= 1
-				for row in colorData:
+						color_data_row_index += 1
+						closer_count += 1
+						is_closer = False
+						color_data.append([])
+					if is_opener:
+						color_data[color_data_row_index].append(proper_line[colorIndex + 1:colorIndex + 3])
+						color_data[color_data_row_index].append((colorIndex - (opener_count * 3) - closer_count) + (len(window_line.expandtabs(tab_expand_size)) - len(window_line)))
+						opener_count += 1
+						is_opener = False
+						is_closer = True
+					color_instances -= 1
+				for row in color_data:
 					if row != []:
-						self.fileWindow.window.chgat(windowY - viewportY, row[1], row[2], self.manager.curses.color_pair(self.colorMap[str(int(row[0]))]))
-			windowY += 1
-			if windowY > viewportY + windowMaxY-1:
+						self.file_window.window.chgat(window_y - viewport_y, row[1], row[2], self.manager.curses.color_pair(self.color_map[str(int(row[0]))]))
+			window_y += 1
+			if window_y > viewport_y + window_max_y-1:
 				break
 		self.drawSelect()
-		self.fileWindow.drawCursor()
+		self.file_window.drawCursor()
 
-# #	where are we getting the string from? the active string... but we would only want the part that the user sees.
-# #		we would need filewindow module variables: fileLines?, viewport, window size xy, 
-# #	before we get there... how to color the screen? does it have to be character by character?
-# #	no way!!!! that's insane. it can be done in chunks, searching for the next ^C character index each time.
-	
 	##
 	## @brief      Terminates Highlighter
 	##
@@ -194,71 +182,85 @@ class Highlighter:
 	## @param      self  The object
 	##
 	def drawSelect(self):
-		filecursorX = self.fileWindow.getFilecursorX()
-		filecursorY = self.fileWindow.getFilecursorY()
-		selectX = self.fileWindow.getSelectX()
-		selectY = self.fileWindow.getSelectY()
-		viewportX = self.fileWindow.getViewportX()
-		viewportY = self.fileWindow.getViewportY()
-		windowMaxY = self.fileWindow.getWindowMaxY()
-		tabExpandSize = self.manager.Objects["config"].options["TabExpandSize"]
-		if self.fileWindow.selectOn == True:
+		filecursor_x = self.file_window.getFilecursorX()
+		filecursor_y = self.file_window.getFilecursorY()
+		select_x = self.file_window.getSelectX()
+		select_y = self.file_window.getSelectY()
+		viewport_x = self.file_window.getViewportX()
+		viewport_y = self.file_window.getViewportY()
+		window_max_y = self.file_window.getWindowMaxY()
+		tab_expand_size = self.manager.Objects["config"].options["TabExpandSize"]
 
-			startY = min(filecursorY, selectY)
-			endY = max(filecursorY, selectY)
-			if startY == endY:
-				startX = min(filecursorX, selectX)
-				endX = max(filecursorX, selectX)
-			elif startY == filecursorY:
-				startX = filecursorX
-				endX = selectX
-			elif startY == selectY:
-				startX = selectX
-				endX = filecursorX
+		if self.file_window.is_select_on:
+
+			start_y = min(filecursor_y, select_y)
+			end_y = max(filecursor_y, select_y)
+			if start_y == end_y:
+				start_x = min(filecursor_x, select_x)
+				end_x = max(filecursor_x, select_x)
+			elif start_y == filecursor_y:
+				start_x = filecursor_x
+				end_x = select_x
+			elif start_y == select_y:
+				start_x = select_x
+				end_x = filecursor_x
 					
-			yOffset = 0
-			for line in self.fileWindow.fileLines[viewportY:viewportY + windowMaxY]: # for each line of window contents
-				if viewportY + yOffset in range(startY, endY + 1): # if selection on screen
+			y_offset = 0
+			for line in self.file_window.file_lines[viewport_y:viewport_y + window_max_y]: # for each line of window contents
+				if viewport_y + y_offset in range(start_y, end_y + 1): # if selection on screen
 
-					if startY == endY: # if start and end on same line
+					if start_y == end_y:
+					# if start and end on same line
 						# chgat blue from extendTabString[start[0]:end[0]]
-						tabDiff = len(line[:startX].expandtabs(tabExpandSize)) - len(line[:startX])
-						if startX - viewportX + tabDiff < 0: # if start is off screen
+						tab_diff = len(line[:start_x].expandtabs(tab_expand_size)) - len(line[:start_x])
+						if start_x - viewport_x + tab_diff < 0:
+						# if start is off screen
 							chgx = 0 # start blue from left edge of window.
-							chgl = endX - viewportX #this should work. but. end[0] doesn't care if tabs are before it, spacing bugged. need new/same tabdiff?
-							tabDiffEnd = len(line[:endX].expandtabs(tabExpandSize)) - len(line[:endX]) # similar tab difference but based on sel ends
-							chgl+= tabDiffEnd
+							chgl = end_x - viewport_x # this should work. but. end[0] doesn't care if tabs are before it, spacing bugged. need new/same tabdiff?
+							tab_diff_end = len(line[:end_x].expandtabs(tab_expand_size)) - len(line[:end_x]) # similar tab difference but based on sel ends
+							chgl += tab_diff_end
 							if chgl < 0: # as viewport scrolls right, highlight length calculation dips into negative once start and end are both off screen.
 								chgl = 0 # this nulls the length argument of the chgat function, so anything from here is ensured not to change any characters.
-						else: # start is on screen
-							chgx = startX - viewportX + tabDiff
-							chgl = len(line[startX:endX].expandtabs(tabExpandSize))
-						self.fileWindow.window.chgat(startY - viewportY, chgx, chgl, self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
+						else:
+						# else start is on screen
+							chgx = start_x - viewport_x + tab_diff
+							chgl = len(line[start_x:end_x].expandtabs(tab_expand_size))
 
-					elif startY == viewportY + yOffset: # elif line is line that select starts on
-						tabDiff = len(line[:startX].expandtabs(tabExpandSize)) - len(line[:startX])
-						if startX - viewportX + tabDiff < 0: # if start is off screen
+						self.file_window.window.chgat(start_y - viewport_y, chgx, chgl, self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
+
+					elif start_y == viewport_y + y_offset:
+					# elif line is line that select starts on
+						tab_diff = len(line[:start_x].expandtabs(tab_expand_size)) - len(line[:start_x])
+						if start_x - viewport_x + tab_diff < 0:
+						# if start is off screen
 							chgx = 0
-							chgl = len(line.expandtabs(tabExpandSize)) - viewportX
+							chgl = len(line.expandtabs(tab_expand_size)) - viewport_x
 							if chgl < 0: # as viewport scrolls right, highlight length calculation dips into negative once start and end are both off screen.
 								chgl = 0 # this nulls the length argument of the chgat function, so anything from here is ensured not to change any characters.
-						else: # start is on screen
-							chgx = startX - viewportX + tabDiff
-							chgl = len(line[startX:].expandtabs(tabExpandSize))
-						self.fileWindow.window.chgat(yOffset, chgx, chgl, self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
+						else:
+						# else start is on screen
+							chgx = start_x - viewport_x + tab_diff
+							chgl = len(line[start_x:].expandtabs(tab_expand_size))
+
+						self.file_window.window.chgat(y_offset, chgx, chgl, self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
 						# chgat blue from start[0] to end of line
 
-					elif endY == viewportY + yOffset: # elif line is line that select ends on
-						chgl = len(line[:endX].expandtabs(tabExpandSize)) - viewportX
+					elif end_y == viewport_y + y_offset:
+					# elif line is line that select ends on
+						chgl = len(line[:end_x].expandtabs(tab_expand_size)) - viewport_x
 						if chgl < 0: # as viewport scrolls right, highlight length calculation dips into negative once start and end are both off screen.
 							chgl = 0 # this nulls the length argument of the chgat function, so anything from here is ensured not to change any characters.
-						self.fileWindow.window.chgat(yOffset, 0, chgl, self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
+
+						self.file_window.window.chgat(y_offset, 0, chgl, self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
 						# chgat blue from start to end[0] of line
 
-					else: # elif line is between start and end
-						chgl = len(line.expandtabs(tabExpandSize)) - viewportX
+					else:
+					# elif line is between start and end
+						chgl = len(line.expandtabs(tab_expand_size)) - viewport_x
 						if chgl < 0: # as viewport scrolls right, highlight length calculation dips into negative once start and end are both off screen.
 							chgl = 0 # this nulls the length argument of the chgat function, so anything from here is ensured not to change any characters.
-						self.fileWindow.window.chgat(yOffset, 0, chgl, self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
+
+						self.file_window.window.chgat(y_offset, 0, chgl, self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
 						# chgat blue whole line
-				yOffset += 1
+
+				y_offset += 1

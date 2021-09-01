@@ -9,7 +9,7 @@ class File:
 	## @param      source  The file location as a string
 	##
 	def __init__(self, source):
-		self.source = source	# source should be a filename string, I'm assuming it'll end up being relative...
+		self.source = source	# source should be a filename string
 		try:
 			file = open(source)
 			self.exists = True

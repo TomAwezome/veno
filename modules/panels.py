@@ -19,11 +19,12 @@ class Manager:
 		self.panel = panel
 		## Dictionary of Window instances
 		self.Windows = {}
+		## Dictionary of global Objects
 		self.Objects = {}
 		curses.start_color()
 		curses.use_default_colors()
 		for i in range(0,curses.COLORS):
-			curses.init_pair(i+1,i,-1)
+			curses.init_pair(i + 1, i, -1)
 		curses.noecho()
 		curses.cbreak()
 		stdscr.keypad(True)
@@ -45,9 +46,9 @@ class Manager:
 	## @param      name    name of panel to be used in dictionary as key
 	##
 	def addPanel(self, Window, name):
-		newPanel = self.panel.new_panel(Window.window)
+		new_panel = self.panel.new_panel(Window.window)
 		self.Windows[name] = Window
-		return newPanel
+		return new_panel
 	##
 	## @brief      Terminate Manager
 	##

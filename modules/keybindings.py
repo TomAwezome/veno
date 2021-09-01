@@ -11,20 +11,20 @@ class Keyboard:
 	##
 	def __init__(self, manager):
 
-		## The manager to allow scheduling actions in external Windows
+		## The manager to allow scheduling actions in external Windows.
 		self.manager = manager
 
-		## The binding dictionary. Bindings saved as "keyname"->function instance
+		## The binding dictionary. Bindings saved as "keyname": function instance.
 		self.bindings = {}
 
-		## FileWindow instance for fileWindow keybindings
-		self.fileWindow = self.manager.Windows["fileWindow"]
+		## FileWindow instance for fileWindow keybindings.
+		self.file_window = self.manager.Windows["fileWindow"]
 
-		## MagicBar instance for magicBar keybindings
-		self.magicBar = self.manager.Windows["magicBar"]
+		## MagicBar instance for magicBar keybindings.
+		self.magic_bar = self.manager.Windows["magicBar"]
 		
-		## ConfigCustomizer instance for customizer keybindings (only toggle for now)
-		self.configCustomizer = self.manager.Windows["configCustomizer"]
+		## ConfigCustomizer instance for customizer keybindings. (Only used for toggle)
+		self.config_customizer = self.manager.Windows["configCustomizer"]
 		
 		self.bind()
 	##
@@ -37,7 +37,7 @@ class Keyboard:
 			c = self.manager.stdscr.getch()
 		except KeyboardInterrupt:
 			c = -1
-			self.magicBar.confirmExitSave()
+			self.magic_bar.confirmExitSave()
 
 		while c != -1:
 			self.manager.stdscr.timeout(20)
@@ -64,51 +64,53 @@ class Keyboard:
 	def terminate(self):
 		pass
 	##
-	## @brief      Binds all keybindings to binding dictionary. Saved as "keyname"->function instance
+	## @brief      Binds all keybindings to binding dictionary. Saved as "keyname": function instance.
 	##
 	## @param      self  The object
 	##
 	def bind(self):
-		self.bindings["KEY_UP"] = self.fileWindow.moveFilecursorUp
-		self.bindings["KEY_DOWN"] = self.fileWindow.moveFilecursorDown
-		self.bindings["KEY_LEFT"] = self.fileWindow.moveFilecursorLeft
-		self.bindings["KEY_RIGHT"] = self.fileWindow.moveFilecursorRight
+		self.bindings = {
+			"KEY_UP":    self.file_window.moveFilecursorUp,
+			"KEY_DOWN":  self.file_window.moveFilecursorDown,
+			"KEY_LEFT":  self.file_window.moveFilecursorLeft,
+			"KEY_RIGHT": self.file_window.moveFilecursorRight,
 
-		self.bindings["printable-character"] = self.fileWindow.enterTextAtFilecursor
+			"printable-character": self.file_window.enterTextAtFilecursor,
 
-		self.bindings["KEY_BACKSPACE"] = self.fileWindow.backspaceTextAtFilecursor
-		self.bindings["^H"] = self.fileWindow.backspaceTextAtFilecursor
-		self.bindings["^?"] = self.fileWindow.backspaceTextAtFilecursor
+			"KEY_BACKSPACE": self.file_window.backspaceTextAtFilecursor,
+			"^H":            self.file_window.backspaceTextAtFilecursor,
+			"^?":            self.file_window.backspaceTextAtFilecursor,
 
-		self.bindings["KEY_DC"] = self.fileWindow.deleteTextAtFilecursor
+			"KEY_DC": self.file_window.deleteTextAtFilecursor,
 
-		self.bindings["KEY_END"] = self.fileWindow.gotoEndOfLine
-		self.bindings["KEY_F(3)"] = self.fileWindow.gotoStartOfFile
-		self.bindings["KEY_F(4)"] = self.fileWindow.gotoEndOfFile
-		self.bindings["KEY_HOME"] = self.fileWindow.gotoStartOfLine
-		self.bindings["KEY_NPAGE"] = self.fileWindow.scrollDown
-		self.bindings["KEY_PPAGE"] = self.fileWindow.scrollUp
+			"KEY_END":   self.file_window.gotoEndOfLine,
+			"KEY_F(3)":  self.file_window.gotoStartOfFile,
+			"KEY_F(4)":  self.file_window.gotoEndOfFile,
+			"KEY_HOME":  self.file_window.gotoStartOfLine,
+			"KEY_NPAGE": self.file_window.scrollDown,
+			"KEY_PPAGE": self.file_window.scrollUp,
 
-		self.bindings["KEY_BTAB"] = self.fileWindow.unindentSelectedLines
+			"KEY_BTAB":  self.file_window.unindentSelectedLines,
 
-		self.bindings["^D"] = self.fileWindow.deleteLineAtFilecursor
-		self.bindings["^J"] = self.fileWindow.newLineAtFilecursor
-		self.bindings["^W"] = self.fileWindow.saveFile
-		self.bindings["^I"] = self.fileWindow.enterTextAtFilecursor
+			"^D": self.file_window.deleteLineAtFilecursor,
+			"^J": self.file_window.newLineAtFilecursor,
+			"^W": self.file_window.saveFile,
+			"^I": self.file_window.enterTextAtFilecursor,
 
-		self.bindings["^F"] = self.magicBar.search
-		self.bindings["^L"] = self.magicBar.gotoLine
-		self.bindings["^G"] = self.magicBar.searchNext
-		self.bindings["^R"] = self.magicBar.replace
+			"^F": self.magic_bar.search,
+			"^L": self.magic_bar.gotoLine,
+			"^G": self.magic_bar.searchNext,
+			"^R": self.magic_bar.replace,
 
-		self.bindings["^_"] = self.configCustomizer.toggle
+			"^_": self.config_customizer.toggle,
 
-		self.bindings["^B"] = self.fileWindow.toggleSelect
-		self.bindings["^K"] = self.fileWindow.copySelect
-		self.bindings["^V"] = self.fileWindow.pasteAtFilecursor
-		self.bindings["^X"] = self.fileWindow.cutSelect
+			"^B": self.file_window.toggleSelect,
+			"^K": self.file_window.copySelect,
+			"^V": self.file_window.pasteAtFilecursor,
+			"^X": self.file_window.cutSelect,
 
-		self.bindings["kRIT5"] = self.fileWindow.moveViewportRight
-		self.bindings["kLFT5"] = self.fileWindow.moveViewportLeft
-		self.bindings["kUP5"] = self.fileWindow.moveViewportUp
-		self.bindings["kDN5"] = self.fileWindow.moveViewportDown
+			"kRIT5": self.file_window.moveViewportRight,
+			"kLFT5": self.file_window.moveViewportLeft,
+			"kUP5":  self.file_window.moveViewportUp,
+			"kDN5":  self.file_window.moveViewportDown
+		}

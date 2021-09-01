@@ -1,56 +1,55 @@
-# # file window covers everything about a file and seeing it visually
-# # filecursor (current location in file), viewport? (what YOU're seeing), screenCursor (wherever you are has to visible _somehow_).
-
 from modules.window import Window
 class LineNumbersWindow(Window):
 	def __init__(self, manager, name):
 		Window.__init__(self, manager, name)
 
 		## FileWindow instance that LineNumbersWindow is attached to.
-		self.fileWindow = self.manager.Windows["fileWindow"]
+		self.file_window = self.manager.Windows["fileWindow"]
 
-		self.intendedY = self.fileWindow.getWindowBegY()
-		self.intendedWidth = 5
-		self.intendedX = self.fileWindow.getWindowBegX() - self.intendedWidth
-		self.intendedHeight = self.fileWindow.getWindowMaxY()
-		if self.intendedX < 0:
-			self.intendedX = 0
+		self.intended_y			= self.file_window.getWindowBegY()
+		self.intended_width		= 5
+		self.intended_x			= self.file_window.getWindowBegX() - self.intended_width
+		self.intended_height	= self.file_window.getWindowMaxY()
+		if self.intended_x < 0:
+			self.intended_x = 0
 
-		totalLines = len(self.fileWindow.fileLines)
-		self.fileWindow.intendedX = len(str(totalLines)) + 1
+		total_lines = len(self.file_window.file_lines)
+		self.file_window.intended_x = len(str(total_lines)) + 1
 
 		self.window.erase()
 		self.keepWindowInMainScreen()
-		self.fileWindow.panel.top()
+		self.file_window.panel.top()
 
 	def update(self):
 		self.window.erase()
 
-		totalLines = len(self.fileWindow.fileLines)
-		self.intendedWidth = len(str(totalLines)) + 2
-		self.fileWindow.intendedX = len(str(totalLines)) + 1
-		self.fileWindow.intendedWidth = self.getStdscrMaxX() - self.fileWindow.intendedX - 1
-		self.fileWindow.keepWindowInMainScreen()
-		self.intendedX = self.fileWindow.getWindowBegX() - self.intendedWidth + 1
-		self.intendedHeight = self.fileWindow.getWindowMaxY()
+		total_lines = len(self.file_window.file_lines)
+		self.intended_width = len(str(total_lines)) + 2
+
+		self.file_window.intended_x		= len(str(total_lines)) + 1
+		self.file_window.intended_width	= self.getStdscrMaxX() - self.file_window.intended_x - 1
+		self.file_window.keepWindowInMainScreen()
+
+		self.intended_x			= self.file_window.getWindowBegX() - self.intended_width + 1
+		self.intended_height	= self.file_window.getWindowMaxY()
 
 		self.keepWindowInMainScreen()
 
-		if self.intendedX >= 0:
-			self.window.mvwin(self.intendedY, self.intendedX)
+		if self.intended_x >= 0:
+			self.window.mvwin(self.intended_y, self.intended_x)
 		else:
-			self.window.mvwin(self.intendedY, 0)
-			self.fileWindow.intendedX += 1
-			self.fileWindow.keepWindowInMainScreen()
+			self.window.mvwin(self.intended_y, 0)
+			self.file_window.intended_x += 1
+			self.file_window.keepWindowInMainScreen()
 
-		windowY = 0
-		currentLine = self.fileWindow.getViewportY()
-		self.fileWindow.intendedX = len(str(totalLines)) + 1
-		if self.intendedWidth <= self.getWindowMaxX():
-			while windowY < self.getWindowMaxY() and windowY + currentLine < totalLines:
-				lineNumberString = str(currentLine + windowY + 1)
-				self.window.addstr(windowY, 0, lineNumberString + (" " * (len(str(totalLines)) - len(lineNumberString))) + "┃")
-				windowY += 1
+		window_y = 0
+		current_line = self.file_window.getViewportY()
+		self.file_window.intended_x = len(str(total_lines)) + 1
+		if self.intended_width <= self.getWindowMaxX():
+			while window_y < self.getWindowMaxY() and window_y + current_line < total_lines:
+				line_number_string = str(current_line + window_y + 1)
+				self.window.addstr(window_y, 0, line_number_string + (" " * (len(str(total_lines)) - len(line_number_string))) + "┃")
+				window_y += 1
 
 	def terminate(self):
  		pass

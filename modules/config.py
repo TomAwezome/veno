@@ -1,5 +1,4 @@
-import json
-import os
+import json, os
 from pathlib import Path
 
 ##
@@ -12,7 +11,7 @@ class Config:
 	## @param      self    The object
 	##
 	def __init__(self, filename):
-		self.defaultOptions = {
+		self.default_options = {
 			"TabExpandSize": 4,
 			"TabLength": 4,
 			"LineWrapLength": 100,
@@ -55,18 +54,18 @@ class Config:
 
 			# read json text for config options
 			try:
-				jsonDict = json.loads(self.text) # load config json file in as dictionary
-				self.options = {**self.defaultOptions, **jsonDict} # set config options as default options, overridden by config file settings
-				if len(jsonDict) < len(self.defaultOptions): # if config file has less entries than default, .veno is old and will be updated
+				json_dict = json.loads(self.text) # load config json file in as dictionary
+				self.options = {**self.default_options, **json_dict} # set config options as default options, overridden by config file settings
+				if len(json_dict) < len(self.default_options): # if config file has less entries than default, .veno is old and will be updated
 					self.save()
 			except:
-				self.options = self.defaultOptions
+				self.options = self.default_options
 
 		except FileNotFoundError:
 			home = str(Path.home())
-			file = open(home+'/.veno', "w")
+			file = open(home + '/.veno', "w")
 			file.write("{}")
-			self.options = self.defaultOptions
+			self.options = self.default_options
 			file.close()
 
 		extension = os.path.splitext(filename)[1][1:]
@@ -76,7 +75,7 @@ class Config:
 	def save(self):
 		self.text = json.dumps(self.options, sort_keys=True, indent=4, separators=(',', ': '))
 		home = str(Path.home())
-		file = open(home+'/.veno',"w")
+		file = open(home + '/.veno', "w")
 		file.write(self.text)
 		file.close()
 

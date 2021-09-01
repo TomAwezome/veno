@@ -13,16 +13,23 @@ Multi-purpose text/code editor meant for easy and vast expandability.
 
 ## Install
 
-Uses external libraries. Requires Python3.
-Prerequisites: Pygments, Curses. Install these for Python3 if not currently on system.
+Requires Python 3.
 
-Run `pip3 install -r requirements.txt` in `veno` directory to install prerequisites.
+Dependencies:
+ - Pygments
+ - ncurses
+
+Run `pip3 install -r requirements.txt` to install dependencies.
  - In case this does not successfully install Pygments, installing Pygments through a package manager may.
    - On Ubuntu, try `sudo apt install python3-pygments`
 
+To use `veno` globally, add the repo to your $PATH. Alternatively, add an alias to `veno` in your `.bashrc` or `.bash_alias`.
+
+Run `chmod +x veno` to mark `veno` as executable.
+
 ## Usage
 
-To run, execute `python3 veno [filename]` Filename optional. 
+`veno [filename]` Filename optional. 
 
 Runs in a terminal window. GUI not yet implemented.
 
@@ -52,5 +59,5 @@ Runs in a terminal window. GUI not yet implemented.
  - **Ctrl-K** -- copy and store selection in file
  - **Ctrl-X** -- cut and store selection from file
  - **Ctrl-V** -- paste selection into file
- - **Ctrl-_** -- toggle config customizer.
+ - **Ctrl-_, Ctrl-/** -- toggle config customizer.
 

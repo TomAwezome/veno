@@ -1,5 +1,4 @@
-import re
-import string
+import re, string
 
 from modules.window import Window
 class MagicBar(Window):
@@ -9,219 +8,228 @@ class MagicBar(Window):
 		self.string = string
 		
 		## FileWindow instance MagicBar is attached to.
-		self.fileWindow = self.manager.Windows["fileWindow"]
+		self.file_window = self.manager.Windows["fileWindow"]
 		
 		self.config = self.manager.Objects["config"].options
 
-		self.searchCursorX = 0
-		self.searchString = ""
+		self.search_cursor_x = 0
+		self.search_string = ""
 
-		self.gotoLineCursorX = 0
-		self.gotoLineString = ""
+		self.goto_line_cursor_x = 0
+		self.goto_line_string = ""
 
-		self.saveCursorX = 0
-		self.saveString = self.fileWindow.file.source
+		self.save_cursor_x = 0
+		self.save_string = self.file_window.file.source
 
-		self.patternMatches = None
-		self.nextMatch = None
+		self.pattern_matches = None
+		self.next_match = None
 
 		# Functions are stored in these dictionaries for magicBar curses getch() loops.
-		self.searchBindings = {}
-		self.gotoLineBindings = {}
-		self.saveBindings = {}
-		self.replaceBindings = {}
+		self.search_bindings	= {}
+		self.goto_line_bindings = {}
+		self.save_bindings		= {}
+		self.replace_bindings	= {}
 		self.bind()
 
 		self.panel.top()
 		self.panel.hide()
 
 	def update(self):
-		self.cursor = self.fileWindow.filecursor
+		self.cursor = self.file_window.filecursor
 
 	def bind(self):
-		self.searchBindings["KEY_LEFT"] = self.moveSearchCursorLeft
-		self.searchBindings["KEY_RIGHT"] = self.moveSearchCursorRight
-		self.searchBindings["KEY_BACKSPACE"] = self.backspaceAtSearchCursor
-		self.searchBindings["^?"] = self.backspaceAtSearchCursor
-		self.searchBindings["^H"] = self.backspaceAtSearchCursor
-		self.searchBindings["KEY_DC"] = self.deleteAtSearchCursor
-		self.searchBindings["KEY_HOME"] = self.moveSearchCursorToStart
-		self.searchBindings["KEY_END"] = self.moveSearchCursorToEnd
-		self.searchBindings["^I"] = self.enterTabAtSearchCursor
-		self.searchBindings["printable-character"] = self.enterTextAtSearchCursor
+		self.search_bindings = {
+			"KEY_LEFT":      self.moveSearchCursorLeft,
+			"KEY_RIGHT":     self.moveSearchCursorRight,
+			"KEY_BACKSPACE": self.backspaceAtSearchCursor,
+			"^?":            self.backspaceAtSearchCursor,
+			"^H":            self.backspaceAtSearchCursor,
+			"KEY_DC":        self.deleteAtSearchCursor,
+			"KEY_HOME":      self.moveSearchCursorToStart,
+			"KEY_END":       self.moveSearchCursorToEnd,
+			"^I":            self.enterTabAtSearchCursor,
 
-		self.gotoLineBindings["KEY_LEFT"] = self.moveGotoLineCursorLeft
-		self.gotoLineBindings["KEY_RIGHT"] = self.moveGotoLineCursorRight
-		self.gotoLineBindings["KEY_BACKSPACE"] = self.backspaceAtGotoLineCursor
-		self.gotoLineBindings["^?"] = self.backspaceAtGotoLineCursor
-		self.gotoLineBindings["^H"] = self.backspaceAtGotoLineCursor
-		self.gotoLineBindings["KEY_DC"] = self.deleteAtGotoLineCursor
-		self.gotoLineBindings["KEY_HOME"] = self.moveGotoLineCursorToStart
-		self.gotoLineBindings["KEY_END"] = self.moveGotoLineCursorToEnd
-		self.gotoLineBindings["digit"] = self.enterDigitAtGotoLineCursor
-		
-		self.saveBindings["KEY_LEFT"] = self.moveSaveCursorLeft
-		self.saveBindings["KEY_RIGHT"] = self.moveSaveCursorRight
-		self.saveBindings["KEY_BACKSPACE"] = self.backspaceAtSaveCursor
-		self.saveBindings["^?"] = self.backspaceAtSaveCursor
-		self.saveBindings["^H"] = self.backspaceAtSaveCursor
-		self.saveBindings["KEY_DC"] = self.deleteAtSaveCursor
-		self.saveBindings["KEY_HOME"] = self.moveSaveCursorToStart
-		self.saveBindings["KEY_END"] = self.moveSaveCursorToEnd
-		self.saveBindings["printable-character"] = self.enterTextAtSaveCursor
+			"printable-character": self.enterTextAtSearchCursor
+		}
 
-		self.replaceBindings["y"] = self.replaceTextAtMatch
-		self.replaceBindings["a"] = self.replaceAllMatches
+		self.goto_line_bindings = {
+			"KEY_LEFT":      self.moveGotoLineCursorLeft,
+			"KEY_RIGHT":     self.moveGotoLineCursorRight,
+			"KEY_BACKSPACE": self.backspaceAtGotoLineCursor,
+			"^?":            self.backspaceAtGotoLineCursor,
+			"^H":            self.backspaceAtGotoLineCursor,
+			"KEY_DC":        self.deleteAtGotoLineCursor,
+			"KEY_HOME":      self.moveGotoLineCursorToStart,
+			"KEY_END":       self.moveGotoLineCursorToEnd,
+			"digit":         self.enterDigitAtGotoLineCursor
+		}
 
+		self.save_bindings = {
+			"KEY_LEFT":      self.moveSaveCursorLeft,
+			"KEY_RIGHT":     self.moveSaveCursorRight,
+			"KEY_BACKSPACE": self.backspaceAtSaveCursor,
+			"^?":            self.backspaceAtSaveCursor,
+			"^H":            self.backspaceAtSaveCursor,
+			"KEY_DC":        self.deleteAtSaveCursor,
+			"KEY_HOME":      self.moveSaveCursorToStart,
+			"KEY_END":       self.moveSaveCursorToEnd,
+
+			"printable-character": self.enterTextAtSaveCursor
+		}
+
+		self.replace_bindings = {
+			"y": self.replaceTextAtMatch,
+			"a": self.replaceAllMatches
+		}
 
 	def moveSearchCursorLeft(self):
-		if self.searchCursorX > 0:
-			self.searchCursorX -= 1
+		if self.search_cursor_x > 0:
+			self.search_cursor_x -= 1
 
 	def moveSearchCursorRight(self):
-		if self.searchCursorX < len(self.searchString):
-			self.searchCursorX += 1
+		if self.search_cursor_x < len(self.search_string):
+			self.search_cursor_x += 1
 
 	def backspaceAtSearchCursor(self):
-		if self.searchCursorX > 0:
-			searchStringLeft = self.searchString[:self.searchCursorX - 1]
-			searchStringRight = self.searchString[self.searchCursorX:]
-			self.searchString = searchStringLeft + searchStringRight
-			self.searchCursorX -= 1
+		if self.search_cursor_x > 0:
+			search_string_left = self.search_string[:self.search_cursor_x - 1]
+			search_string_right = self.search_string[self.search_cursor_x:]
+			self.search_string = search_string_left + search_string_right
+			self.search_cursor_x -= 1
 
 	def deleteAtSearchCursor(self):
-		if self.searchCursorX + 1 <= len(self.searchString): # if there is text to the right of our cursor
-			searchStringLeft = self.searchString[:self.searchCursorX]
-			searchStringRight = self.searchString[self.searchCursorX + 1:]
-			self.searchString = searchStringLeft + searchStringRight
+		if self.search_cursor_x + 1 <= len(self.search_string): # if there is text to the right of our cursor
+			search_string_left = self.search_string[:self.search_cursor_x]
+			search_string_right = self.search_string[self.search_cursor_x + 1:]
+			self.search_string = search_string_left + search_string_right
 
 	def moveSearchCursorToStart(self):
-		if self.searchCursorX > 0:
-			self.searchCursorX = 0
+		if self.search_cursor_x > 0:
+			self.search_cursor_x = 0
 
 	def moveSearchCursorToEnd(self):
-		if self.searchCursorX < len(self.searchString):
-			self.searchCursorX = len(self.searchString)
+		if self.search_cursor_x < len(self.search_string):
+			self.search_cursor_x = len(self.search_string)
 
 	def enterTabAtSearchCursor(self):
-		searchStringLeft = self.searchString[:self.searchCursorX] + '\t'
-		searchStringRight = self.searchString[self.searchCursorX:]
-		self.searchString = searchStringLeft + searchStringRight
-		self.searchCursorX += 1
+		search_string_left = self.search_string[:self.search_cursor_x] + '\t'
+		search_string_right = self.search_string[self.search_cursor_x:]
+		self.search_string = search_string_left + search_string_right
+		self.search_cursor_x += 1
 
 	def enterTextAtSearchCursor(self, text):
-		searchStringLeft = self.searchString[:self.searchCursorX] + text
-		searchStringRight = self.searchString[self.searchCursorX:]
-		self.searchString = searchStringLeft + searchStringRight
-		self.searchCursorX += 1
+		search_string_left = self.search_string[:self.search_cursor_x] + text
+		search_string_right = self.search_string[self.search_cursor_x:]
+		self.search_string = search_string_left + search_string_right
+		self.search_cursor_x += 1
 
 	def moveGotoLineCursorLeft(self):
-		if self.gotoLineCursorX > 0:
-			self.gotoLineCursorX -= 1
+		if self.goto_line_cursor_x > 0:
+			self.goto_line_cursor_x -= 1
 
 	def moveGotoLineCursorRight(self):
-		if self.gotoLineCursorX < len(self.gotoLineString):
-			self.gotoLineCursorX += 1
+		if self.goto_line_cursor_x < len(self.goto_line_string):
+			self.goto_line_cursor_x += 1
 
 	def backspaceAtGotoLineCursor(self):
-		if self.gotoLineCursorX > 0:
-			searchStringLeft = self.gotoLineString[:self.gotoLineCursorX - 1]
-			searchStringRight = self.gotoLineString[self.gotoLineCursorX:]
-			self.gotoLineString = searchStringLeft + searchStringRight
-			self.gotoLineCursorX -= 1
+		if self.goto_line_cursor_x > 0:
+			search_string_left = self.goto_line_string[:self.goto_line_cursor_x - 1]
+			search_string_right = self.goto_line_string[self.goto_line_cursor_x:]
+			self.goto_line_string = search_string_left + search_string_right
+			self.goto_line_cursor_x -= 1
 
 	def deleteAtGotoLineCursor(self):
-		if self.gotoLineCursorX + 1 <= len(self.gotoLineString): # if there is text to the right of our cursor
-			searchStringLeft = self.gotoLineString[:self.gotoLineCursorX]
-			searchStringRight = self.gotoLineString[self.gotoLineCursorX + 1:]
-			self.gotoLineString = searchStringLeft + searchStringRight
+		if self.goto_line_cursor_x + 1 <= len(self.goto_line_string): # if there is text to the right of our cursor
+			search_string_left = self.goto_line_string[:self.goto_line_cursor_x]
+			search_string_right = self.goto_line_string[self.goto_line_cursor_x + 1:]
+			self.goto_line_string = search_string_left + search_string_right
 
 	def moveGotoLineCursorToStart(self):
-		if self.gotoLineCursorX > 0:
-			self.gotoLineCursorX = 0
+		if self.goto_line_cursor_x > 0:
+			self.goto_line_cursor_x = 0
 
 	def moveGotoLineCursorToEnd(self):
-		if self.gotoLineCursorX < len(self.gotoLineString):
-			self.gotoLineCursorX = len(self.gotoLineString)
+		if self.goto_line_cursor_x < len(self.goto_line_string):
+			self.goto_line_cursor_x = len(self.goto_line_string)
 
 	def enterDigitAtGotoLineCursor(self, digit):
-		searchStringLeft = self.gotoLineString[:self.gotoLineCursorX] + digit
-		searchStringRight = self.gotoLineString[self.gotoLineCursorX:]
-		self.gotoLineString = searchStringLeft + searchStringRight
-		self.gotoLineCursorX += 1
+		search_string_left = self.goto_line_string[:self.goto_line_cursor_x] + digit
+		search_string_right = self.goto_line_string[self.goto_line_cursor_x:]
+		self.goto_line_string = search_string_left + search_string_right
+		self.goto_line_cursor_x += 1
 
 	def moveSaveCursorLeft(self):
-		if self.saveCursorX > 0:
-			self.saveCursorX -= 1
+		if self.save_cursor_x > 0:
+			self.save_cursor_x -= 1
 
 	def moveSaveCursorRight(self):
-		if self.saveCursorX < len(self.saveString):
-			self.saveCursorX += 1
+		if self.save_cursor_x < len(self.save_string):
+			self.save_cursor_x += 1
 
 	def backspaceAtSaveCursor(self):
-		if self.saveCursorX > 0:
-			saveStringLeft = self.saveString[:self.saveCursorX - 1]
-			saveStringRight = self.saveString[self.saveCursorX:]
-			self.saveString = saveStringLeft + saveStringRight
-			self.saveCursorX -= 1
+		if self.save_cursor_x > 0:
+			save_string_left = self.save_string[:self.save_cursor_x - 1]
+			save_string_right = self.save_string[self.save_cursor_x:]
+			self.save_string = save_string_left + save_string_right
+			self.save_cursor_x -= 1
 
 	def deleteAtSaveCursor(self):
-		if self.saveCursorX + 1 <= len(self.saveString): # if there is text to the right of our cursor
-			saveStringLeft = self.saveString[:self.saveCursorX]
-			saveStringRight = self.saveString[self.saveCursorX + 1:]
-			self.saveString = saveStringLeft + saveStringRight
+		if self.save_cursor_x + 1 <= len(self.save_string): # if there is text to the right of our cursor
+			save_string_left = self.save_string[:self.save_cursor_x]
+			save_string_right = self.save_string[self.save_cursor_x + 1:]
+			self.save_string = save_string_left + save_string_right
 
 	def moveSaveCursorToStart(self):
-		if self.saveCursorX > 0:
-			self.saveCursorX = 0
+		if self.save_cursor_x > 0:
+			self.save_cursor_x = 0
 
 	def moveSaveCursorToEnd(self):
-		if self.saveCursorX < len(self.saveString):
-			self.saveCursorX = len(self.saveString)
+		if self.save_cursor_x < len(self.save_string):
+			self.save_cursor_x = len(self.save_string)
 
 	def enterTextAtSaveCursor(self, text):
-		saveStringLeft = self.saveString[:self.saveCursorX] + text
-		saveStringRight = self.saveString[self.saveCursorX:]
-		self.saveString = saveStringLeft + saveStringRight
-		self.saveCursorX += 1
+		save_string_left = self.save_string[:self.save_cursor_x] + text
+		save_string_right = self.save_string[self.save_cursor_x:]
+		self.save_string = save_string_left + save_string_right
+		self.save_cursor_x += 1
 
-	def replaceTextAtMatch(self, firstString, secondString):
-		fileLines = self.fileWindow.fileLines
-		fileString = '\n'.join(fileLines)
+	def replaceTextAtMatch(self, first_string, second_string):
+		file_lines = self.file_window.file_lines
+		file_string = '\n'.join(file_lines)
 
-		replacedString = self.re.sub(firstString, secondString, fileString[self.nextMatch.start():self.nextMatch.end()])
-		replaceStringLeft = fileString[:self.nextMatch.start()]
-		replaceStringRight = fileString[self.nextMatch.end():]
-		replaceStringCombined = replaceStringLeft + replacedString + replaceStringRight
-		self.fileWindow.fileLines = replaceStringCombined.splitlines()
-		self.fileWindow.file.contents = replaceStringCombined
+		replaced_string = self.re.sub(first_string, second_string, file_string[self.next_match.start():self.next_match.end()])
+		replaced_string_left = file_string[:self.next_match.start()]
+		replaced_string_right = file_string[self.next_match.end():]
+		replaced_string_combined = replaced_string_left + replaced_string + replaced_string_right
+		self.file_window.file_lines = replaced_string_combined.splitlines()
+		self.file_window.file.contents = replaced_string_combined
 
-	def replaceAllMatches(self, firstString, secondString):
-		fileLines = self.fileWindow.fileLines
-		fileString = '\n'.join(fileLines)
-		replacedString = self.re.sub(firstString, secondString, fileString)
-		self.fileWindow.file.contents = replacedString
-		self.fileWindow.fileLines = replacedString.splitlines()
+	def replaceAllMatches(self, first_string, second_string):
+		file_lines = self.file_window.file_lines
+		file_string = '\n'.join(file_lines)
+		replaced_string = self.re.sub(first_string, second_string, file_string)
+		self.file_window.file.contents = replaced_string
+		self.file_window.file_lines = replaced_string.splitlines()
 
 
 	def search(self):
 		self.panel.show()
 		self.panel.top()
-		self.intendedX = 0 
-		self.intendedY = self.getStdscrMaxY()
-		self.intendedWidth = self.getStdscrMaxX() - 1
-		self.intendedHeight = 1
+		self.intended_x = 0 
+		self.intended_y = self.getStdscrMaxY()
+		self.intended_width = self.getStdscrMaxX() - 1
+		self.intended_height = 1
 
 		self.keepWindowInMainScreen()
 		self.manager.update()
 		self.keepWindowInMainScreen()
 		
-		tabExpandSize = tabExpandSize = self.config["TabExpandSize"]
-		self.window.addnstr(0, 0, self.searchString.expandtabs(tabExpandSize), self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
+		tab_expand_size = tab_expand_size = self.config["TabExpandSize"]
+		self.window.addnstr(0, 0, self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
 
-		tabDiff = len(self.searchString[:self.searchCursorX].expandtabs(tabExpandSize)) - len(self.searchString[:self.searchCursorX])
-		if self.searchCursorX + tabDiff <= self.getWindowMaxX() - 2 and self.searchCursorX >= 0:
-			self.window.chgat(0, self.searchCursorX + tabDiff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+		tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
+		if self.search_cursor_x + tab_diff <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
+			self.window.chgat(0, self.search_cursor_x + tab_diff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 
 		self.manager.update()
 		while True: # break out of this loop with enter key
@@ -229,7 +237,7 @@ class MagicBar(Window):
 			try:
 				c = self.manager.stdscr.getch()
 			except KeyboardInterrupt:
-				break
+				return
 
 			if c == -1:
 				continue
@@ -237,56 +245,56 @@ class MagicBar(Window):
 			c = self.manager.curses.keyname(c)
 			c = c.decode("utf-8")
 
-			if c in self.searchBindings:
-				self.searchBindings[c]()
+			if c in self.search_bindings:
+				self.search_bindings[c]()
 			elif c in self.string.punctuation + self.string.digits + self.string.ascii_letters + self.string.whitespace:
-				self.searchBindings["printable-character"](c)
+				self.search_bindings["printable-character"](c)
 			elif c == "^J": # enter key
 				break
 
 			self.keepWindowInMainScreen()
-			self.window.addnstr(0, 0, self.searchString.expandtabs(tabExpandSize), self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
+			self.window.addnstr(0, 0, self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
 
-			tabDiff = len(self.searchString[:self.searchCursorX].expandtabs(tabExpandSize)) - len(self.searchString[:self.searchCursorX])
-			if self.searchCursorX + tabDiff <= self.getWindowMaxX() - 2 and self.searchCursorX >= 0:
-				self.window.chgat(0, self.searchCursorX + tabDiff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+			tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
+			if self.search_cursor_x + tab_diff <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
+				self.window.chgat(0, self.search_cursor_x + tab_diff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 
 			self.manager.update()
 
-		pattern = self.re.compile(self.searchString)
-		self.patternMatches = pattern.finditer(self.fileWindow.file.contents)
+		pattern = self.re.compile(self.search_string)
+		self.pattern_matches = pattern.finditer(self.file_window.file.contents)
 		try:
-			self.nextMatch = next(self.patternMatches)
-			searchIndexY = self.fileWindow.file.contents[:self.nextMatch.start()].count('\n')
-			searchLines = self.fileWindow.file.contents[:self.nextMatch.start()].split('\n')
-			if len(searchLines) > 0:
-				searchIndexX = len(searchLines[len(searchLines) - 1])
+			self.next_match = next(self.pattern_matches)
+			search_index_y = self.file_window.file.contents[:self.next_match.start()].count('\n')
+			search_lines = self.file_window.file.contents[:self.next_match.start()].split('\n')
+			if len(search_lines) > 0:
+				search_index_x = len(search_lines[len(search_lines) - 1])
 		except StopIteration:
 			pass
 
-		if self.nextMatch != None:
-			while searchIndexY < self.cursor[1]:
+		if self.next_match:
+			while search_index_y < self.cursor[1]:
 				try:
-					self.nextMatch = next(self.patternMatches)
-					searchIndexY = self.fileWindow.file.contents[:self.nextMatch.start()].count('\n')
-					searchLines = self.fileWindow.file.contents[:self.nextMatch.start()].split('\n')
-					if len(searchLines) > 0:
-						searchIndexX = len(searchLines[len(searchLines) - 1])
+					self.next_match = next(self.pattern_matches)
+					search_index_y = self.file_window.file.contents[:self.next_match.start()].count('\n')
+					search_lines = self.file_window.file.contents[:self.next_match.start()].split('\n')
+					if len(search_lines) > 0:
+						search_index_x = len(search_lines[len(search_lines) - 1])
 				except StopIteration:
 					break
 
-			while searchIndexY == self.cursor[1] and searchIndexX <= self.cursor[0]:
+			while search_index_y == self.cursor[1] and search_index_x <= self.cursor[0]:
 				try:
-					self.nextMatch = next(self.patternMatches)
-					searchIndexY = self.fileWindow.file.contents[:self.nextMatch.start()].count('\n')
-					searchLines = self.fileWindow.file.contents[:self.nextMatch.start()].split('\n')
-					if len(searchLines) > 0:
-						searchIndexX = len(searchLines[len(searchLines) - 1])
+					self.next_match = next(self.pattern_matches)
+					search_index_y = self.file_window.file.contents[:self.next_match.start()].count('\n')
+					search_lines = self.file_window.file.contents[:self.next_match.start()].split('\n')
+					if len(search_lines) > 0:
+						search_index_x = len(search_lines[len(search_lines) - 1])
 				except StopIteration:
 					break
 
-			self.fileWindow.gotoLine(searchIndexY)
-			self.fileWindow.setFilecursorX(searchIndexX)
+			self.file_window.gotoLine(search_index_y)
+			self.file_window.setFilecursorX(search_index_x)
 			self.update()
 
 			self.keepWindowInMainScreen()
@@ -294,80 +302,77 @@ class MagicBar(Window):
 	def gotoLine(self):
 		self.panel.show()
 		self.panel.top()
-		self.intendedX = 0
-		self.intendedY = self.getStdscrMaxY()
-		self.intendedWidth = self.getStdscrMaxX() - 1
-		self.intendedHeight = 1
+		self.intended_x = 0
+		self.intended_y = self.getStdscrMaxY()
+		self.intended_width = self.getStdscrMaxX() - 1
+		self.intended_height = 1
 
 		self.keepWindowInMainScreen()
 		self.manager.update()
 		
-		self.window.addnstr(0, 0, self.gotoLineString, self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
+		self.window.addnstr(0, 0, self.goto_line_string, self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
 
-		if self.gotoLineCursorX <= self.getWindowMaxX() - 2 and self.gotoLineCursorX >= 0:
-			self.window.chgat(0, self.gotoLineCursorX, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+		if self.goto_line_cursor_x <= self.getWindowMaxX() - 2 and self.goto_line_cursor_x >= 0:
+			self.window.chgat(0, self.goto_line_cursor_x, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 
 		self.manager.update()
 		
-		wasInterrupted = False
 		while True: # break out of this loop with enter key
 			self.window.erase()
 			try:
 				c = self.manager.stdscr.getch()
 			except KeyboardInterrupt:
-				wasInterrupted = True
-				break
+				return
 			if c == -1:
 				continue
 			c = self.manager.curses.keyname(c)
 			c = c.decode("utf-8")
 
-			if c in self.gotoLineBindings:
-				self.gotoLineBindings[c]()
+			if c in self.goto_line_bindings:
+				self.goto_line_bindings[c]()
 			elif c in self.string.digits:
-				self.gotoLineBindings["digit"](c)
+				self.goto_line_bindings["digit"](c)
 			elif c == "^J": # enter key
 				break
 
 			self.keepWindowInMainScreen()
-			self.window.addnstr(0, 0, self.gotoLineString, self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
+			self.window.addnstr(0, 0, self.goto_line_string, self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
 
-			if self.gotoLineCursorX <= self.getWindowMaxX() - 2 and self.gotoLineCursorX >= 0:
-				self.window.chgat(0, self.gotoLineCursorX, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+			if self.goto_line_cursor_x <= self.getWindowMaxX() - 2 and self.goto_line_cursor_x >= 0:
+				self.window.chgat(0, self.goto_line_cursor_x, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 
 			self.manager.update()
 
-		if not wasInterrupted:
-			if self.gotoLineString != "":
-				lineNumber = int(self.gotoLineString)
-				if lineNumber > 0:
-					self.fileWindow.gotoLine(lineNumber - 1)
+		if self.goto_line_string != "":
+			lineNumber = int(self.goto_line_string)
+			if lineNumber > 0:
+				self.file_window.gotoLine(lineNumber - 1)
 
 		self.keepWindowInMainScreen()
 
 	def searchNext(self):
 		self.panel.show()
 		self.panel.top()
-		self.intendedX = 0
-		self.intendedY = self.getStdscrMaxY()
-		self.intendedWidth = self.getStdscrMaxX() - 1
-		self.intendedHeight = 1
+		self.intended_x = 0
+		self.intended_y = self.getStdscrMaxY()
+		self.intended_width = self.getStdscrMaxX() - 1
+		self.intended_height = 1
 
 		self.keepWindowInMainScreen()
 		
 		try:
 			try:
-				self.nextMatch = next(self.patternMatches) # next operates to go down iterator, in this case if hitting first instance of given string, next() will start at that first index and continue through matches
+				self.next_match = next(self.pattern_matches) # next operates to go down iterator, in this case if hitting first instance of given string, next() will start at that first index and continue through matches
 			except TypeError: # if patternMatches is not iterator, next() raises TypeError. Catch and abort.
 				return
 
-			searchIndexY = self.fileWindow.file.contents[:self.nextMatch.start()].count('\n')
-			searchLines = self.fileWindow.file.contents[:self.nextMatch.start()].split('\n')
-			if len(searchLines) > 0:
-				searchIndexX = len(searchLines[len(searchLines) - 1])
+			search_index_y = self.file_window.file.contents[:self.next_match.start()].count('\n')
+			search_lines = self.file_window.file.contents[:self.next_match.start()].split('\n')
+			if len(search_lines) > 0:
+				search_index_x = len(search_lines[len(search_lines) - 1])
 
-			self.fileWindow.gotoLine(searchIndexY)
-			self.fileWindow.setFilecursorX(searchIndexX)
+			self.file_window.gotoLine(search_index_y)
+			self.file_window.setFilecursorX(search_index_x)
 
 		except StopIteration:
 			pass
@@ -375,21 +380,21 @@ class MagicBar(Window):
 	def replace(self):
 		self.panel.show()
 		self.panel.top()
-		self.intendedX = 0
-		self.intendedY = self.getStdscrMaxY()
-		self.intendedWidth = self.getStdscrMaxX() - 1
-		self.intendedHeight = 1
+		self.intended_x = 0
+		self.intended_y = self.getStdscrMaxY()
+		self.intended_width = self.getStdscrMaxX() - 1
+		self.intended_height = 1
 
 		self.keepWindowInMainScreen()	
 		self.manager.update()
 		self.keepWindowInMainScreen()
 
-		tabExpandSize = tabExpandSize = self.config["TabExpandSize"]
-		self.window.addnstr(0, 0, self.searchString.expandtabs(tabExpandSize), self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
+		tab_expand_size = tab_expand_size = self.config["TabExpandSize"]
+		self.window.addnstr(0, 0, self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
 
-		tabDiff = len(self.searchString[:self.searchCursorX].expandtabs(tabExpandSize)) - len(self.searchString[:self.searchCursorX])
-		if self.searchCursorX + tabDiff <= self.getWindowMaxX() - 2 and self.searchCursorX >= 0:
-			self.window.chgat(0, self.searchCursorX + tabDiff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+		tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
+		if self.search_cursor_x + tab_diff <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
+			self.window.chgat(0, self.search_cursor_x + tab_diff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 
 		self.manager.update()
 
@@ -400,43 +405,43 @@ class MagicBar(Window):
 			try:
 				c = self.manager.stdscr.getch()
 			except KeyboardInterrupt:
-				break
+				return
 			if c == -1:
 				continue
 			c = self.manager.curses.keyname(c)
 			c = c.decode("utf-8")
 
-			if c in self.searchBindings:
-				self.searchBindings[c]()
+			if c in self.search_bindings:
+				self.search_bindings[c]()
 			elif c in self.string.punctuation + self.string.digits + self.string.ascii_letters + self.string.whitespace:
-				self.searchBindings["printable-character"](c)
+				self.search_bindings["printable-character"](c)
 			elif c == "^J": # enter key
 				break
 			
 			self.keepWindowInMainScreen()
-			self.window.addnstr(0, 0, self.searchString.expandtabs(tabExpandSize), self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
+			self.window.addnstr(0, 0, self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
 
-			tabDiff = len(self.searchString[:self.searchCursorX].expandtabs(tabExpandSize)) - len(self.searchString[:self.searchCursorX])
-			if self.searchCursorX + tabDiff <= self.getWindowMaxX() - 2 and self.searchCursorX >= 0:
-				self.window.chgat(0, self.searchCursorX + tabDiff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+			tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
+			if self.search_cursor_x + tab_diff <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
+				self.window.chgat(0, self.search_cursor_x + tab_diff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 
 			self.manager.update()
 		
-		firstString = self.searchString
+		first_string = self.search_string
 		
 	# replacement string
 	# keypress loop: begin catching characters
-		self.searchString = ""
-		self.searchCursorX = 0
+		self.search_string = ""
+		self.search_cursor_x = 0
 
 		self.manager.update()
 		self.keepWindowInMainScreen()
 
-		self.window.addnstr(0, 0, self.searchString.expandtabs(tabExpandSize), self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
+		self.window.addnstr(0, 0, self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
 
-		tabDiff = len(self.searchString[:self.searchCursorX].expandtabs(tabExpandSize)) - len(self.searchString[:self.searchCursorX])
-		if self.searchCursorX + tabDiff <= self.getWindowMaxX() - 2 and self.searchCursorX >= 0:
-			self.window.chgat(0, self.searchCursorX + tabDiff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+		tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
+		if self.search_cursor_x + tab_diff <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
+			self.window.chgat(0, self.search_cursor_x + tab_diff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 
 		self.manager.update()
 
@@ -445,81 +450,81 @@ class MagicBar(Window):
 			try:
 				c = self.manager.stdscr.getch()
 			except KeyboardInterrupt:
-				break
+				return
 			if c == -1:
 				continue
 			c = self.manager.curses.keyname(c)
 			c = c.decode("utf-8")
 
-			if c in self.searchBindings:
-				self.searchBindings[c]()
+			if c in self.search_bindings:
+				self.search_bindings[c]()
 			elif c in self.string.punctuation + self.string.digits + self.string.ascii_letters + self.string.whitespace:
-				self.searchBindings["printable-character"](c)
+				self.search_bindings["printable-character"](c)
 			elif c == "^J": # enter key
 				break
 			
 			self.keepWindowInMainScreen()
-			self.window.addnstr(0, 0, self.searchString.expandtabs(tabExpandSize), self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
+			self.window.addnstr(0, 0, self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
 
-			tabDiff = len(self.searchString[:self.searchCursorX].expandtabs(tabExpandSize)) - len(self.searchString[:self.searchCursorX])
-			if self.searchCursorX + tabDiff <= self.getWindowMaxX() - 2 and self.searchCursorX >= 0:
-				self.window.chgat(0, self.searchCursorX + tabDiff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+			tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
+			if self.search_cursor_x + tab_diff <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
+				self.window.chgat(0, self.search_cursor_x + tab_diff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 
 			self.manager.update()
 			
-		secondString = self.searchString
+		second_string = self.search_string
 
-		fileLines = self.fileWindow.fileLines
-		fileString = '\n'.join(fileLines)
+		file_lines = self.file_window.file_lines
+		file_string = '\n'.join(file_lines)
 
 		# next we'll find the first occurence (relative to our cursor) of our to-be-replaced string, and move the file cursor there and have our current nexMatch be that occurence
 
-		pattern = self.re.compile(firstString)
-		self.patternMatches = pattern.finditer(self.fileWindow.file.contents)
+		pattern = self.re.compile(first_string)
+		self.pattern_matches = pattern.finditer(self.file_window.file.contents)
 		try:
-			self.nextMatch = next(self.patternMatches)
-			searchIndexY = self.fileWindow.file.contents[:self.nextMatch.start()].count('\n')
-			searchLines = self.fileWindow.file.contents[:self.nextMatch.start()].split('\n')
-			if len(searchLines) > 0:
-				searchIndexX = len(searchLines[len(searchLines) - 1])
+			self.next_match = next(self.pattern_matches)
+			search_index_y = self.file_window.file.contents[:self.next_match.start()].count('\n')
+			search_lines = self.file_window.file.contents[:self.next_match.start()].split('\n')
+			if len(search_lines) > 0:
+				search_index_x = len(search_lines[len(search_lines) - 1])
 		except StopIteration:
 			pass
 
-		if self.nextMatch != None:
-			while searchIndexY < self.cursor[1]:
+		if self.next_match:
+			while search_index_y < self.cursor[1]:
 				try:
-					self.nextMatch = next(self.patternMatches)
-					searchIndexY = self.fileWindow.file.contents[:self.nextMatch.start()].count('\n')
-					searchLines = self.fileWindow.file.contents[:self.nextMatch.start()].split('\n')
-					if len(searchLines) > 0:
-						searchIndexX = len(searchLines[len(searchLines) - 1])
+					self.next_match = next(self.pattern_matches)
+					search_index_y = self.file_window.file.contents[:self.next_match.start()].count('\n')
+					search_lines = self.file_window.file.contents[:self.next_match.start()].split('\n')
+					if len(search_lines) > 0:
+						search_index_x = len(search_lines[len(search_lines) - 1])
 				except StopIteration:
 					break
 
-			while searchIndexY == self.cursor[1] and searchIndexX < self.cursor[0]:
+			while search_index_y == self.cursor[1] and search_index_x < self.cursor[0]:
 				try:
-					self.nextMatch = next(self.patternMatches)
-					searchIndexY = self.fileWindow.file.contents[:self.nextMatch.start()].count('\n')
-					searchLines = self.fileWindow.file.contents[:self.nextMatch.start()].split('\n')
-					if len(searchLines) > 0:
-						searchIndexX = len(searchLines[len(searchLines) - 1])
+					self.next_match = next(self.pattern_matches)
+					search_index_y = self.file_window.file.contents[:self.next_match.start()].count('\n')
+					search_lines = self.file_window.file.contents[:self.next_match.start()].split('\n')
+					if len(search_lines) > 0:
+						search_index_x = len(search_lines[len(search_lines) - 1])
 				except StopIteration:
 					break
 
-			self.fileWindow.gotoLine(searchIndexY)
-			self.fileWindow.setFilecursorX(searchIndexX)
+			self.file_window.gotoLine(search_index_y)
+			self.file_window.setFilecursorX(search_index_x)
 
 			self.keepWindowInMainScreen()
 
-		self.fileWindow.modified = True
-		self.fileWindow.update() # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
+		self.file_window.is_modified = True
+		self.file_window.update() # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
 
 		self.manager.Objects["highlighter"].update()
 
 		self.manager.update()
 
 		while True: # break out of this loop with enter key
-			if self.nextMatch == None:
+			if not self.next_match:
 				break
 
 			self.window.erase()
@@ -538,8 +543,8 @@ class MagicBar(Window):
 			c = self.manager.curses.keyname(c)
 			c = c.decode("utf-8")
 
-			if c in self.replaceBindings:
-				self.replaceBindings[c](firstString, secondString)
+			if c in self.replace_bindings:
+				self.replace_bindings[c](first_string, second_string)
 				if c == "a":
 					break
 			elif c == "n":
@@ -547,46 +552,46 @@ class MagicBar(Window):
 			elif c == "^J": # enter key
 				break
 
-			self.patternMatches = pattern.finditer(self.fileWindow.file.contents)
+			self.pattern_matches = pattern.finditer(self.file_window.file.contents)
 			try:
-				self.nextMatch = next(self.patternMatches)
-				searchIndexY = self.fileWindow.file.contents[:self.nextMatch.start()].count('\n')
-				searchLines = self.fileWindow.file.contents[:self.nextMatch.start()].split('\n')
-				if len(searchLines) > 0:
-					searchIndexX = len(searchLines[len(searchLines) - 1])
+				self.next_match = next(self.pattern_matches)
+				search_index_y = self.file_window.file.contents[:self.next_match.start()].count('\n')
+				search_lines = self.file_window.file.contents[:self.next_match.start()].split('\n')
+				if len(search_lines) > 0:
+					search_index_x = len(search_lines[len(search_lines) - 1])
 			except StopIteration:
 				break
 
-			if self.nextMatch != None:
-				while searchIndexY < self.cursor[1]:
+			if self.next_match:
+				while search_index_y < self.cursor[1]:
 					try:
-						self.nextMatch = next(self.patternMatches)
-						searchIndexY = self.fileWindow.file.contents[:self.nextMatch.start()].count('\n')
-						searchLines = self.fileWindow.file.contents[:self.nextMatch.start()].split('\n')
-						if len(searchLines) > 0:
-							searchIndexX = len(searchLines[len(searchLines) - 1])
+						self.next_match = next(self.pattern_matches)
+						search_index_y = self.file_window.file.contents[:self.next_match.start()].count('\n')
+						search_lines = self.file_window.file.contents[:self.next_match.start()].split('\n')
+						if len(search_lines) > 0:
+							search_index_x = len(search_lines[len(search_lines) - 1])
 					except StopIteration:
 						break
 
-				while searchIndexY == self.cursor[1] and searchIndexX <= self.cursor[0]:
+				while search_index_y == self.cursor[1] and search_index_x <= self.cursor[0]:
 					try:
-						self.nextMatch = next(self.patternMatches)
-						searchIndexY = self.fileWindow.file.contents[:self.nextMatch.start()].count('\n')
-						searchLines = self.fileWindow.file.contents[:self.nextMatch.start()].split('\n')
-						if len(searchLines) > 0:
-							searchIndexX = len(searchLines[len(searchLines) - 1])
+						self.next_match = next(self.pattern_matches)
+						search_index_y = self.file_window.file.contents[:self.next_match.start()].count('\n')
+						search_lines = self.file_window.file.contents[:self.next_match.start()].split('\n')
+						if len(search_lines) > 0:
+							search_index_x = len(search_lines[len(search_lines) - 1])
 					except StopIteration:
 						break
 
-				self.fileWindow.gotoLine(searchIndexY)
-				self.fileWindow.setFilecursorX(searchIndexX)
+				self.file_window.gotoLine(search_index_y)
+				self.file_window.setFilecursorX(search_index_x)
 
 				self.keepWindowInMainScreen()
 
 			self.keepWindowInMainScreen()
 
-			self.fileWindow.modified = True
-			self.fileWindow.update() # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
+			self.file_window.is_modified = True
+			self.file_window.update() # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
 
 			self.manager.Objects["highlighter"].update()
 
@@ -595,8 +600,8 @@ class MagicBar(Window):
 		self.window.erase()
 		self.keepWindowInMainScreen()
 
-		self.fileWindow.modified = True
-		self.fileWindow.update() # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
+		self.file_window.is_modified = True
+		self.file_window.update() # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
 
 		self.manager.Objects["highlighter"].update()
 
@@ -605,10 +610,10 @@ class MagicBar(Window):
 	def confirmExitSave(self):
 		self.panel.show()
 		self.panel.top()
-		self.intendedX = 0
-		self.intendedY = self.getStdscrMaxY()
-		self.intendedWidth = self.getStdscrMaxX() - 1
-		self.intendedHeight = 1
+		self.intended_x = 0
+		self.intended_y = self.getStdscrMaxY()
+		self.intended_width = self.getStdscrMaxX() - 1
+		self.intended_height = 1
 
 		self.keepWindowInMainScreen()
 		self.manager.update()
@@ -632,7 +637,7 @@ class MagicBar(Window):
 			c = c.decode("utf-8")
 			if c == "^J":
 				self.window.erase()
-				if self.fileWindow.saveFile() == 0: # successfully saved
+				if self.file_window.saveFile() == 0: # successfully saved
 					exit("File saved, safe to exit")
 				else: # Ctrl-C to exit confirmExitSave and return to file
 					break
@@ -640,10 +645,10 @@ class MagicBar(Window):
 	def save(self):
 		self.panel.show()
 		self.panel.top()
-		self.intendedX = 0
-		self.intendedY = self.getStdscrMaxY()
-		self.intendedWidth = self.getStdscrMaxX() - 1
-		self.intendedHeight = 1
+		self.intended_x = 0
+		self.intended_y = self.getStdscrMaxY()
+		self.intended_width = self.getStdscrMaxX() - 1
+		self.intended_height = 1
 		returnval = 0
 
 		self.keepWindowInMainScreen()
@@ -670,7 +675,7 @@ class MagicBar(Window):
 			if c == "^J":
 				break
 
-		if kill == True:
+		if kill:
 			self.window.erase()
 			returnval = 1
 			return returnval
@@ -678,10 +683,10 @@ class MagicBar(Window):
 		# savefile string
 		# keypress loop: begin catching characters
 		self.window.erase()
-		self.window.addnstr(0, 0, self.saveString, self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
+		self.window.addnstr(0, 0, self.save_string, self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
 
-		if self.saveCursorX <= self.getWindowMaxX() - 2 and self.saveCursorX >= 0:
-			self.window.chgat(0, self.saveCursorX, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+		if self.save_cursor_x <= self.getWindowMaxX() - 2 and self.save_cursor_x >= 0:
+			self.window.chgat(0, self.save_cursor_x, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 
 		self.manager.update()
 		while True: # break out of this loop with enter key
@@ -696,23 +701,23 @@ class MagicBar(Window):
 			c = self.manager.curses.keyname(c)
 			c = c.decode("utf-8")
 
-			if c in self.saveBindings:
-				self.saveBindings[c]()
+			if c in self.save_bindings:
+				self.save_bindings[c]()
 			elif c in self.string.punctuation + self.string.digits + self.string.ascii_letters + self.string.whitespace:
-				self.saveBindings["printable-character"](c)
+				self.save_bindings["printable-character"](c)
 			elif c == "^J": # enter key
-				if self.saveString != "":
+				if self.save_string != "":
 					break
 
 			self.keepWindowInMainScreen()
-			self.window.addnstr(0, 0, self.saveString, self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
+			self.window.addnstr(0, 0, self.save_string, self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
 
-			if self.saveCursorX <= self.getWindowMaxX() - 2 and self.saveCursorX >= 0:
-				self.window.chgat(0, self.saveCursorX, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+			if self.save_cursor_x <= self.getWindowMaxX() - 2 and self.save_cursor_x >= 0:
+				self.window.chgat(0, self.save_cursor_x, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 
 			self.manager.update()
 
-		self.fileWindow.file.source = self.saveString
+		self.file_window.file.source = self.save_string
 		return returnval
 
 	def terminate(self):

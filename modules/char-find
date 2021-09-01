@@ -1,26 +1,29 @@
 #!/usr/bin/env python3
+import sys, curses
 
-import curses   # our friendly painter
-stdscr = curses.initscr()       # give us a WindowObject to work with.
+stdscr = curses.initscr()
 curses.start_color()
 curses.curs_set(0)
 curses.noecho()
 curses.use_default_colors()
-for i in range(0,curses.COLORS):
-        curses.init_pair(i+1,i,-1)
+for i in range(0, curses.COLORS):
+        curses.init_pair(i + 1, i, -1)
 
 def run(self):
 	while True:
-		c = stdscr.getch()
+		try:
+			c = stdscr.getch()
+		except:
+			sys.exit(0)
+
 		old = c
 		c = curses.keyname(c)
 		stdscr.clear()
 
-		stdscr.addstr(0,0,c)
-		stdscr.addstr(1,0,str(len(c)))
-		stdscr.addstr(2,0,str(old))
+		stdscr.addstr(0, 0, c)
+		stdscr.addstr(1, 0, str(len(c)))
+		stdscr.addstr(2, 0, str(old))
 
 		stdscr.refresh()
-
 
 curses.wrapper(run)

@@ -9,57 +9,56 @@ class FileWindow(Window):
 		self.filecursor = [0, 0] # [X, Y]
 		self.panel.bottom()
 		self.file = file
-		self.fileLines = self.file.contents.splitlines()
+		self.file_lines = self.file.contents.splitlines()
 		self.config = self.manager.Objects["config"].options
 
-		self.modified = True ## i.e. Modified since last highlight. Variable used for speed optimization of syntax highlighting algorithm.
-		self.selectPosition = []
-		self.selectOn = False
-		self.isRepeatingQuote = False
-		self.copyLines = []
+		self.is_modified = True ## i.e. Modified since last highlight. Variable used for speed optimization of syntax highlighting algorithm.
+		self.select_position = []
+		self.is_select_on = self.is_repeating_quote = False
+		self.copy_lines = []
 
 	def update(self):
 		self.window.erase()
-		self.intendedHeight = self.getStdscrMaxY() - self.intendedY - 1
-		self.intendedWidth = self.getStdscrMaxX() - self.intendedX - 1
+		self.intended_height = self.getStdscrMaxY() - self.intended_y - 1
+		self.intended_width = self.getStdscrMaxX() - self.intended_x - 1
 
 		self.keepWindowInMainScreen()
 
-		windowY = 0
-		tabExpandSize = self.config["TabExpandSize"]
-		viewportY = self.getViewportY()
-		windowMaxY = self.getWindowMaxY()
-		viewportX = self.getViewportX()
-		windowMaxX = self.getWindowMaxX()
+		window_y = 0
+		tab_expand_size = self.config["TabExpandSize"]
+		viewport_y = self.getViewportY()
+		viewport_x = self.getViewportX()
+		window_max_y = self.getWindowMaxY()
+		window_max_x = self.getWindowMaxX()
 
-		for line in self.fileLines[viewportY:viewportY + windowMaxY]:
-			line = line.expandtabs(tabExpandSize)[viewportX:]
+		for line in self.file_lines[viewport_y:viewport_y + window_max_y]:
+			line = line.expandtabs(tab_expand_size)[viewport_x:]
 
-			self.window.addnstr(windowY, 0, line, windowMaxX - 1, self.manager.curses.color_pair(0))
-			windowY += 1
+			self.window.addnstr(window_y, 0, line, window_max_x - 1, self.manager.curses.color_pair(0))
+			window_y += 1
 
 		self.drawCursor()
 
 	def drawCursor(self):
-		tabExpandSize = self.config["TabExpandSize"]
-		filecursorY = self.getFilecursorY()
-		filecursorX = self.getFilecursorX()
-		viewportY = self.getViewportY()
-		viewportX = self.getViewportX()
-		windowMaxY = self.getWindowMaxY()
-		windowMaxX = self.getWindowMaxX()
+		tab_expand_size = self.config["TabExpandSize"]
+		filecursor_y = self.getFilecursorY()
+		filecursor_x = self.getFilecursorX()
+		viewport_y = self.getViewportY()
+		viewport_x = self.getViewportX()
+		window_max_y = self.getWindowMaxY()
+		window_max_x = self.getWindowMaxX()
 
-		if filecursorY >= viewportY and filecursorY <= viewportY + windowMaxY - 1:
-			if len(self.fileLines) == 0:
-				self.fileLines.append("")
+		if filecursor_y >= viewport_y and filecursor_y <= viewport_y + window_max_y - 1:
+			if len(self.file_lines) == 0:
+				self.file_lines.append("")
 
-			line = self.fileLines[filecursorY][:filecursorX]
-			expandedLine = line.expandtabs(tabExpandSize)
-			tabDiff = len(expandedLine) - len(line)
-			cursorX = filecursorX - viewportX + tabDiff
-			cursorY = filecursorY - viewportY
+			line = self.file_lines[filecursor_y][:filecursor_x]
+			expanded_line = line.expandtabs(tab_expand_size)
+			tab_diff = len(expanded_line) - len(line)
+			cursorX = filecursor_x - viewport_x + tab_diff
+			cursorY = filecursor_y - viewport_y
 
-			if cursorX <= windowMaxX - 2 and cursorX >= 0:
+			if cursorX <= window_max_x - 2 and cursorX >= 0:
 				self.window.chgat(cursorY, cursorX, 1, self.manager.curses.color_pair(3) | self.manager.curses.A_REVERSE)
 
 # FUNCTIONS TO BE CALLED EXTERNALLY
@@ -77,20 +76,20 @@ class FileWindow(Window):
 		return self.filecursor[1]
 
 	def getSelectX(self):
-		if self.selectPosition != []:
-			return self.selectPosition[0]
+		if self.select_position != []:
+			return self.select_position[0]
 
 	def getSelectY(self):
-		if self.selectPosition != []:
-			return self.selectPosition[1]
+		if self.select_position != []:
+			return self.select_position[1]
 
 	def setSelectX(self, x):
-		if self.selectPosition != []:
-			self.selectPosition[0] = x
+		if self.select_position != []:
+			self.select_position[0] = x
 
 	def setSelectY(self, y):
-		if self.selectPosition != []:
-			self.selectPosition[1] = y
+		if self.select_position != []:
+			self.select_position[1] = y
 
 	def setViewportX(self, x):
 		self.viewport[0] = x
@@ -105,54 +104,50 @@ class FileWindow(Window):
 		self.filecursor[1] = y
 
 	def toggleSelect(self):
-		if self.selectOn == False:
-			self.selectOn = True
-			self.selectPosition = [self.getFilecursorX(), self.getFilecursorY()]
+		if not self.is_select_on:
+			self.is_select_on = True
+			self.select_position = [self.getFilecursorX(), self.getFilecursorY()]
 		else:
-			self.selectOn = False
-			self.selectPosition = []
+			self.is_select_on = False
+			self.select_position = []
 
 	def copySelect(self, toggle=True):
-		filecursorX = self.getFilecursorX()
-		filecursorY = self.getFilecursorY()
-		selectX = self.getSelectX()
-		selectY = self.getSelectY()
+		filecursor_x = self.getFilecursorX()
+		filecursor_y = self.getFilecursorY()
+		select_x = self.getSelectX()
+		select_y = self.getSelectY()
 
-		if self.selectOn == True:
-			self.copyLines = []
-			# copy. so i need to store (RAM, variable :/ ) text between filecursor and select
-			# store as list or string? well. selection<--filecursor<--fileLines<--list of strings. so list it is.
-			# how to copy? work out start and end maybe mimic drawSelect logic. line by line or all at once?
-			# tbh line by line likely better. easier to break down code to parse states of start line, middle lines, and end line.
-			startY = min(filecursorY, selectY)
-			endY = max(filecursorY, selectY)
-			if startY == endY:
-				startX = min(filecursorX, selectX)
-				endX = max(filecursorX, selectX)
-			elif startY == filecursorY:
-				startX = filecursorX
-				endX = selectX
-			elif startY == selectY:
-				startX = selectX
-				endX = filecursorX
+		if self.is_select_on:
+			self.copy_lines = []
+			start_y = min(filecursor_y, select_y)
+			end_y = max(filecursor_y, select_y)
+			if start_y == end_y:
+				start_x = min(filecursor_x, select_x)
+				end_x = max(filecursor_x, select_x)
+			elif start_y == filecursor_y:
+				start_x = filecursor_x
+				end_x = select_x
+			elif start_y == select_y:
+				start_x = select_x
+				end_x = filecursor_x
 
 			index = 0
-			yOffset = len(self.fileLines[:startY])
-			# for each line of file, from startY to endY
-			for line in self.fileLines[startY:endY + 1]: # +1 to grab line select ends on and not stop one before it
-				if startY == endY: # if start and end on same line (means only one line to process.)
-					self.copyLines = [self.fileLines[index + yOffset][startX:endX]]
+			y_offset = len(self.file_lines[:start_y])
+			# for each line of file, from start_y to end_y
+			for line in self.file_lines[start_y:end_y + 1]: # +1 to grab line select ends on and not stop one before it
+				if start_y == end_y: # if start and end on same line (means only one line to process.)
+					self.copy_lines = [self.file_lines[index + y_offset][start_x:end_x]]
 					#self.toggleSelect()
 					break
 
-				elif startY == index + yOffset: # elif line is line that select starts on
-					self.copyLines.append(self.fileLines[index + yOffset][startX:])
+				elif start_y == index + y_offset: # elif line is line that select starts on
+					self.copy_lines.append(self.file_lines[index + y_offset][start_x:])
 
-				elif endY == index + yOffset: # elif line is line that select ends on
-					self.copyLines.append(self.fileLines[index + yOffset][:endX])
+				elif end_y == index + y_offset: # elif line is line that select ends on
+					self.copy_lines.append(self.file_lines[index + y_offset][:end_x])
 
 				else: # elif line is between start and end
-					self.copyLines.append(self.fileLines[index + yOffset])
+					self.copy_lines.append(self.file_lines[index + y_offset])
 
 				index += 1
 
@@ -160,86 +155,86 @@ class FileWindow(Window):
 				self.toggleSelect()
 
 	def cutSelect(self):
-		filecursorX = self.getFilecursorX()
-		filecursorY = self.getFilecursorY()
-		selectX = self.getSelectX()
-		selectY = self.getSelectY()
+		filecursor_x = self.getFilecursorX()
+		filecursor_y = self.getFilecursorY()
+		select_x = self.getSelectX()
+		select_y = self.getSelectY()
 
-		if self.selectOn == True:
+		if self.is_select_on == True:
 			self.copySelect(False) # select text copied; toggle arg set to false so select attributes still populated
 
-			startY = min(filecursorY, selectY)
-			endY = max(filecursorY, selectY)
-			if startY == endY:
-				startX = min(filecursorX, selectX)
-				endX = max(filecursorX, selectX)
-			elif startY == filecursorY:
-				startX = filecursorX
-				endX = selectX
-			elif startY == selectY:
-				startX = selectX
-				endX = filecursorX
+			start_y = min(filecursor_y, select_y)
+			end_y = max(filecursor_y, select_y)
+			if start_y == end_y:
+				start_x = min(filecursor_x, select_x)
+				end_x = max(filecursor_x, select_x)
+			elif start_y == filecursor_y:
+				start_x = filecursor_x
+				end_x = select_x
+			elif start_y == select_y:
+				start_x = select_x
+				end_x = filecursor_x
 
-			last = len(self.copyLines) - 1 # index of last line in copy lines.
+			last = len(self.copy_lines) - 1 # index of last line in copy lines.
 			i = 0
-			for line in self.copyLines: # now to delete lines and correct filecursor position
-				filecursorX = self.getFilecursorX()
-				filecursorY = self.getFilecursorY()
+			for line in self.copy_lines: # now to delete lines and correct filecursor position
+				filecursor_x = self.getFilecursorX()
+				filecursor_y = self.getFilecursorY()
 
-				if i == 0 and i == last: # if BOTH first and last cut line (copyLines length 1, startY & endY are ==), same line cut
-					if startY != endY or len(self.copyLines) != 1:
-						exit("Debug! Assumption Wrong!" + str(startY != endY) + str(len(self.copyLines) != 1))
-					lineStringLeft = self.fileLines[startY][:startX]
-					lineStringRight = self.fileLines[endY][endX:]
+				if i == 0 and i == last: # if BOTH first and last cut line (copyLines length 1, start_y & end_y are ==), same line cut
+					if start_y != end_y or len(self.copy_lines) != 1:
+						exit("Debug! Assumption Wrong!" + str(start_y != end_y) + str(len(self.copy_lines) != 1))
+					line_string_left = self.file_lines[start_y][:start_x]
+					line_string_right = self.file_lines[end_y][end_x:]
 
-					self.fileLines[startY] = lineStringLeft + lineStringRight
-					if filecursorX != startX or filecursorY != startY: # filecursor after select start, select dragged left->right
+					self.file_lines[start_y] = line_string_left + line_string_right
+					if filecursor_x != start_x or filecursor_y != start_y: # filecursor after select start, select dragged left->right
 						# move filecursor back to select start
-						self.setFilecursorX(startX)
-						self.setFilecursorY(startY)
+						self.setFilecursorX(start_x)
+						self.setFilecursorY(start_y)
 						self.moveViewportToCursor()
 
 				elif i == 0: # if first cut line, retain text from beginning to start[]
-					lineStringLeft = self.fileLines[startY][:startX]
-					self.fileLines[startY] = lineStringLeft
+					line_string_left = self.file_lines[start_y][:start_x]
+					self.file_lines[start_y] = line_string_left
 
 				elif i == last: # if last cut line, retain text from end[] to end of string
-					lineStringRight = self.fileLines[startY + 1][endX:] # +1 since reading line ahead of start at this point
+					line_string_right = self.file_lines[start_y + 1][end_x:] # +1 since reading line ahead of start at this point
 
-					self.fileLines.pop(startY + 1) # delete line one ahead of start
-					self.fileLines[startY] += lineStringRight
-					if filecursorX != startX or filecursorY != startY:
-						self.setFilecursorX(startX)
-						self.setFilecursorY(startY)
+					self.file_lines.pop(start_y + 1) # delete line one ahead of start
+					self.file_lines[start_y] += line_string_right
+					if filecursor_x != start_x or filecursor_y != start_y:
+						self.setFilecursorX(start_x)
+						self.setFilecursorY(start_y)
 						self.moveViewportToCursor()
 
 				else:
-					self.fileLines.pop(startY + 1) # delete line one ahead of start
+					self.file_lines.pop(start_y + 1) # delete line one ahead of start
 
 				i += 1
 
-			self.modified = True
+			self.is_modified = True
 
 			self.toggleSelect()
 
 	def pasteAtFilecursor(self):
-		if self.copyLines != []:
-			last = len(self.copyLines) - 1 # index of last line in copy lines. this is to not add an unessecary newline at the end
+		if self.copy_lines != []:
+			last = len(self.copy_lines) - 1 # index of last line in copy lines. this is to not add an unessecary newline at the end
 			i = 0
-			for line in self.copyLines:
-				filecursorY = self.getFilecursorY()
-				filecursorX = self.getFilecursorX()
-				lineStringLeft = self.fileLines[filecursorY][:filecursorX]
-				lineStringRight = self.fileLines[filecursorY][filecursorX:]
-				lineStringLeft += line
+			for line in self.copy_lines:
+				filecursor_y = self.getFilecursorY()
+				filecursor_x = self.getFilecursorX()
+				line_string_left = self.file_lines[filecursor_y][:filecursor_x]
+				line_string_right = self.file_lines[filecursor_y][filecursor_x:]
+				line_string_left += line
 
-				self.fileLines[filecursorY] = lineStringLeft + lineStringRight
-				self.modified = True
+				self.file_lines[filecursor_y] = line_string_left + line_string_right
+				self.is_modified = True
 				for ch in line:
 					self.moveFilecursorRight()
 
 				if i != last: #   ^ to not add unneeded newline
-					self.newLineAtFilecursor(autoIndentOverride=False)
+					self.newLineAtFilecursor(auto_indent_override=False)
 
 				i += 1
 			
@@ -247,37 +242,37 @@ class FileWindow(Window):
 		self.setViewportY(self.getViewportY() + 1)
 
 	def moveViewportUp(self):
-		viewportY = self.getViewportY()
+		viewport_y = self.getViewportY()
 
-		if viewportY > 0:
-			self.setViewportY(viewportY - 1)
+		if viewport_y > 0:
+			self.setViewportY(viewport_y - 1)
 
 	def moveViewportRight(self):
 		self.setViewportX(self.getViewportX() + 1)
 
 	def moveViewportLeft(self):
-		viewportX = self.getViewportX()
+		viewport_x = self.getViewportX()
 
-		if viewportX > 0:
-			self.setViewportX(viewportX - 1)
+		if viewport_x > 0:
+			self.setViewportX(viewport_x - 1)
 
 	def moveFilecursorUp(self):
 		if self.getFilecursorY() > 0:
 			self.setFilecursorY(self.getFilecursorY() - 1)
-			if self.getFilecursorX() > len(self.fileLines[self.getFilecursorY()]):
-				if len(self.fileLines[self.getFilecursorY()]) > 0:
-					self.setFilecursorX(len(self.fileLines[self.getFilecursorY()]))
-				elif len(self.fileLines[self.getFilecursorY()]) == 0:
+			if self.getFilecursorX() > len(self.file_lines[self.getFilecursorY()]):
+				if len(self.file_lines[self.getFilecursorY()]) > 0:
+					self.setFilecursorX(len(self.file_lines[self.getFilecursorY()]))
+				elif len(self.file_lines[self.getFilecursorY()]) == 0:
 					self.setFilecursorX(0)
 			self.moveViewportToCursor()
 
 	def moveFilecursorDown(self):
-		if self.getFilecursorY() < len(self.fileLines)-1:
+		if self.getFilecursorY() < len(self.file_lines)-1:
 			self.setFilecursorY(self.getFilecursorY() + 1)
-			if self.getFilecursorX() > len(self.fileLines[self.getFilecursorY()]):
-				if len(self.fileLines[self.getFilecursorY()]) > 0:
-					self.setFilecursorX(len(self.fileLines[self.getFilecursorY()]))
-				elif len(self.fileLines[self.getFilecursorY()]) == 0:
+			if self.getFilecursorX() > len(self.file_lines[self.getFilecursorY()]):
+				if len(self.file_lines[self.getFilecursorY()]) > 0:
+					self.setFilecursorX(len(self.file_lines[self.getFilecursorY()]))
+				elif len(self.file_lines[self.getFilecursorY()]) == 0:
 					self.setFilecursorX(0)
 			self.moveViewportToCursor()
 
@@ -286,19 +281,19 @@ class FileWindow(Window):
 
 	def moveFilecursorRight(self, dist=1):
 		self.setFilecursorX(self.getFilecursorX() + dist)
-		filecursorY = self.getFilecursorY()
-		filecursorX = self.getFilecursorX()
+		filecursor_y = self.getFilecursorY()
+		filecursor_x = self.getFilecursorX()
 
-		if filecursorX < 0:
-			if filecursorY != 0: # if filecursor not at first line
+		if filecursor_x < 0:
+			if filecursor_y != 0: # if filecursor not at first line
 				self.setFilecursorX(0)
 				self.moveFilecursorUp()
 				self.gotoEndOfLine()
 			else: # filcursor on first line
 				self.gotoStartOfLine()
 
-		if filecursorX > len(self.fileLines[filecursorY]):
-			if filecursorY != len(self.fileLines) - 1: # if filecursor not at last line
+		if filecursor_x > len(self.file_lines[filecursor_y]):
+			if filecursor_y != len(self.file_lines) - 1: # if filecursor not at last line
 				self.moveFilecursorDown()
 				self.gotoStartOfLine()
 
@@ -308,49 +303,49 @@ class FileWindow(Window):
 		self.moveViewportToCursor()
 
 	def moveViewportToCursorX(self):
-		tabExpandSize = self.config["TabExpandSize"]
-		filecursorY = self.getFilecursorY()
-		filecursorX = self.getFilecursorX()
-		viewportX = self.getViewportX()
-		tabDiff = len(self.fileLines[filecursorY][:filecursorX].expandtabs(tabExpandSize)) - len(self.fileLines[filecursorY][:filecursorX])
-		tabcursorX = filecursorX + tabDiff
+		tab_expand_size = self.config["TabExpandSize"]
+		filecursor_y = self.getFilecursorY()
+		filecursor_x = self.getFilecursorX()
+		viewport_x = self.getViewportX()
+		tab_diff = len(self.file_lines[filecursor_y][:filecursor_x].expandtabs(tab_expand_size)) - len(self.file_lines[filecursor_y][:filecursor_x])
+		tabcursorX = filecursor_x + tab_diff
 		viewportWidth = self.getWindowMaxX() - 2
 
-		if viewportX > tabcursorX:
+		if viewport_x > tabcursorX:
 			self.setViewportX(tabcursorX)
 
-		elif viewportX < tabcursorX - viewportWidth:
+		elif viewport_x < tabcursorX - viewportWidth:
 			self.setViewportX(tabcursorX - viewportWidth)
 
 	def moveViewportToCursorY(self):
-		filecursorY = self.getFilecursorY()
+		filecursor_y = self.getFilecursorY()
 		viewportHeight = self.getWindowMaxY() - 1
-		viewportY = self.getViewportY()
+		viewport_y = self.getViewportY()
 
-		if viewportY > filecursorY:
-			self.setViewportY(filecursorY)
+		if viewport_y > filecursor_y:
+			self.setViewportY(filecursor_y)
 
-		elif viewportY < filecursorY - viewportHeight:
-			self.setViewportY(filecursorY - viewportHeight)
+		elif viewport_y < filecursor_y - viewportHeight:
+			self.setViewportY(filecursor_y - viewportHeight)
 
 	def moveViewportToCursor(self):
 		self.moveViewportToCursorX()
 		self.moveViewportToCursorY()
 
-	def gotoLine(self, lineNum, preserveX = False):
-		filecursorX = self.getFilecursorX()
-		filecursorY = self.getFilecursorY()
+	def gotoLine(self, line_num, preserve_x = False):
+		filecursor_x = self.getFilecursorX()
+		filecursor_y = self.getFilecursorY()
 
-		if lineNum >= len(self.fileLines): # if linenumber is greater than last line,
-			lineNum = len(self.fileLines) - 1 # goto last line
+		if line_num >= len(self.file_lines): # if linenumber is greater than last line,
+			line_num = len(self.file_lines) - 1 # goto last line
 
-		if lineNum > -1:
-			self.setFilecursorY(lineNum)
-			if (preserveX):
-				if filecursorX > len(self.fileLines[filecursorY]):
-					if len(self.fileLines[filecursorY]) > 0:
-						self.setFilecursorX(len(self.fileLines[filecursorY]))
-					elif len(self.fileLines[filecursorY]) == 0:
+		if line_num > -1:
+			self.setFilecursorY(line_num)
+			if preserve_x:
+				if filecursor_x > len(self.file_lines[filecursor_y]):
+					if len(self.file_lines[filecursor_y]) > 0:
+						self.setFilecursorX(len(self.file_lines[filecursor_y]))
+					elif len(self.file_lines[filecursor_y]) == 0:
 						self.setFilecursorX(0)
 			else:
 				self.setFilecursorX(0)
@@ -361,184 +356,184 @@ class FileWindow(Window):
 		self.gotoLine(0)
 
 	def gotoEndOfFile(self):
-		self.gotoLine(len(self.fileLines) - 1)
+		self.gotoLine(len(self.file_lines) - 1)
 
 	def gotoStartOfLine(self):
 		self.setFilecursorX(0)
 		self.moveViewportToCursorX()
 
 	def gotoEndOfLine(self):
-		self.setFilecursorX(len(self.fileLines[self.getFilecursorY()]))
+		self.setFilecursorX(len(self.file_lines[self.getFilecursorY()]))
 		self.moveViewportToCursorX()
 
 	def unindentSelectedLines(self):
-		filecursorY = self.getFilecursorY()
-		filecursorX = self.getFilecursorX()
+		filecursor_y = self.getFilecursorY()
+		filecursor_x = self.getFilecursorX()
 
-		indentText = "\t"
+		indent_text = "\t"
 		if self.config["TabLength"] != "char":
-			indentText = str(self.config["TabLength"])
+			indent_text = str(self.config["TabLength"])
 
-		if self.selectOn:
-			selectY = self.getSelectY()
-			selectX = self.getSelectX()
+		if self.is_select_on:
+			select_y = self.getSelectY()
+			select_x = self.getSelectX()
 			
-			startY = min(filecursorY, selectY)
-			endY = max(filecursorY, selectY)
-			if startY == endY:
-				startX = min(filecursorX, selectX)
-				endX = max(filecursorX, selectX)
+			start_y = min(filecursor_y, select_y)
+			end_y = max(filecursor_y, select_y)
+			if start_y == end_y:
+				start_x = min(filecursor_x, select_x)
+				end_x = max(filecursor_x, select_x)
 
-				line = self.fileLines[filecursorY]
-				if line.find(indentText) == 0: # if we find indentText at line start, remove it, skips removal if not found or at wrong spot in line
-					self.fileLines[filecursorY] = line.replace(indentText, "", 1) # 1 to only replace first occurence of indentText
-					self.modified = True
+				line = self.file_lines[filecursor_y]
+				if line.find(indent_text) == 0: # if we find indent_text at line start, remove it, skips removal if not found or at wrong spot in line
+					self.file_lines[filecursor_y] = line.replace(indent_text, "", 1) # 1 to only replace first occurence of indent_text
+					self.is_modified = True
 					
-					self.setSelectX(selectX - len(indentText))
-					if filecursorX >= len(indentText): # if won't be pushed off line during moving, shift it back
-						self.moveFilecursorLeft(len(indentText))
+					self.setSelectX(select_x - len(indent_text))
+					if filecursor_x >= len(indent_text): # if won't be pushed off line during moving, shift it back
+						self.moveFilecursorLeft(len(indent_text))
 
 				return
 
-			if startY == filecursorY:
-				startX = filecursorX
-				endX = selectX
-			elif startY == selectY:
-				startX = selectX
-				endX = filecursorX
+			if start_y == filecursor_y:
+				start_x = filecursor_x
+				end_x = select_x
+			elif start_y == select_y:
+				start_x = select_x
+				end_x = filecursor_x
 
-			for lineIndex in range(startY, endY + 1): # + 1 to end range on endY
-				line = self.fileLines[lineIndex]
+			for line_index in range(start_y, end_y + 1): # + 1 to end range on end_y
+				line = self.file_lines[line_index]
 				
-				if line.find(indentText) == 0: # if we find indentText at line start, remove it, skips removal if not found or at wrong spot in line
-					if lineIndex == startY and startX == len(line): # don't indent start line if selection starts at end of line
+				if line.find(indent_text) == 0: # if we find indent_text at line start, remove it, skips removal if not found or at wrong spot in line
+					if line_index == start_y and start_x == len(line): # don't indent start line if selection starts at end of line
 						continue
-					if lineIndex == endY and endX == 0: # don't indent end line if selection ends at beginning of a line
+					if line_index == end_y and end_x == 0: # don't indent end line if selection ends at beginning of a line
 						continue
-					self.fileLines[lineIndex] = line.replace(indentText, "", 1) # 1 to only replace first occurence of indentText
+					self.file_lines[line_index] = line.replace(indent_text, "", 1) # 1 to only replace first occurence of indent_text
 					
 					# if current line is selection start, move either cursor or select
-					if lineIndex == startY:
-						if self.fileLines[lineIndex][startX - len(indentText):startX] == indentText: # if select still at indentText after replace, keep it there
-							continue # since line was unindented and startX unchanged, subtracted indentText length to peek 
+					if line_index == start_y:
+						if self.file_lines[line_index][start_x - len(indent_text):start_x] == indent_text: # if select still at indent_text after replace, keep it there
+							continue # since line was unindented and start_x unchanged, subtracted indent_text length to peek 
 
-						if startY == filecursorY and startX == filecursorX: # if start is filecursor
-							if filecursorX >= len(indentText): # if cursor won't be pushed off line during moving, shift it back
-								self.moveFilecursorLeft(len(indentText))
+						if start_y == filecursor_y and start_x == filecursor_x: # if start is filecursor
+							if filecursor_x >= len(indent_text): # if cursor won't be pushed off line during moving, shift it back
+								self.moveFilecursorLeft(len(indent_text))
 
-						if startY == selectY and startX == selectX: # if start is selectPosition
-							if selectX >= len(indentText): # if selectPosition won't be pushed off line, shift back
-								self.setSelectX(selectX - len(indentText))
+						if start_y == select_y and start_x == select_x: # if start is selectPosition
+							if select_x >= len(indent_text): # if selectPosition won't be pushed off line, shift back
+								self.setSelectX(select_x - len(indent_text))
 
 					# if current line is selection end, move either cursor or select
-					elif lineIndex == endY:
-						if self.fileLines[lineIndex][endX - len(indentText):endX] == indentText: # if select still at indentText after replace, keep it there
-							continue # since line was unindented and endX unchanged, subtracted indentText length to peek 
+					elif line_index == end_y:
+						if self.file_lines[line_index][end_x - len(indent_text):end_x] == indent_text: # if select still at indent_text after replace, keep it there
+							continue # since line was unindented and end_x unchanged, subtracted indent_text length to peek 
 
-						if endY == filecursorY and endX == filecursorX: # if end is filecursor
-							if filecursorX >= len(indentText): # if cursor won't be pushed off line during moving, shift it back
-								self.moveFilecursorLeft(len(indentText))
+						if end_y == filecursor_y and end_x == filecursor_x: # if end is filecursor
+							if filecursor_x >= len(indent_text): # if cursor won't be pushed off line during moving, shift it back
+								self.moveFilecursorLeft(len(indent_text))
 
-						if endY == selectY and endX == selectX: # if end is selectPosition
-							if selectX >= len(indentText): # if selectPosition won't be pushed off line, shift back
-								self.setSelectX(selectX - len(indentText))
+						if end_y == select_y and end_x == select_x: # if end is selectPosition
+							if select_x >= len(indent_text): # if selectPosition won't be pushed off line, shift back
+								self.setSelectX(select_x - len(indent_text))
 		else:
-			line = self.fileLines[filecursorY]
-			if line.find(indentText) == 0: # if we find indentText at line start, remove it, skips removal if not found or at wrong spot in line
-				self.fileLines[filecursorY] = line.replace(indentText, "", 1) # 1 to only replace first occurence of indentText
-				if filecursorX >= len(indentText): # if won't be pushed off line during moving, shift it back
-					self.moveFilecursorLeft(len(indentText))
+			line = self.file_lines[filecursor_y]
+			if line.find(indent_text) == 0: # if we find indent_text at line start, remove it, skips removal if not found or at wrong spot in line
+				self.file_lines[filecursor_y] = line.replace(indent_text, "", 1) # 1 to only replace first occurence of indent_text
+				if filecursor_x >= len(indent_text): # if won't be pushed off line during moving, shift it back
+					self.moveFilecursorLeft(len(indent_text))
 		
-		self.modified = True
+		self.is_modified = True
 
 
 	def indentSelectedLines(self, text):
-		filecursorY = self.getFilecursorY()
-		filecursorX = self.getFilecursorX()
-		selectY = self.getSelectY()
-		selectX = self.getSelectX()
+		filecursor_y = self.getFilecursorY()
+		filecursor_x = self.getFilecursorX()
+		select_y = self.getSelectY()
+		select_x = self.getSelectX()
 
-		startY = min(filecursorY, selectY)
-		endY = max(filecursorY, selectY)
+		start_y = min(filecursor_y, select_y)
+		end_y = max(filecursor_y, select_y)
 
-		if startY == endY: # if selection is on one line
-			startX = min(filecursorX, selectX)
-			endX = max(filecursorX, selectX)
+		if start_y == end_y: # if selection is on one line
+			start_x = min(filecursor_x, select_x)
+			end_x = max(filecursor_x, select_x)
 
-			lineStringLeft = self.fileLines[startY][:startX]
-			lineStringRight = self.fileLines[startY][startX:]
-			lineStringLeft += text
+			line_string_left = self.file_lines[start_y][:start_x]
+			line_string_right = self.file_lines[start_y][start_x:]
+			line_string_left += text
 
-			self.fileLines[startY] = lineStringLeft + lineStringRight
-			self.modified = True
+			self.file_lines[start_y] = line_string_left + line_string_right
+			self.is_modified = True
 
 			self.moveFilecursorRight(len(text))
-			if startX == selectX: # if stored select value is start, set select to start + text length
-				self.setSelectX(startX + len(text))
-			elif startX == filecursorX: # if filecursor marks start, set select to end + text length
-				self.setSelectX(endX + len(text))
+			if start_x == select_x: # if stored select value is start, set select to start + text length
+				self.setSelectX(start_x + len(text))
+			elif start_x == filecursor_x: # if filecursor marks start, set select to end + text length
+				self.setSelectX(end_x + len(text))
 
 			return
 
 		# selection is on different lines 
-		elif startY == filecursorY: # filecursor marks start
-			startX = filecursorX
-			endX = selectX
-		elif startY == selectY: # selectPosition marks start
-			startX = selectX
-			endX = filecursorX
+		elif start_y == filecursor_y: # filecursor marks start
+			start_x = filecursor_x
+			end_x = select_x
+		elif start_y == select_y: # selectPosition marks start
+			start_x = select_x
+			end_x = filecursor_x
 
-		for lineIndex in range(startY, endY + 1): # + 1 to end range on endY
-			line = self.fileLines[lineIndex]
+		for line_index in range(start_y, end_y + 1): # + 1 to end range on end_y
+			line = self.file_lines[line_index]
 			if line == "": # don't tab empty lines 
 				continue
 
-			elif lineIndex == startY: # if current line is selection start
-				if startX == len(line): # if startX is at the end of the line, don't indent it
+			elif line_index == start_y: # if current line is selection start
+				if start_x == len(line): # if start_x is at the end of the line, don't indent it
 					continue
-				elif startX == filecursorX and startY == filecursorY: # if filecursor is start, indent line and move filecursor right, continue to next line
+				elif start_x == filecursor_x and start_y == filecursor_y: # if filecursor is start, indent line and move filecursor right, continue to next line
 					line = text + line
-					self.fileLines[lineIndex] = line
-					if startX != 0: # don't move cursor if it's at the beginning of a line
+					self.file_lines[line_index] = line
+					if start_x != 0: # don't move cursor if it's at the beginning of a line
 						self.moveFilecursorRight(len(text))
 					continue
-				elif startX == selectX and startY == selectY: # if select position is end, shift it by text length
-					if startX != 0: # don't move select if it's at beginning of a line
-						self.setSelectX(startX + len(text))
+				elif start_x == select_x and start_y == select_y: # if select position is end, shift it by text length
+					if start_x != 0: # don't move select if it's at beginning of a line
+						self.setSelectX(start_x + len(text))
 
-			elif lineIndex == endY: # if current line is end
-				if endX == 0: # if endX is at start of the line, don't indent 
+			elif line_index == end_y: # if current line is end
+				if end_x == 0: # if end_x is at start of the line, don't indent 
 					continue
-				elif endX == filecursorX and endY == filecursorY: # if filecursor is end, indent line and move filecursor right, continue to next line
+				elif end_x == filecursor_x and end_y == filecursor_y: # if filecursor is end, indent line and move filecursor right, continue to next line
 					line = text + line
-					self.fileLines[lineIndex] = line
+					self.file_lines[line_index] = line
 					self.moveFilecursorRight(len(text))
 					continue
-				elif endX == selectX and endY == selectY: # if select position is end, shift it by text length
-					self.setSelectX(endX + len(text))
+				elif end_x == select_x and end_y == select_y: # if select position is end, shift it by text length
+					self.setSelectX(end_x + len(text))
 			
 			line = text + line
-			self.fileLines[lineIndex] = line
+			self.file_lines[line_index] = line
 
-		self.modified = True
+		self.is_modified = True
 
 	def enterTextAtFilecursor(self, text):
 		if text == "\t":
 			if self.config["TabLength"] != "char":
 				text = " " * self.config["TabLength"]
-			if self.selectOn:
+			if self.is_select_on:
 				self.indentSelectedLines(text)
 				return
 
-		filecursorX = self.getFilecursorX()
-		filecursorY = self.getFilecursorY()
-		lineStringLeft = self.fileLines[filecursorY][:filecursorX]
-		lineStringRight = self.fileLines[filecursorY][filecursorX:]
-		lineStringLeft += text
+		filecursor_x = self.getFilecursorX()
+		filecursor_y = self.getFilecursorY()
+		line_string_left = self.file_lines[filecursor_y][:filecursor_x]
+		line_string_right = self.file_lines[filecursor_y][filecursor_x:]
+		line_string_left += text
 
-		self.fileLines[filecursorY] = lineStringLeft + lineStringRight
+		self.file_lines[filecursor_y] = line_string_left + line_string_right
 		self.moveFilecursorRight(len(text))
-		self.modified = True
+		self.is_modified = True
 		
 		if self.config["BracketMatching"]:
 			braceMatches = {
@@ -551,103 +546,102 @@ class FileWindow(Window):
 				self.moveFilecursorLeft()
 
 		if self.config["QuoteMatching"]:
-			if text in ["\"", "'"] and not self.isRepeatingQuote:
-				self.isRepeatingQuote = True
+			if text in ["\"", "'"] and not self.is_repeating_quote:
+				self.is_repeating_quote = True
 				self.enterTextAtFilecursor(text)
 				self.moveFilecursorLeft()
-				self.isRepeatingQuote = False
+				self.is_repeating_quote = False
 
-	def newLineAtFilecursor(self, autoIndentOverride=True):
-		filecursorX = self.getFilecursorX()
-		filecursorY = self.getFilecursorY()
-		lineStringLeft = self.fileLines[filecursorY][:filecursorX]
-		lineStringRight = self.fileLines[filecursorY][filecursorX:]
-		indentSize = 0
-		if self.config["AutoIndent"] and autoIndentOverride:
-			indentSize = len(lineStringLeft) - len(lineStringLeft.lstrip())
-			lineStringRight = lineStringLeft[:indentSize] + lineStringRight
+	def newLineAtFilecursor(self, auto_indent_override=True):
+		filecursor_x = self.getFilecursorX()
+		filecursor_y = self.getFilecursorY()
+		line_string_left = self.file_lines[filecursor_y][:filecursor_x]
+		line_string_right = self.file_lines[filecursor_y][filecursor_x:]
+		indent_size = 0
+		if self.config["AutoIndent"] and auto_indent_override:
+			indent_size = len(line_string_left) - len(line_string_left.lstrip())
+			line_string_right = line_string_left[:indent_size] + line_string_right
 
-		self.fileLines[filecursorY] = lineStringLeft
-		self.fileLines.insert(filecursorY + 1, "")
+		self.file_lines[filecursor_y] = line_string_left
+		self.file_lines.insert(filecursor_y + 1, "")
 		self.moveFilecursorDown()
-		self.fileLines[self.getFilecursorY()] = lineStringRight
-		self.moveFilecursorRight(indentSize)
-		self.modified = True
+		self.file_lines[self.getFilecursorY()] = line_string_right
+		self.moveFilecursorRight(indent_size)
+		self.is_modified = True
 
 	def backspaceTextAtFilecursor(self):
-		filecursorX = self.getFilecursorX()
-		filecursorY = self.getFilecursorY()
+		filecursor_x = self.getFilecursorX()
+		filecursor_y = self.getFilecursorY()
 
-		if filecursorX == 0:
-			if filecursorY > 0:
-				lineString = self.fileLines[filecursorY]
-				self.fileLines.pop(filecursorY)
+		if filecursor_x == 0:
+			if filecursor_y > 0:
+				line_string = self.file_lines[filecursor_y]
+				self.file_lines.pop(filecursor_y)
 				self.moveFilecursorUp()
 				self.gotoEndOfLine()
-				self.fileLines[self.getFilecursorY()] += lineString
+				self.file_lines[self.getFilecursorY()] += line_string
 		else:
-			lineStringLeft = self.fileLines[filecursorY][:filecursorX - 1]
-			lineStringRight = self.fileLines[filecursorY][filecursorX:]
-			self.fileLines[filecursorY] = lineStringLeft + lineStringRight
+			line_string_left = self.file_lines[filecursor_y][:filecursor_x - 1]
+			line_string_right = self.file_lines[filecursor_y][filecursor_x:]
+			self.file_lines[filecursor_y] = line_string_left + line_string_right
 			self.moveFilecursorLeft()
 
-		self.modified = True
+		self.is_modified = True
 
 	def saveFile(self):
-		fileString = ""
-		linesRow = 0
-		for line in self.fileLines:
-			fileString += line + "\n"
+		file_string = ""
+		for line in self.file_lines:
+			file_string += line + "\n"
 
 		returnval = self.manager.Windows["magicBar"].save()
-		self.file.save(fileString)
+		self.file.save(file_string)
 		return returnval
 
 	def searchForText(self):
 		pass
 
 	def scrollDown(self):
-		scrollAmount = 20
-		filecursorY = self.getFilecursorY()
-		self.gotoLine(min(filecursorY + scrollAmount, len(self.fileLines) - 1))
+		scroll_amount = 20
+		filecursor_y = self.getFilecursorY()
+		self.gotoLine(min(filecursor_y + scroll_amount, len(self.file_lines) - 1))
 
 	def scrollUp(self):
-		scrollAmount = 20
-		filecursorY = self.getFilecursorY()
-		self.gotoLine(max(filecursorY - scrollAmount, 0))
+		scroll_amount = 20
+		filecursor_y = self.getFilecursorY()
+		self.gotoLine(max(filecursor_y - scroll_amount, 0))
 
 	def deleteLineAtFilecursor(self):
-		filecursorX = self.getFilecursorX()
-		filecursorY = self.getFilecursorY()
+		filecursor_x = self.getFilecursorX()
+		filecursor_y = self.getFilecursorY()
 
-		if filecursorY != len(self.fileLines) - 1:
-			self.fileLines.pop(filecursorY)
-			if len(self.fileLines[filecursorY]) >= filecursorX:
+		if filecursor_y != len(self.file_lines) - 1:
+			self.file_lines.pop(filecursor_y)
+			if len(self.file_lines[filecursor_y]) >= filecursor_x:
 				pass
 			else:
-				self.setFilecursorX(len(self.fileLines[filecursorY]))
+				self.setFilecursorX(len(self.file_lines[filecursor_y]))
 
 		else:
-			self.fileLines.pop(filecursorY)
-			if len(self.fileLines) - 1 >= 0:
+			self.file_lines.pop(filecursor_y)
+			if len(self.file_lines) - 1 >= 0:
 				self.moveFilecursorUp()
 			else:
 				self.setFilecursorX(0)
 
-		self.modified = True
+		self.is_modified = True
 
 	def deleteTextAtFilecursor(self):
-		filecursorX = self.getFilecursorX()
-		filecursorY = self.getFilecursorY()
+		filecursor_x = self.getFilecursorX()
+		filecursor_y = self.getFilecursorY()
 
-		if filecursorX + 1 <= len(self.fileLines[filecursorY]): # if there is text to the right of our self.filecursor
-			lineStringLeft = self.fileLines[filecursorY][:filecursorX]
-			lineStringRight = self.fileLines[filecursorY][filecursorX + 1:]
-			self.fileLines[filecursorY] = lineStringLeft + lineStringRight
+		if filecursor_x + 1 <= len(self.file_lines[filecursor_y]): # if there is text to the right of our self.filecursor
+			line_string_left = self.file_lines[filecursor_y][:filecursor_x]
+			line_string_right = self.file_lines[filecursor_y][filecursor_x + 1:]
+			self.file_lines[filecursor_y] = line_string_left + line_string_right
 
-		elif filecursorY != len(self.fileLines) - 1: # else (no text to right of self.filecursor) if there is line below
-			nextLine = self.fileLines[filecursorY + 1] # append line below to current line
-			self.fileLines.pop(filecursorY + 1)
-			self.fileLines[filecursorY] += nextLine
+		elif filecursor_y != len(self.file_lines) - 1: # else (no text to right of self.filecursor) if there is line below
+			nextLine = self.file_lines[filecursor_y + 1] # append line below to current line
+			self.file_lines.pop(filecursor_y + 1)
+			self.file_lines[filecursor_y] += nextLine
 
-		self.modified = True
+		self.is_modified = True
