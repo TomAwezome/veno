@@ -4,7 +4,7 @@ class LineNumbersWindow(Window):
 		Window.__init__(self, manager, name)
 
 		## FileWindow instance that LineNumbersWindow is attached to.
-		self.file_window = self.manager.Windows["fileWindow"]
+		self.file_window = self.manager.get("fileWindow")
 
 		self.intended_y			= self.file_window.getWindowBegY()
 		self.intended_width		= 5
@@ -32,7 +32,6 @@ class LineNumbersWindow(Window):
 
 		self.intended_x			= self.file_window.getWindowBegX() - self.intended_width + 1
 		self.intended_height	= self.file_window.getWindowMaxY()
-
 		self.keepWindowInMainScreen()
 
 		if self.intended_x >= 0:

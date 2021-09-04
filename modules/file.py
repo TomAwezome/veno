@@ -5,7 +5,7 @@ class File:
 	##
 	## @brief      Constructs the object.
 	##
-	## @param      self    The object
+	## @param      self    This object
 	## @param      source  The file location as a string
 	##
 	def __init__(self, source):
@@ -26,7 +26,7 @@ class File:
 	##
 	## @brief      save altered contents to File
 	##
-	## @param      self        The object
+	## @param      self        This object
 	## @param      fileString  The altered contents
 	##
 	def save(self, fileString):
@@ -38,7 +38,7 @@ class File:
 	##
 	## @brief      terminates File
 	##
-	## @param      self  The object
+	## @param      self  This object
 	##
 	## @return     None
 	##

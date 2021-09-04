@@ -10,7 +10,7 @@ class FileWindow(Window):
 		self.panel.bottom()
 		self.file = file
 		self.file_lines = self.file.contents.splitlines()
-		self.config = self.manager.Objects["config"].options
+		self.config = self.manager.get("config").options
 
 		self.is_modified = True ## i.e. Modified since last highlight. Variable used for speed optimization of syntax highlighting algorithm.
 		self.select_position = []
@@ -593,7 +593,7 @@ class FileWindow(Window):
 		for line in self.file_lines:
 			file_string += line + "\n"
 
-		returnval = self.manager.Windows["magicBar"].save()
+		returnval = self.manager.get("magicBar").save()
 		self.file.save(file_string)
 		return returnval
 

@@ -8,7 +8,7 @@ class Config:
 	##
 	## @brief      Constructs the object.
 	##
-	## @param      self    The object
+	## @param      self    This object
 	##
 	def __init__(self, filename):
 		self.default_options = {
@@ -81,7 +81,7 @@ class Config:
 
 	## @brief      terminates Config
 	##
-	## @param      self  The object
+	## @param      self  This object
 	##
 	## @return     None
 	##

@@ -18,7 +18,7 @@ class ConfigCustomizerWindow(Window):
 		self.viewport_y = 0
 		
 		## Config instance.
-		self.config = self.manager.Objects["config"]
+		self.config = self.manager.get("config")
 
 		## ConfigCustomizer keybindings dictionary stores functions
 		self.bindings = {}
@@ -265,13 +265,15 @@ class ConfigCustomizerWindow(Window):
 
 			self.window.box()
 				
-			for i in self.manager.Windows:
-				if self.manager.Windows[i].name == "configCustomizer": # name given in engine init
+			for i in self.manager.objects:
+				if not issubclass(type(self.manager.get(i)), Window):
+					continue
+				if self.manager.get(i).name == "configCustomizer": # name given in engine init
 					continue # to avoid recursive loop
 
-				self.manager.Windows[i].update()
+				self.manager.get(i).update()
 
-			self.manager.Objects["highlighter"].update()
+			self.manager.get("highlighter").update()
 			self.manager.update()
 
 		self.config.save()

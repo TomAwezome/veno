@@ -4,13 +4,11 @@ from modules.window import Window
 class MagicBar(Window):
 	def __init__(self, manager, name):
 		Window.__init__(self, manager, name)
-		self.re = re
-		self.string = string
 		
 		## FileWindow instance MagicBar is attached to.
-		self.file_window = self.manager.Windows["fileWindow"]
+		self.file_window = self.manager.get("fileWindow")
 		
-		self.config = self.manager.Objects["config"].options
+		self.config = self.manager.get("config").options
 
 		self.search_cursor_x = 0
 		self.search_string = ""
@@ -197,7 +195,7 @@ class MagicBar(Window):
 		file_lines = self.file_window.file_lines
 		file_string = '\n'.join(file_lines)
 
-		replaced_string = self.re.sub(first_string, second_string, file_string[self.next_match.start():self.next_match.end()])
+		replaced_string = re.sub(first_string, second_string, file_string[self.next_match.start():self.next_match.end()])
 		replaced_string_left = file_string[:self.next_match.start()]
 		replaced_string_right = file_string[self.next_match.end():]
 		replaced_string_combined = replaced_string_left + replaced_string + replaced_string_right
@@ -207,7 +205,7 @@ class MagicBar(Window):
 	def replaceAllMatches(self, first_string, second_string):
 		file_lines = self.file_window.file_lines
 		file_string = '\n'.join(file_lines)
-		replaced_string = self.re.sub(first_string, second_string, file_string)
+		replaced_string = re.sub(first_string, second_string, file_string)
 		self.file_window.file.contents = replaced_string
 		self.file_window.file_lines = replaced_string.splitlines()
 
@@ -247,7 +245,7 @@ class MagicBar(Window):
 
 			if c in self.search_bindings:
 				self.search_bindings[c]()
-			elif c in self.string.punctuation + self.string.digits + self.string.ascii_letters + self.string.whitespace:
+			elif c in string.punctuation + string.digits + string.ascii_letters + string.whitespace:
 				self.search_bindings["printable-character"](c)
 			elif c == "^J": # enter key
 				break
@@ -261,7 +259,7 @@ class MagicBar(Window):
 
 			self.manager.update()
 
-		pattern = self.re.compile(self.search_string)
+		pattern = re.compile(self.search_string)
 		self.pattern_matches = pattern.finditer(self.file_window.file.contents)
 		try:
 			self.next_match = next(self.pattern_matches)
@@ -330,7 +328,7 @@ class MagicBar(Window):
 
 			if c in self.goto_line_bindings:
 				self.goto_line_bindings[c]()
-			elif c in self.string.digits:
+			elif c in string.digits:
 				self.goto_line_bindings["digit"](c)
 			elif c == "^J": # enter key
 				break
@@ -413,7 +411,7 @@ class MagicBar(Window):
 
 			if c in self.search_bindings:
 				self.search_bindings[c]()
-			elif c in self.string.punctuation + self.string.digits + self.string.ascii_letters + self.string.whitespace:
+			elif c in string.punctuation + string.digits + string.ascii_letters + string.whitespace:
 				self.search_bindings["printable-character"](c)
 			elif c == "^J": # enter key
 				break
@@ -458,7 +456,7 @@ class MagicBar(Window):
 
 			if c in self.search_bindings:
 				self.search_bindings[c]()
-			elif c in self.string.punctuation + self.string.digits + self.string.ascii_letters + self.string.whitespace:
+			elif c in string.punctuation + string.digits + string.ascii_letters + string.whitespace:
 				self.search_bindings["printable-character"](c)
 			elif c == "^J": # enter key
 				break
@@ -479,7 +477,7 @@ class MagicBar(Window):
 
 		# next we'll find the first occurence (relative to our cursor) of our to-be-replaced string, and move the file cursor there and have our current nexMatch be that occurence
 
-		pattern = self.re.compile(first_string)
+		pattern = re.compile(first_string)
 		self.pattern_matches = pattern.finditer(self.file_window.file.contents)
 		try:
 			self.next_match = next(self.pattern_matches)
@@ -519,7 +517,7 @@ class MagicBar(Window):
 		self.file_window.is_modified = True
 		self.file_window.update() # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
 
-		self.manager.Objects["highlighter"].update()
+		self.manager.get("highlighter").update()
 
 		self.manager.update()
 
@@ -530,7 +528,7 @@ class MagicBar(Window):
 			self.window.erase()
 			self.window.addnstr(0, 0, "Replace? (y/n/a) ['a' = All]", self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
 
-			self.manager.Windows["lineNumbers"].update()
+			self.manager.get("lineNumbers").update()
 
 			self.manager.update()
 
@@ -593,7 +591,7 @@ class MagicBar(Window):
 			self.file_window.is_modified = True
 			self.file_window.update() # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
 
-			self.manager.Objects["highlighter"].update()
+			self.manager.get("highlighter").update()
 
 			self.manager.update()
 
@@ -603,7 +601,7 @@ class MagicBar(Window):
 		self.file_window.is_modified = True
 		self.file_window.update() # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
 
-		self.manager.Objects["highlighter"].update()
+		self.manager.get("highlighter").update()
 
 		self.manager.update()
 
@@ -703,7 +701,7 @@ class MagicBar(Window):
 
 			if c in self.save_bindings:
 				self.save_bindings[c]()
-			elif c in self.string.punctuation + self.string.digits + self.string.ascii_letters + self.string.whitespace:
+			elif c in string.punctuation + string.digits + string.ascii_letters + string.whitespace:
 				self.save_bindings["printable-character"](c)
 			elif c == "^J": # enter key
 				if self.save_string != "":

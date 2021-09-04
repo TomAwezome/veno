@@ -1,3 +1,6 @@
+import pygments
+import pygments.lexers as lexers
+from pygments.formatters import IRCFormatter
 
 ##
 ## @brief      Class for highlighter.
@@ -6,53 +9,44 @@ class Highlighter:
 	##
 	## @brief      Constructs the object.
 	##
-	## @param      self     The object
+	## @param      self     This object
 	## @param      manager  The manager to allow access to drawing on window object in FileWindow
 	##
 	def __init__(self, manager):
 		## The manager to allow access to drawing on window object in FileWindow. TODO: replace manager with Window variable to further scale Highlighter
 		self.manager = manager
 
-		import pygments
-		## Pygments module
-		self.pygments = pygments
-
-		import pygments.lexers as lexers
-		## Pygments lexer module
-		self.lexers = lexers
-
-		from pygments.formatters import IRCFormatter
 		## Pygments formatter IRCFormatter
 		self.irc = IRCFormatter
 
-		## color_map dictionary with format of {"highlighterColorCode":RenderedColorCode}
-		self.color_map = self.manager.Objects["config"].options["ColorMap"]
-		
 		## Lexer for filetype
 		self.lexer = None
+
+		## color_map dictionary with format of {"highlighterColorCode":RenderedColorCode}
+		self.color_map = self.manager.get("config").options["ColorMap"]
 		
 		## FileWindow highlighter is attached to.
-		self.file_window = self.manager.Windows["fileWindow"]
+		self.file_window = self.manager.get("fileWindow")
 		
 		try:
 			try:
-				self.lexer = self.lexers.guess_lexer_for_filename(
+				self.lexer = lexers.guess_lexer_for_filename(
 						self.file_window.file.source,
 						self.file_window.file.contents
 					)
 			except:
-				self.lexer = self.lexers.guess_lexer(
+				self.lexer = lexers.guess_lexer(
 						self.file_window.file.contents
 					)
 			if self.lexer.name == "PHP":
-				self.lexer = self.lexers.PhpLexer(startinline=True)
+				self.lexer = lexers.PhpLexer(startinline=True)
 		except:
 			pass
 		self.file_window.is_modified = True
 	##
 	## @brief      Update syntax highlighting on fileWindow
 	##
-	## @param      self  The object
+	## @param      self  This object
 	##
 	def update(self):
 		viewport_x = self.file_window.getViewportX()
@@ -61,10 +55,10 @@ class Highlighter:
 		window_max_x = self.file_window.getWindowMaxX()
 		window_code_lines = self.file_window.file_lines
 		window_code_string = '\n'.join(window_code_lines)
-		tab_expand_size = self.manager.Objects["config"].options["TabExpandSize"]
+		tab_expand_size = self.manager.get("config").options["TabExpandSize"]
 
 		if self.lexer and self.file_window.is_modified:
-			highlighted_code_string = self.pygments.highlight(window_code_string, self.lexer, self.irc())
+			highlighted_code_string = pygments.highlight(window_code_string, self.lexer, self.irc())
 			## **Highlighted** code lines from window_code_lines (which is default defined as file_lines[viewport_y:viewport_y + window_max_y])
 			self.highlighted_code_lines = highlighted_code_string.split('\n')
 			leading_newlines = 0
@@ -119,7 +113,7 @@ class Highlighter:
 					if (colorIndex - (opener_count * 3) - closer_count) + (len(window_line.expandtabs(tab_expand_size)) - len(window_line)) - viewport_x > window_max_x:
 					# if color is offscreen right	
 						if is_closer and color_data[color_data_row_index][1] - viewport_x < window_max_x - 1:
-						# if closer and opener is on screen
+						# if is closer, and opener is on screen
 							color_data[color_data_row_index][1] = max(color_data[color_data_row_index][1] - viewport_x, 0)
 							color_data[color_data_row_index].append(window_max_x + viewport_x - color_data[color_data_row_index][1])
 							color_data_row_index += 1
@@ -127,7 +121,7 @@ class Highlighter:
 							is_closer = False
 							color_data.append([])
 						else:
-						# else if opener is also offscreen right
+						# else (is opener, or opener is also offscreen right)
 							color_data.pop()
 						break
 					if not is_opener and not is_closer:
@@ -141,10 +135,11 @@ class Highlighter:
 								color_data[color_data_row_index][1] = 0
 								color_data[color_data_row_index].append((colorIndex - (opener_count * 3) - closer_count) + (len(window_line.expandtabs(tab_expand_size)) - len(window_line)) - viewport_x)
 							else:
-							# else if closer is not on screen
+							# else (closer is not on screen)
 								color_data.pop()
 								color_data_row_index -= 1
 						else:
+						# else (opener is on screen)
 							color_data[color_data_row_index].append((colorIndex - (opener_count * 3) - closer_count) + (len(window_line.expandtabs(tab_expand_size)) - len(window_line)) - color_data[color_data_row_index][1])
 							color_data[color_data_row_index][1] = color_data[color_data_row_index][1] - viewport_x
 
@@ -171,7 +166,7 @@ class Highlighter:
 	##
 	## @brief      Terminates Highlighter
 	##
-	## @param      self  The object
+	## @param      self  This object
 	##
 	def terminate(self):
 		pass
@@ -179,7 +174,7 @@ class Highlighter:
 	##
 	## @brief      Highlight text between filecursor and selectPosition, this allows onscreen coloration to show what text is currently being selected.
 	##
-	## @param      self  The object
+	## @param      self  This object
 	##
 	def drawSelect(self):
 		filecursor_x = self.file_window.getFilecursorX()
@@ -189,7 +184,7 @@ class Highlighter:
 		viewport_x = self.file_window.getViewportX()
 		viewport_y = self.file_window.getViewportY()
 		window_max_y = self.file_window.getWindowMaxY()
-		tab_expand_size = self.manager.Objects["config"].options["TabExpandSize"]
+		tab_expand_size = self.manager.get("config").options["TabExpandSize"]
 
 		if self.file_window.is_select_on:
 

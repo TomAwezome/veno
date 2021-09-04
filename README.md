@@ -23,9 +23,9 @@ Run `pip3 install -r requirements.txt` to install dependencies.
  - In case this does not successfully install Pygments, installing Pygments through a package manager may.
    - On Ubuntu, try `sudo apt install python3-pygments`
 
-To use `veno` globally, add the repo to your $PATH. Alternatively, add an alias to `veno` in your `.bashrc` or `.bash_alias`.
-
 Run `chmod +x veno` to mark `veno` as executable.
+
+To use `veno` globally, add the repo to your $PATH. Alternatively, add an alias to `veno` in your `.bashrc` or `.bash_alias`.
 
 ## Usage
 

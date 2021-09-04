@@ -6,7 +6,7 @@ class Keyboard:
 	##
 	## @brief      Constructs the object.
 	##
-	## @param      self     The object
+	## @param      self     This object
 	## @param      manager  The manager to allow scheduling actions in external Windows
 	##
 	def __init__(self, manager):
@@ -18,19 +18,19 @@ class Keyboard:
 		self.bindings = {}
 
 		## FileWindow instance for fileWindow keybindings.
-		self.file_window = self.manager.Windows["fileWindow"]
+		self.file_window = self.manager.get("fileWindow")
 
 		## MagicBar instance for magicBar keybindings.
-		self.magic_bar = self.manager.Windows["magicBar"]
+		self.magic_bar = self.manager.get("magicBar")
 		
 		## ConfigCustomizer instance for customizer keybindings. (Only used for toggle)
-		self.config_customizer = self.manager.Windows["configCustomizer"]
+		self.config_customizer = self.manager.get("configCustomizer")
 		
 		self.bind()
 	##
 	## @brief      Update. grab key and do something with it. 
 	##
-	## @param      self  The object
+	## @param      self  This object
 	##
 	def update(self):
 		try:
@@ -59,14 +59,14 @@ class Keyboard:
 	##
 	## @brief      Terminate Keyboard Manager
 	##
-	## @param      self  The object
+	## @param      self  This object
 	##
 	def terminate(self):
 		pass
 	##
 	## @brief      Binds all keybindings to binding dictionary. Saved as "keyname": function instance.
 	##
-	## @param      self  The object
+	## @param      self  This object
 	##
 	def bind(self):
 		self.bindings = {
