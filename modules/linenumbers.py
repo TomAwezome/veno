@@ -4,7 +4,7 @@ class LineNumbersWindow(Window):
 		Window.__init__(self, manager, name)
 
 		## FileWindow instance that LineNumbersWindow is attached to.
-		self.file_window = self.manager.get("fileWindow")
+		self.file_window = self.manager.get("currentFileWindow")
 
 		self.intended_y			= self.file_window.getWindowBegY()
 		self.intended_width		= 5
@@ -22,6 +22,8 @@ class LineNumbersWindow(Window):
 
 	def update(self):
 		self.window.erase()
+
+		self.file_window = self.manager.get("currentFileWindow")
 
 		total_lines = len(self.file_window.file_lines)
 		self.intended_width = len(str(total_lines)) + 2

@@ -26,7 +26,7 @@ class Highlighter:
 		self.color_map = self.manager.get("config").options["ColorMap"]
 		
 		## FileWindow highlighter is attached to.
-		self.file_window = self.manager.get("fileWindow")
+		self.file_window = self.manager.get("currentFileWindow")
 		
 		try:
 			try:
@@ -49,6 +49,9 @@ class Highlighter:
 	## @param      self  This object
 	##
 	def update(self):
+
+		self.file_window = self.manager.get("currentFileWindow")
+
 		viewport_x = self.file_window.getViewportX()
 		viewport_y = self.file_window.getViewportY()
 		window_max_y = self.file_window.getWindowMaxY()
@@ -177,6 +180,9 @@ class Highlighter:
 	## @param      self  This object
 	##
 	def drawSelect(self):
+
+		self.file_window = self.manager.get("currentFileWindow")
+
 		filecursor_x = self.file_window.getFilecursorX()
 		filecursor_y = self.file_window.getFilecursorY()
 		select_x = self.file_window.getSelectX()

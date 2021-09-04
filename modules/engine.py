@@ -18,18 +18,29 @@ class Engine():
 	## @param      self  This object
 	##
 	def __init__(self):
-		# Modules being used: File, Manager, FileWindow, Keyboard, LineNumbers, MagicBar, ConfigCustomizer, SyntaxHighlighting
-		filename = self.parseArgs().filename[0] or "untitled.txt"
+		# Modules being used: Config, File, Manager, FileWindow, Keyboard, LineNumbers, MagicBar, ConfigCustomizer, SyntaxHighlighting
+		filenames = self.parseArgs().filename or ["untitled.txt"]
+
 		## Config instance for editor.
-		self.config = Config(filename)
-		## File instance to be used in editor.
-		self.file = File(filename)												# Load file provided as only arg.
+		self.config = Config(filenames[0])
+		## File instance list to be used by editor.
+		self.files = []
+		## FileWindow instance list.
+		self.file_window_list = []
 		## Panel Manager instance for modules.
 		self.manager = Manager()												# Load Manager.
 		self.manager.add("config", self.config)
-		## FileWindow instance using File to begin editor.
-		self.file_window = FileWindow(self.manager, "fileWindow", self.file)	# Create fileWindow.
-		self.file_window.update()												# Update fileWindow contents.
+		self.manager.add("file_window_list", self.file_window_list)
+
+		for filename in filenames:
+			file = File(filename)
+			self.files.append(file)												# Load file provided as only arg.
+			file_window = FileWindow(self.manager, "fileWindow", file)	# Create fileWindow.
+			self.file_window_list.append(file_window)
+			file_window.update()												# Update fileWindow contents.
+		
+		self.manager.add("currentFileWindow", self.file_window_list[0])
+		
 		## Highlighter instance to colorize FileWindow contents.
 		self.highlighter = Highlighter(self.manager)
 		self.manager.add("highlighter", self.highlighter)
@@ -49,7 +60,7 @@ class Engine():
 	##
 	def turn(self):
 		self.magic_bar.update()
-		self.file_window.update()
+		self.manager.get("currentFileWindow").update()
 		self.line_numbers.update()
 		self.highlighter.update()
 		self.config_customizer.update()
@@ -72,6 +83,8 @@ class Engine():
 	##
 	def terminate(self):														# Terminate all modules in reverse order of initialization.
 		self.keys.terminate()
-		self.file_window.terminate()
+		for file_window in self.file_window_list:
+			file_window.terminate()
 		self.manager.terminate()
-		self.file.terminate()
+		for file in self.files:
+			file.terminate()

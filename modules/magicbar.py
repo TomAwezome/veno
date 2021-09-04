@@ -6,7 +6,7 @@ class MagicBar(Window):
 		Window.__init__(self, manager, name)
 		
 		## FileWindow instance MagicBar is attached to.
-		self.file_window = self.manager.get("fileWindow")
+		self.file_window = self.manager.get("currentFileWindow")
 		
 		self.config = self.manager.get("config").options
 
@@ -30,10 +30,34 @@ class MagicBar(Window):
 		self.bind()
 
 		self.panel.top()
-		self.panel.hide()
 
 	def update(self):
+		self.file_window = self.manager.get("currentFileWindow")
+		self.save_string = self.file_window.file.source
+
 		self.cursor = self.file_window.filecursor
+
+		self.window.erase()
+		self.intended_x = 0
+		self.intended_y = self.getStdscrMaxY()
+		self.intended_width = self.getStdscrMaxX() - 1
+		self.intended_height = 1
+
+		self.keepWindowInMainScreen()
+		self.manager.update()
+		self.keepWindowInMainScreen()
+
+		idle_string = "   "
+		for file_window in self.manager.get("file_window_list"):
+			if file_window == self.file_window:
+				if len(idle_string) + len(file_window.file.source) + 2 >= self.getWindowMaxX() - 1:
+					idle_string = "   "
+				idle_string += "[" + file_window.file.source + "]   "
+			else:
+				idle_string += file_window.file.source + "   "
+		self.window.addnstr(0, 0, idle_string, self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
+
+		self.manager.update()
 
 	def bind(self):
 		self.search_bindings = {
@@ -213,6 +237,7 @@ class MagicBar(Window):
 	def search(self):
 		self.panel.show()
 		self.panel.top()
+		self.window.erase()
 		self.intended_x = 0 
 		self.intended_y = self.getStdscrMaxY()
 		self.intended_width = self.getStdscrMaxX() - 1
@@ -293,7 +318,7 @@ class MagicBar(Window):
 
 			self.file_window.gotoLine(search_index_y)
 			self.file_window.setFilecursorX(search_index_x)
-			self.update()
+			self.cursor = self.file_window.filecursor
 
 			self.keepWindowInMainScreen()
 
@@ -378,6 +403,7 @@ class MagicBar(Window):
 	def replace(self):
 		self.panel.show()
 		self.panel.top()
+		self.window.erase()
 		self.intended_x = 0
 		self.intended_y = self.getStdscrMaxY()
 		self.intended_width = self.getStdscrMaxX() - 1
@@ -608,6 +634,7 @@ class MagicBar(Window):
 	def confirmExitSave(self):
 		self.panel.show()
 		self.panel.top()
+		self.window.erase()
 		self.intended_x = 0
 		self.intended_y = self.getStdscrMaxY()
 		self.intended_width = self.getStdscrMaxX() - 1
@@ -643,6 +670,7 @@ class MagicBar(Window):
 	def save(self):
 		self.panel.show()
 		self.panel.top()
+		self.window.erase()
 		self.intended_x = 0
 		self.intended_y = self.getStdscrMaxY()
 		self.intended_width = self.getStdscrMaxX() - 1
@@ -653,6 +681,7 @@ class MagicBar(Window):
 		self.manager.update()
 		self.keepWindowInMainScreen()
 
+		self.window.erase()
 		self.window.addnstr(0, 0, "Filename?", self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
 
 		self.manager.update()

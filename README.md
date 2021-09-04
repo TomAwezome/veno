@@ -29,7 +29,7 @@ To use `veno` globally, add the repo to your $PATH. Alternatively, add an alias 
 
 ## Usage
 
-`veno [filename]` Filename optional. 
+`veno [filename [filename ...]]` Filename(s) optional.
 
 Runs in a terminal window. GUI not yet implemented.
 
@@ -51,6 +51,8 @@ Runs in a terminal window. GUI not yet implemented.
  - **End Key** -- go to end of line in file
  - **F3** -- go to start of file
  - **F4** -- go to end of file
+ - **F5** -- go to previous open file
+ - **F6** -- go to next open file
  - **Ctrl-L** - go to a line in file
  - **Ctrl-F** -- find regex string in file
  - **Ctrl-G** -- find next match in file

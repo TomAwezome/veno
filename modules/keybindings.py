@@ -18,7 +18,7 @@ class Keyboard:
 		self.bindings = {}
 
 		## FileWindow instance for fileWindow keybindings.
-		self.file_window = self.manager.get("fileWindow")
+		self.file_window = self.manager.get("currentFileWindow")
 
 		## MagicBar instance for magicBar keybindings.
 		self.magic_bar = self.manager.get("magicBar")
@@ -56,6 +56,7 @@ class Keyboard:
 			c = self.manager.stdscr.getch()
 
 		self.manager.stdscr.timeout(-1)
+
 	##
 	## @brief      Terminate Keyboard Manager
 	##
@@ -63,6 +64,7 @@ class Keyboard:
 	##
 	def terminate(self):
 		pass
+
 	##
 	## @brief      Binds all keybindings to binding dictionary. Saved as "keyname": function instance.
 	##
@@ -86,6 +88,8 @@ class Keyboard:
 			"KEY_END":   self.file_window.gotoEndOfLine,
 			"KEY_F(3)":  self.file_window.gotoStartOfFile,
 			"KEY_F(4)":  self.file_window.gotoEndOfFile,
+			"KEY_F(5)":  self.selectPrevFileWindow,
+			"KEY_F(6)":  self.selectNextFileWindow,
 			"KEY_HOME":  self.file_window.gotoStartOfLine,
 			"KEY_NPAGE": self.file_window.scrollDown,
 			"KEY_PPAGE": self.file_window.scrollUp,
@@ -114,3 +118,46 @@ class Keyboard:
 			"kUP5":  self.file_window.moveViewportUp,
 			"kDN5":  self.file_window.moveViewportDown
 		}
+		
+	##
+	## @brief      Change FileWindow instance to which keybindings are bound to the previous instance.
+	##
+	## @param      self  This object
+	##
+	def selectPrevFileWindow(self):
+		self.file_window = self.manager.get("currentFileWindow")
+		self.file_window.panel.hide()
+		old_copy_lines = self.file_window.copy_lines # share copied text globally across fileWindows
+		file_window_list = self.manager.get("file_window_list")
+		if file_window_list.index(self.file_window) - 1 >= 0:
+			self.file_window = file_window_list[file_window_list.index(self.file_window) - 1]
+		else:
+			self.file_window = file_window_list[len(file_window_list) - 1]
+		self.manager.add("currentFileWindow", self.file_window) # re-set current file window in manager
+		self.file_window.panel.top()
+		self.file_window.panel.show()
+		self.file_window.is_modified = True
+		self.file_window.copy_lines = old_copy_lines
+		self.bind() # kludge ... bindings array holds function pointers to specific FileWindow object instances... we have to rebind to keep this implementation...
+
+	##
+	## @brief      Change FileWindow instance to which keybindings are bound to the next instance.
+	##
+	## @param      self  This object
+	##
+	def selectNextFileWindow(self):
+		self.file_window = self.manager.get("currentFileWindow")
+		self.file_window.panel.hide()
+		old_copy_lines = self.file_window.copy_lines # share copied text globally across fileWindows
+		file_window_list = self.manager.get("file_window_list")
+		if file_window_list.index(self.file_window) + 1 < len(file_window_list):
+			self.file_window = file_window_list[file_window_list.index(self.file_window) + 1]
+		else:
+			self.file_window = file_window_list[0]
+		self.manager.add("currentFileWindow", self.file_window) # re-set current file window in manager
+		self.file_window.panel.top()
+		self.file_window.panel.show()
+		self.file_window.is_modified = True
+		self.file_window.copy_lines = old_copy_lines
+		self.bind() # kludge ... bindings array holds function pointers to specific FileWindow object instances... we have to rebind to keep this implementation...
+
