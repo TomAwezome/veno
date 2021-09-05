@@ -4,7 +4,7 @@ import string
 ##
 class Keyboard:
 	##
-	## @brief      Constructs the object.
+	## @brief      Constructs this Keyboard object.
 	##
 	## @param      self     This object
 	## @param      manager  The manager to allow scheduling actions in external Windows

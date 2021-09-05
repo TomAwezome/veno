@@ -3,13 +3,13 @@
 ##
 class File:
 	##
-	## @brief      Constructs the object.
+	## @brief      Constructs this File object.
 	##
 	## @param      self    This object
 	## @param      source  The file location as a string
 	##
 	def __init__(self, source):
-		self.source = source	# source should be a filename string
+		self.source = source
 		try:
 			file = open(source)
 			self.exists = True
@@ -24,10 +24,10 @@ class File:
 			self.exists = False
 
 	##
-	## @brief      save altered contents to File
+	## @brief      Save altered contents to File
 	##
 	## @param      self        This object
-	## @param      fileString  The altered contents
+	## @param      fileString  The altered contents as a string
 	##
 	def save(self, fileString):
 		if self.source != "":
@@ -36,7 +36,7 @@ class File:
 			file.close()
 
 	##
-	## @brief      terminates File
+	## @brief      Terminate this File
 	##
 	## @param      self  This object
 	##

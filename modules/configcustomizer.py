@@ -2,10 +2,13 @@ from modules.window import Window
 class ConfigCustomizerWindow(Window):
 	def __init__(self, manager, name):
 		Window.__init__(self, manager, name)
-		self.intended_y = self.intended_x = 0
-		self.intended_width = self.getStdscrMaxX()
-		self.intended_height = self.getStdscrMaxY()
+
+		self.intended_y	= self.intended_x = 0
+		self.intended_width		= self.getStdscrMaxX()
+		self.intended_height	= self.getStdscrMaxY()
+
 		self.is_open = False
+
 		self.window.erase()
 		self.keepWindowInMainScreen()
 
@@ -16,12 +19,12 @@ class ConfigCustomizerWindow(Window):
 
 		self.current_option = 0
 		self.viewport_y = 0
-		
+
 		## Config instance.
 		self.config = self.manager.get("config")
-
 		## ConfigCustomizer keybindings dictionary stores functions
 		self.bindings = {}
+
 		self.bind()
 
 	def update(self):

@@ -38,10 +38,10 @@ class MagicBar(Window):
 		self.cursor = self.file_window.filecursor
 
 		self.window.erase()
-		self.intended_x = 0
-		self.intended_y = self.getStdscrMaxY()
-		self.intended_width = self.getStdscrMaxX() - 1
-		self.intended_height = 1
+		self.intended_x			= 0
+		self.intended_y			= self.getStdscrMaxY()
+		self.intended_width		= self.getStdscrMaxX() - 1
+		self.intended_height	= 1
 
 		self.keepWindowInMainScreen()
 		self.manager.update()
@@ -70,6 +70,7 @@ class MagicBar(Window):
 			"KEY_HOME":      self.moveSearchCursorToStart,
 			"KEY_END":       self.moveSearchCursorToEnd,
 			"^I":            self.enterTabAtSearchCursor,
+			"^V":            self.pasteAtSearchCursor,
 
 			"printable-character": self.enterTextAtSearchCursor
 		}
@@ -145,6 +146,24 @@ class MagicBar(Window):
 		self.search_string = search_string_left + search_string_right
 		self.search_cursor_x += 1
 
+	def pasteAtSearchCursor(self):
+		if self.file_window.copy_lines != []:
+			paste_string = "\\n".join(self.file_window.copy_lines)
+
+# TODO: make a config option or class member boolean for regex Find mode to fix this?
+#	if the following lines are commented, Find breaks; uncommented, pasting LOC into Find field will work with regex,
+#	but if pasting into Replace field, resulting text has garbage extra \ symbols ...
+
+			paste_string = paste_string.replace("(", "\(").replace("[", "\[").replace("{", "\{") # replacements
+			paste_string = paste_string.replace(")", "\)").replace("]", "\]").replace("}", "\}") # for regex: ()[]{}|?+*$^.
+			paste_string = paste_string.replace("|", "\|").replace("?", "\?").replace("+", "\+").replace("\t", "\\t")
+			paste_string = paste_string.replace("*", "\*").replace("$", "\$").replace("^", "\^").replace(".", "\.")
+
+			search_string_left = self.search_string[:self.search_cursor_x] + paste_string
+			search_string_right = self.search_string[self.search_cursor_x:]
+			self.search_string = search_string_left + search_string_right
+			self.search_cursor_x += len(paste_string)
+			
 	def moveGotoLineCursorLeft(self):
 		if self.goto_line_cursor_x > 0:
 			self.goto_line_cursor_x -= 1
@@ -238,16 +257,16 @@ class MagicBar(Window):
 		self.panel.show()
 		self.panel.top()
 		self.window.erase()
-		self.intended_x = 0 
-		self.intended_y = self.getStdscrMaxY()
-		self.intended_width = self.getStdscrMaxX() - 1
-		self.intended_height = 1
+		self.intended_x			= 0 
+		self.intended_y			= self.getStdscrMaxY()
+		self.intended_width		= self.getStdscrMaxX() - 1
+		self.intended_height	= 1
 
 		self.keepWindowInMainScreen()
 		self.manager.update()
 		self.keepWindowInMainScreen()
 		
-		tab_expand_size = tab_expand_size = self.config["TabExpandSize"]
+		tab_expand_size = self.config["TabExpandSize"]
 		self.window.addnstr(0, 0, self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
 
 		tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
@@ -284,7 +303,11 @@ class MagicBar(Window):
 
 			self.manager.update()
 
-		pattern = re.compile(self.search_string)
+		try:
+			pattern = re.compile(self.search_string)
+		except:
+			return
+
 		self.pattern_matches = pattern.finditer(self.file_window.file.contents)
 		try:
 			self.next_match = next(self.pattern_matches)
@@ -293,7 +316,7 @@ class MagicBar(Window):
 			if len(search_lines) > 0:
 				search_index_x = len(search_lines[len(search_lines) - 1])
 		except StopIteration:
-			pass
+			self.next_match = None
 
 		if self.next_match:
 			while search_index_y < self.cursor[1]:
@@ -325,10 +348,11 @@ class MagicBar(Window):
 	def gotoLine(self):
 		self.panel.show()
 		self.panel.top()
-		self.intended_x = 0
-		self.intended_y = self.getStdscrMaxY()
-		self.intended_width = self.getStdscrMaxX() - 1
-		self.intended_height = 1
+		self.window.erase()
+		self.intended_x			= 0
+		self.intended_y			= self.getStdscrMaxY()
+		self.intended_width		= self.getStdscrMaxX() - 1
+		self.intended_height	= 1
 
 		self.keepWindowInMainScreen()
 		self.manager.update()
@@ -374,15 +398,6 @@ class MagicBar(Window):
 		self.keepWindowInMainScreen()
 
 	def searchNext(self):
-		self.panel.show()
-		self.panel.top()
-		self.intended_x = 0
-		self.intended_y = self.getStdscrMaxY()
-		self.intended_width = self.getStdscrMaxX() - 1
-		self.intended_height = 1
-
-		self.keepWindowInMainScreen()
-		
 		try:
 			try:
 				self.next_match = next(self.pattern_matches) # next operates to go down iterator, in this case if hitting first instance of given string, next() will start at that first index and continue through matches
@@ -404,16 +419,16 @@ class MagicBar(Window):
 		self.panel.show()
 		self.panel.top()
 		self.window.erase()
-		self.intended_x = 0
-		self.intended_y = self.getStdscrMaxY()
-		self.intended_width = self.getStdscrMaxX() - 1
-		self.intended_height = 1
+		self.intended_x			= 0
+		self.intended_y			= self.getStdscrMaxY()
+		self.intended_width		= self.getStdscrMaxX() - 1
+		self.intended_height	= 1
 
 		self.keepWindowInMainScreen()	
 		self.manager.update()
 		self.keepWindowInMainScreen()
 
-		tab_expand_size = tab_expand_size = self.config["TabExpandSize"]
+		tab_expand_size = self.config["TabExpandSize"]
 		self.window.addnstr(0, 0, self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
 
 		tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
@@ -502,8 +517,11 @@ class MagicBar(Window):
 		file_string = '\n'.join(file_lines)
 
 		# next we'll find the first occurence (relative to our cursor) of our to-be-replaced string, and move the file cursor there and have our current nexMatch be that occurence
+		try:
+			pattern = re.compile(first_string)
+		except:
+			return
 
-		pattern = re.compile(first_string)
 		self.pattern_matches = pattern.finditer(self.file_window.file.contents)
 		try:
 			self.next_match = next(self.pattern_matches)
@@ -635,10 +653,10 @@ class MagicBar(Window):
 		self.panel.show()
 		self.panel.top()
 		self.window.erase()
-		self.intended_x = 0
-		self.intended_y = self.getStdscrMaxY()
-		self.intended_width = self.getStdscrMaxX() - 1
-		self.intended_height = 1
+		self.intended_x			= 0
+		self.intended_y			= self.getStdscrMaxY()
+		self.intended_width		= self.getStdscrMaxX() - 1
+		self.intended_height	= 1
 
 		self.keepWindowInMainScreen()
 		self.manager.update()
@@ -671,10 +689,10 @@ class MagicBar(Window):
 		self.panel.show()
 		self.panel.top()
 		self.window.erase()
-		self.intended_x = 0
-		self.intended_y = self.getStdscrMaxY()
-		self.intended_width = self.getStdscrMaxX() - 1
-		self.intended_height = 1
+		self.intended_x			= 0
+		self.intended_y			= self.getStdscrMaxY()
+		self.intended_width		= self.getStdscrMaxX() - 1
+		self.intended_height	= 1
 		returnval = 0
 
 		self.keepWindowInMainScreen()

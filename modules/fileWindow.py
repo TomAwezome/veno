@@ -1,26 +1,24 @@
-# # file window covers everything about a file and seeing it visually
-# # filecursor (current location in file), viewport? (what YOU're seeing), screenCursor (wherever you are has to visible _somehow_).
-
 from modules.window import Window
 class FileWindow(Window):
 	def __init__(self, manager, name, file):
 		Window.__init__(self, manager, name)
-		self.viewport = [0, 0] #   [X, Y]
+		self.viewport	= [0, 0] # [X, Y]
 		self.filecursor = [0, 0] # [X, Y]
-		self.panel.bottom()
-		self.file = file
-		self.file_lines = self.file.contents.splitlines()
-		self.config = self.manager.get("config").options
+		self.file		= file
+		self.file_lines	= self.file.contents.splitlines()
+		self.config		= self.manager.get("config").options
 
-		self.is_modified = True ## i.e. Modified since last highlight. Variable used for speed optimization of syntax highlighting algorithm.
-		self.select_position = []
+		self.is_modified		= True ## i.e. Modified since last highlight. Variable used for speed optimization of syntax highlighting algorithm.
+		self.select_position	= []
 		self.is_select_on = self.is_repeating_quote = False
-		self.copy_lines = []
+		self.copy_lines			= []
+		
+		self.panel.bottom()
 
 	def update(self):
 		self.window.erase()
 		self.intended_height = self.getStdscrMaxY() - self.intended_y - 1
-		self.intended_width = self.getStdscrMaxX() - self.intended_x - 1
+		self.intended_width  = self.getStdscrMaxX() - self.intended_x - 1
 
 		self.keepWindowInMainScreen()
 
@@ -601,12 +599,12 @@ class FileWindow(Window):
 		pass
 
 	def scrollDown(self):
-		scroll_amount = 20
+		scroll_amount = self.config["ScrollAmount"]
 		filecursor_y = self.getFilecursorY()
 		self.gotoLine(min(filecursor_y + scroll_amount, len(self.file_lines) - 1))
 
 	def scrollUp(self):
-		scroll_amount = 20
+		scroll_amount = self.config["ScrollAmount"]
 		filecursor_y = self.getFilecursorY()
 		self.gotoLine(max(filecursor_y - scroll_amount, 0))
 

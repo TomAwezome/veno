@@ -6,7 +6,7 @@ from pathlib import Path
 ##
 class Config:
 	##
-	## @brief      Constructs the object.
+	## @brief      Constructs this Config object.
 	##
 	## @param      self    This object
 	##
@@ -14,11 +14,12 @@ class Config:
 		self.default_options = {
 			"TabExpandSize": 4,
 			"TabLength": 4,
-			"LineWrapLength": 100,
+			"LineWrapLength": 40,
 			"AutoIndent": True,
 			"UseLineWrap": False,
 			"BracketMatching": True,
 			"QuoteMatching": True,
+			"ScrollAmount": 20,
 			"LanguageOverrides": {
 				"py": {
 					"TabLength": "char"
@@ -28,22 +29,22 @@ class Config:
 				}
 			},
 			"ColorMap": {
-				"0": 8,
-				"1": 8,
+				"0": 7,
+				"1": 7,
 				"2": 2, # class, def, try, if, break, while, for, ints, pass
-				"3": 8,
-				"4": 8,
+				"3": 7,
+				"4": 7,
 				"5": 3, # quotes
 				"6": 2, # in, and, or
-				"7": 3, #class/function name
-				"8": 8,
-				"9": 8,
+				"7": 5, #class/function name
+				"8": 7,
+				"9": 7,
 				"10": 4, # self, modules, literals
-				"11": 8,
-				"12": 8,
-				"13": 8,
-				"14": 8,
-				"15": 1 # Comments. This color.
+				"11": 7,
+				"12": 7,
+				"13": 7,
+				"14": 7,
+				"15": 6 # Comments. This color.
 			}
 		}
 		try:

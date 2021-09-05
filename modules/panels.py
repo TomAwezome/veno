@@ -6,7 +6,7 @@ import curses.panel as panel
 ##
 class Manager:
 	##
-	## @brief      Constructs the object.
+	## @brief      Constructs this Manager object.
 	##
 	## @param      self  This object
 	##

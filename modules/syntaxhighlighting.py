@@ -7,7 +7,7 @@ from pygments.formatters import IRCFormatter
 ##
 class Highlighter:
 	##
-	## @brief      Constructs the object.
+	## @brief      Constructs this Highlighter object.
 	##
 	## @param      self     This object
 	## @param      manager  The manager to allow access to drawing on window object in FileWindow
@@ -159,7 +159,7 @@ class Highlighter:
 					color_instances -= 1
 				for row in color_data:
 					if row != []:
-						self.file_window.window.chgat(window_y - viewport_y, row[1], row[2], self.manager.curses.color_pair(self.color_map[str(int(row[0]))]))
+						self.file_window.window.chgat(window_y - viewport_y, row[1], row[2], self.manager.curses.color_pair(self.color_map[str(int(row[0]))]) | self.manager.curses.A_ITALIC | self.manager.curses.A_BOLD)
 			window_y += 1
 			if window_y > viewport_y + window_max_y-1:
 				break

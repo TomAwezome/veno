@@ -13,7 +13,7 @@ from modules.configcustomizer import ConfigCustomizerWindow
 ##
 class Engine():
 	##
-	## @brief      Constructs the object.
+	## @brief      Constructs this Engine object.
 	##
 	## @param      self  This object
 	##
@@ -33,14 +33,24 @@ class Engine():
 		self.manager.add("file_window_list", self.file_window_list)
 
 		for filename in filenames:
-			file = File(filename)
-			self.files.append(file)												# Load file provided as only arg.
-			file_window = FileWindow(self.manager, "fileWindow", file)	# Create fileWindow.
+			try:
+				file = File(filename)
+				self.files.append(file)											# Load file provided as only arg.
+				file_window = FileWindow(self.manager, "fileWindow", file)		# Create fileWindow.
+				self.file_window_list.append(file_window)
+				file_window.update()											# Update fileWindow contents.
+			except IsADirectoryError:
+				pass		
+		if self.file_window_list != []:
+			self.manager.add("currentFileWindow", self.file_window_list[0])
+		else: # filewindow list can be empty if provided arg is a directory and no other filename args are given
+			file = File("untitled.txt")
+			self.files.append(file)
+			file_window = FileWindow(self.manager, "fileWindow", file)
 			self.file_window_list.append(file_window)
-			file_window.update()												# Update fileWindow contents.
-		
-		self.manager.add("currentFileWindow", self.file_window_list[0])
-		
+			file_window.update()
+			self.manager.add("currentFileWindow", self.file_window_list[0])
+
 		## Highlighter instance to colorize FileWindow contents.
 		self.highlighter = Highlighter(self.manager)
 		self.manager.add("highlighter", self.highlighter)
