@@ -47,15 +47,22 @@ class MagicBar(Window):
 		self.manager.update()
 		self.keepWindowInMainScreen()
 
-		idle_string = "   "
+		idle_string = "    "
+		highlight_x_start = 0
+		highlight_x_len = 0
 		for file_window in self.manager.get("file_window_list"):
 			if file_window == self.file_window:
 				if len(idle_string) + len(file_window.file.source) + 2 >= self.getWindowMaxX() - 1:
-					idle_string = "   "
-				idle_string += "[" + file_window.file.source + "]   "
+					idle_string = "... "
+				highlight_x_start = len(idle_string)
+				idle_string += file_window.file.source
+				highlight_x_len = len(idle_string) - highlight_x_start
+				idle_string += "  "
 			else:
-				idle_string += file_window.file.source + "   "
+				idle_string += file_window.file.source + "  "
 		self.window.addnstr(0, 0, idle_string, self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
+		self.window.chgat(0, highlight_x_start, min(highlight_x_len, self.getWindowMaxX() - 1), self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE | self.manager.curses.A_BOLD)
+
 
 		self.manager.update()
 
