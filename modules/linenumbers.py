@@ -49,7 +49,7 @@ class LineNumbersWindow(Window):
 		if self.intended_width <= self.getWindowMaxX():
 			while window_y < self.getWindowMaxY() and window_y + current_line < total_lines:
 				line_number_string = str(current_line + window_y + 1)
-				self.window.addstr(window_y, 0, line_number_string + (" " * (len(str(total_lines)) - len(line_number_string))) + "┃")
+				self.window.addstr(window_y, 0, line_number_string + (" " * (len(str(total_lines)) - len(line_number_string))) + " ", self.manager.curses.A_REVERSE)
 				window_y += 1
 
 	def terminate(self):

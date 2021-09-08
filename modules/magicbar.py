@@ -60,6 +60,10 @@ class MagicBar(Window):
 				idle_string += "  "
 			else:
 				idle_string += file_window.file.source + "  "
+
+		if len(idle_string) >= self.getWindowMaxX() - 1:
+			idle_string = idle_string[:self.getWindowMaxX() - 4] + "..."
+
 		self.window.addnstr(0, 0, idle_string, self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
 		self.window.chgat(0, highlight_x_start, min(highlight_x_len, self.getWindowMaxX() - 1), self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE | self.manager.curses.A_BOLD)
 
