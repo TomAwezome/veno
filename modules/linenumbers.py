@@ -24,6 +24,12 @@ class LineNumbersWindow(Window):
 		self.window.erase()
 
 		self.file_window = self.manager.get("currentFileWindow")
+		
+		if not self.manager.get("config").options["ShowLineNumbers"]:
+			self.file_window.intended_x	= 0
+			self.file_window.window.mvwin(self.file_window.intended_y, self.file_window.intended_x)
+			self.file_window.keepWindowInMainScreen()
+			return
 
 		total_lines = len(self.file_window.file_lines)
 		self.intended_width = len(str(total_lines)) + 2

@@ -16,6 +16,7 @@ class Config:
 			"TabLength": 4,
 			"LineWrapLength": 40,
 			"AutoIndent": True,
+			"ShowLineNumbers": True,
 			"UseLineWrap": False,
 			"BracketMatching": True,
 			"QuoteMatching": True,
