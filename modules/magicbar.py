@@ -6,7 +6,7 @@ class MagicBar(Window):
 		Window.__init__(self, manager, name)
 		
 		## FileWindow instance MagicBar is attached to.
-		self.file_window = self.manager.get("currentFileWindow")
+		self.file_window = self.manager.get("current_file_window")
 		
 		self.config = self.manager.get("config").options
 
@@ -32,7 +32,7 @@ class MagicBar(Window):
 		self.panel.top()
 
 	def update(self):
-		self.file_window = self.manager.get("currentFileWindow")
+		self.file_window = self.manager.get("current_file_window")
 		self.save_string = self.file_window.file.source
 
 		self.cursor = self.file_window.filecursor

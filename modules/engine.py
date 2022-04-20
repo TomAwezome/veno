@@ -42,14 +42,14 @@ class Engine():
 			except IsADirectoryError:
 				pass		
 		if self.file_window_list != []:
-			self.manager.add("currentFileWindow", self.file_window_list[0])
+			self.manager.add("current_file_window", self.file_window_list[0])
 		else: # filewindow list can be empty if provided arg is a directory and no other filename args are given
 			file = File("untitled.txt")
 			self.files.append(file)
 			file_window = FileWindow(self.manager, "fileWindow", file)
 			self.file_window_list.append(file_window)
 			file_window.update()
-			self.manager.add("currentFileWindow", self.file_window_list[0])
+			self.manager.add("current_file_window", self.file_window_list[0])
 
 		## Highlighter instance to colorize FileWindow contents.
 		self.highlighter = Highlighter(self.manager)
@@ -70,7 +70,7 @@ class Engine():
 	##
 	def turn(self):
 		self.magic_bar.update()
-		self.manager.get("currentFileWindow").update()
+		self.manager.get("current_file_window").update()
 		self.line_numbers.update()
 		self.highlighter.update()
 		self.config_customizer.update()
