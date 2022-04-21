@@ -592,7 +592,9 @@ class FileWindow(Window):
 			file_string += line + "\n"
 
 		returnval = self.manager.get("magicBar").save()
-		self.file.save(file_string)
+		if returnval == True: # magicBar save filename get success, save file
+			self.file.save(file_string)
+
 		return returnval
 
 	def searchForText(self):

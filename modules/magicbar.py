@@ -705,7 +705,7 @@ class MagicBar(Window):
 		self.intended_y			= self.getStdscrMaxY()
 		self.intended_width		= self.getStdscrMaxX() - 1
 		self.intended_height	= 1
-		returnval = 0
+		returnval = True
 
 		self.keepWindowInMainScreen()
 		self.manager.update()
@@ -717,12 +717,12 @@ class MagicBar(Window):
 		self.manager.update()
 
 		while True:
-			kill = False
 			try:
 				c = self.manager.stdscr.getch()
 			except KeyboardInterrupt:
-				kill = True
-				break
+				self.window.erase()
+				returnval = False
+				return returnval
 
 			if c == -1:
 				continue
@@ -731,11 +731,6 @@ class MagicBar(Window):
 			c = c.decode("utf-8")
 			if c == "^J":
 				break
-
-		if kill:
-			self.window.erase()
-			returnval = 1
-			return returnval
 
 		# savefile string
 		# keypress loop: begin catching characters
@@ -751,7 +746,7 @@ class MagicBar(Window):
 			try:
 				c = self.manager.stdscr.getch()
 			except KeyboardInterrupt:
-				returnval = 1
+				returnval = False
 				break
 			if c == -1:
 				continue
