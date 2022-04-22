@@ -1,6 +1,6 @@
 from modules.config import Config
 from modules.file import File
-from modules.panels import Manager
+from modules.manager import Manager
 from modules.fileWindow import FileWindow
 from modules.keybindings import Keyboard
 from modules.syntaxhighlighting import Highlighter

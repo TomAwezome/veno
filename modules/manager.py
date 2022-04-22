@@ -2,7 +2,8 @@ import curses
 import curses.panel as panel
 
 ##
-## @brief      Class for manager. has .stdscr, .panel, ..think main WindowPanel for everything, other panels created on this
+## @brief      Class for managing global program objects, window panel instances, and ncurses screen.
+##             New window panels are created on top of the base ncurses panel object.
 ##
 class Manager:
 	##
