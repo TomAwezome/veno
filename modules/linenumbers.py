@@ -23,6 +23,9 @@ class LineNumbersWindow(Window):
 	def update(self):
 		self.window.erase()
 
+		if self.manager.get("config").options["UseLineWrap"]:
+			return # bail, handle that mess later
+
 		self.file_window = self.manager.get("current_file_window")
 		
 		if not self.manager.get("config").options["ShowLineNumbers"]:

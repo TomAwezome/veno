@@ -52,6 +52,9 @@ class Highlighter:
 
 		self.file_window = self.manager.get("current_file_window")
 
+		if self.manager.get("config").options["UseLineWrap"]:
+			return # bail, handle that mess later
+
 		viewport_x = self.file_window.getViewportX()
 		viewport_y = self.file_window.getViewportY()
 		window_max_y = self.file_window.getWindowMaxY()

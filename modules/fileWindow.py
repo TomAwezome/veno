@@ -17,9 +17,9 @@ class FileWindow(Window):
 
 	def update(self):
 		self.window.erase()
-		self.intended_height = self.getStdscrMaxY() - self.intended_y - 1
-		self.intended_width  = self.getStdscrMaxX() - self.intended_x - 1
 
+		self.intended_height = self.getStdscrMaxY() - self.intended_y - 1 # set height from intended y to screen bottom edge
+		self.intended_width  = self.getStdscrMaxX() - self.intended_x - 1 # set width from intended x to screen right edge
 		self.keepWindowInMainScreen()
 
 		window_y = 0
@@ -29,11 +29,29 @@ class FileWindow(Window):
 		window_max_y = self.getWindowMaxY()
 		window_max_x = self.getWindowMaxX()
 
-		for line in self.file_lines[viewport_y:viewport_y + window_max_y]:
-			line = line.expandtabs(tab_expand_size)[viewport_x:]
+		if self.config["UseLineWrap"]:
+			for line in self.file_lines[viewport_y:viewport_y + window_max_y]:
+				if window_y >= window_max_y:
+					break
+				line = line.expandtabs(tab_expand_size)[viewport_x:]
 
-			self.window.addnstr(window_y, 0, line, window_max_x - 1, self.manager.curses.color_pair(0))
-			window_y += 1
+				self.window.addnstr(window_y, 0, line, min(window_max_x - 1, self.config["LineWrapLength"]), self.manager.curses.color_pair(0))
+				window_y += 1
+				num_wrapped = len(line) - self.config["LineWrapLength"]
+				while num_wrapped > 0:
+					if window_y >= window_max_y:
+						break
+					line = line[self.config["LineWrapLength"]:]
+					self.window.addnstr(window_y, 0, line, min(window_max_x - 1, self.config["LineWrapLength"]), self.manager.curses.color_pair(0))
+					window_y += 1
+					num_wrapped = len(line) - self.config["LineWrapLength"]
+					
+		else:		
+			for line in self.file_lines[viewport_y:viewport_y + window_max_y]:
+				line = line.expandtabs(tab_expand_size)[viewport_x:]
+
+				self.window.addnstr(window_y, 0, line, window_max_x - 1, self.manager.curses.color_pair(0))
+				window_y += 1
 
 		self.drawCursor()
 
