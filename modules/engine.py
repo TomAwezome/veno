@@ -4,9 +4,12 @@ from modules.manager import Manager
 from modules.fileWindow import FileWindow
 from modules.keybindings import Keyboard
 from modules.syntaxhighlighting import Highlighter
-from modules.magicbar import MagicBar
+from modules.windowbar import WindowBar
 from modules.linenumbers import LineNumbersWindow
 from modules.configcustomizer import ConfigCustomizerWindow
+from modules.linejumpbar import LineJumpBar
+from modules.savebar import SaveBar
+from modules.searchbar import SearchBar
 
 ##
 ## @brief      Veno Engine Class. Built to be easily and swiftly customized.
@@ -40,7 +43,7 @@ class Engine():
 				self.file_window_list.append(file_window)
 				file_window.update()											# Update fileWindow contents.
 			except IsADirectoryError:
-				pass		
+				pass
 		if self.file_window_list != []:
 			self.manager.add("current_file_window", self.file_window_list[0])
 		else: # filewindow list can be empty if provided arg is a directory and no other filename args are given
@@ -54,12 +57,18 @@ class Engine():
 		## Highlighter instance to colorize FileWindow contents.
 		self.highlighter = Highlighter(self.manager)
 		self.manager.add("highlighter", self.highlighter)
-		## MagicBar Window instance to perform various file utilities.
-		self.magic_bar = MagicBar(self.manager, "magicBar")
+		## WindowBar Window instance to print list of windows in use by veno.
+		self.window_bar = WindowBar(self.manager, "windowBar")
 		## LineNumbers Window instance to display next to FileWindow.
 		self.line_numbers = LineNumbersWindow(self.manager, "lineNumbers")
 		## ConfigCustomizer Window instance to allow modifying configuration.
 		self.config_customizer = ConfigCustomizerWindow(self.manager, "configCustomizer")
+		## LineJumpBar Window instance to pop-up for prompting line number to jump to in current FileWindow.
+		self.line_jump_bar = LineJumpBar(self.manager, "lineJumpBar")
+		## SaveBar Window instance to pop-up for prompting save filename for current FileWindow.
+		self.save_bar = SaveBar(self.manager, "saveBar")
+		## SearchBar Window instance to pop-up for prompting find (and replace) text for current FileWindow.
+		self.search_bar = SearchBar(self.manager, "searchBar")
 		## Keyboard Manager instance to interpret key input.
 		self.keys = Keyboard(self.manager)										# Load Keyboard module.
 		self.manager.update()													# Update Panel Manager contents.
@@ -69,7 +78,10 @@ class Engine():
 	## @param      self  This object
 	##
 	def turn(self):
-		self.magic_bar.update()
+		self.window_bar.update()
+		self.line_jump_bar.update()
+		self.save_bar.update()
+		self.search_bar.update()
 		self.manager.get("current_file_window").update()
 		self.line_numbers.update()
 		self.highlighter.update()

@@ -20,12 +20,15 @@ class Keyboard:
 		## FileWindow instance for fileWindow keybindings.
 		self.file_window = self.manager.get("current_file_window")
 
-		## MagicBar instance for magicBar keybindings.
-		self.magic_bar = self.manager.get("magicBar")
+		self.line_jump_bar = self.manager.get("lineJumpBar")
 		
+		self.save_bar = self.manager.get("saveBar")
+
+		self.search_bar = self.manager.get("searchBar")
+
 		## ConfigCustomizer instance for customizer keybindings. (Only used for toggle)
 		self.config_customizer = self.manager.get("configCustomizer")
-		
+
 		self.bind()
 	##
 	## @brief      Update. grab key and do something with it. 
@@ -37,7 +40,7 @@ class Keyboard:
 			c = self.manager.stdscr.getch()
 		except KeyboardInterrupt:
 			c = -1
-			self.magic_bar.confirmExitSave()
+			self.save_bar.confirmExitSave()
 
 		while c != -1:
 			self.manager.stdscr.timeout(20)
@@ -101,10 +104,10 @@ class Keyboard:
 			"^W": self.file_window.saveFile,
 			"^I": self.file_window.enterTextAtFilecursor,
 
-			"^F": self.magic_bar.search,
-			"^L": self.magic_bar.gotoLine,
-			"^G": self.magic_bar.searchNext,
-			"^R": self.magic_bar.replace,
+			"^F": self.search_bar.search,
+			"^L": self.line_jump_bar.jumpToLine,
+			"^G": self.search_bar.searchNext,
+			"^R": self.search_bar.replace,
 
 			"^_": self.config_customizer.toggle,
 
