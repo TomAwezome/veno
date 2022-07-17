@@ -1,3 +1,5 @@
+import argparse # load arg parser module for file input
+
 from modules.config import Config
 from modules.file import File
 from modules.manager import Manager
@@ -21,7 +23,6 @@ class Engine():
 	## @param      self  This object
 	##
 	def __init__(self):
-		# Modules being used: Config, File, Manager, FileWindow, Keyboard, LineNumbers, MagicBar, ConfigCustomizer, SyntaxHighlighting
 		filenames = self.parseArgs().filename or ["untitled.txt"]
 
 		## Config instance for editor.
@@ -94,7 +95,6 @@ class Engine():
 	## @param      self  This object
 	##
 	def parseArgs(self):														# 
-		import argparse															# load arg parser module for file input
 		parser = argparse.ArgumentParser()										#
 		parser.add_argument("filename", nargs='*')								# create program parameter, filename/path
 		return parser.parse_args()												#
