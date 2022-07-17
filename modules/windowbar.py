@@ -5,7 +5,7 @@ class WindowBar(Window):
 	def __init__(self, manager, name):
 		Window.__init__(self, manager, name)
 		
-		## FileWindow instance MagicBar is attached to.
+		## FileWindow instance WindowBar is attached to.
 		self.file_window = self.manager.get("current_file_window")
 		
 		self.config = self.manager.get("config").options
