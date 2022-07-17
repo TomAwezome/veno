@@ -12,6 +12,7 @@ from modules.configcustomizer import ConfigCustomizerWindow
 from modules.linejumpbar import LineJumpBar
 from modules.savebar import SaveBar
 from modules.searchbar import SearchBar
+from modules.debugwindow import DebugWindow
 
 ##
 ## @brief      Veno Engine Class. Built to be easily and swiftly customized.
@@ -70,6 +71,8 @@ class Engine():
 		self.save_bar = SaveBar(self.manager, "saveBar")
 		## SearchBar Window instance to pop-up for prompting find (and replace) text for current FileWindow.
 		self.search_bar = SearchBar(self.manager, "searchBar")
+		## DebugWindow instance to print debug information to.
+		self.debug_window = DebugWindow(self.manager, "debugWindow")
 		## Keyboard Manager instance to interpret key input.
 		self.keys = Keyboard(self.manager)										# Load Keyboard module.
 		self.manager.update()													# Update Panel Manager contents.
@@ -87,6 +90,7 @@ class Engine():
 		self.line_numbers.update()
 		self.highlighter.update()
 		self.config_customizer.update()
+		self.debug_window.update()
 		self.manager.update()
 		self.keys.update()														# Grab key input and interpret through bindings.
 	##

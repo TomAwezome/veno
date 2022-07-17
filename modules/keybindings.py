@@ -21,10 +21,12 @@ class Keyboard:
 		self.file_window = self.manager.get("current_file_window")
 
 		self.line_jump_bar = self.manager.get("lineJumpBar")
-		
+
 		self.save_bar = self.manager.get("saveBar")
 
 		self.search_bar = self.manager.get("searchBar")
+
+		self.debug_window = self.manager.get("debugWindow")
 
 		## ConfigCustomizer instance for customizer keybindings. (Only used for toggle)
 		self.config_customizer = self.manager.get("configCustomizer")
@@ -119,7 +121,9 @@ class Keyboard:
 			"kRIT5": self.file_window.moveViewportRight,
 			"kLFT5": self.file_window.moveViewportLeft,
 			"kUP5":  self.file_window.moveViewportUp,
-			"kDN5":  self.file_window.moveViewportDown
+			"kDN5":  self.file_window.moveViewportDown,
+
+			"KEY_F(12)": self.debug_window.toggle
 		}
 		
 	##
