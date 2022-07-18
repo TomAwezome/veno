@@ -100,26 +100,38 @@ class SaveBar(Window):
 		self.manager.update()
 		self.keepWindowInMainScreen()
 
+		result = False
+
 		while True:
 			self.keepWindowInMainScreen()
 
 			self.window.erase()
-			self.window.addnstr(0, 0, "Save before exit?", self.getWindowMaxX() - 1, self.manager.curses.color_pair(4) | self.manager.curses.A_REVERSE | self.manager.curses.A_BLINK)
+			self.window.addnstr(0, 0, "Save before exit? (Y/N or Enter/Ctrl-C)", self.getWindowMaxX() - 1, self.manager.curses.color_pair(4) | self.manager.curses.A_REVERSE)
 
 			self.manager.update()
 
-			c = self.manager.stdscr.getch() # (Ctrl-C to refuse exit save)
+			try:
+				c = self.manager.stdscr.getch()
+			except KeyboardInterrupt:
+				result = True # (Ctrl-C to refuse exit save)
+				break
 			if c == -1:
 				continue
 
 			c = self.manager.curses.keyname(c)
 			c = c.decode("utf-8")
-			if c == "^J":
+			if c.lower() == 'n':
+				result = True
+				break
+			if c == "^J" or c.lower() == "y":
 				self.window.erase()
 				if self.file_window.saveFile() == True: # successfully saved
-					exit("File saved, safe to exit")
+					result = True
+					break
 				else: # Ctrl-C to exit confirmExitSave and return to file
 					break
+
+		return result
 
 	def save(self):
 		self.panel.show()
@@ -136,7 +148,7 @@ class SaveBar(Window):
 		self.keepWindowInMainScreen()
 
 		self.window.erase()
-		self.window.addnstr(0, 0, "Filename?", self.getWindowMaxX() - 1, self.manager.curses.color_pair(4) | self.manager.curses.A_REVERSE | self.manager.curses.A_BLINK)
+		self.window.addnstr(0, 0, "Filename?", self.getWindowMaxX() - 1, self.manager.curses.color_pair(4) | self.manager.curses.A_REVERSE)
 
 		self.manager.update()
 

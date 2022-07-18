@@ -1,4 +1,5 @@
 import string
+
 ##
 ## @brief      Class for keyboard.
 ##
@@ -38,11 +39,17 @@ class Keyboard:
 	## @param      self  This object
 	##
 	def update(self):
+		should_exit = False
+
 		try:
 			c = self.manager.stdscr.getch()
 		except KeyboardInterrupt:
 			c = -1
-			self.save_bar.confirmExitSave()
+			if self.save_bar.confirmExitSave():
+				should_exit = True
+
+		if should_exit:
+			raise KeyboardInterrupt # TODO make a veno-specific exception that is used for safe shutdown as opposed to a 'panic' force shutdown
 
 		while c != -1:
 			self.manager.stdscr.timeout(20)
