@@ -98,10 +98,12 @@ class LineJumpBar(Window):
 		self.keepWindowInMainScreen()
 		self.manager.update()
 
-		self.window.addnstr(0, 0, self.line_jump_string, self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
+		prompt = "Line: "
 
-		if self.line_jump_cursor_x <= self.getWindowMaxX() - 2 and self.line_jump_cursor_x >= 0:
-			self.window.chgat(0, self.line_jump_cursor_x, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+		self.window.addnstr(0, 0, prompt + self.line_jump_string, self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
+
+		if self.line_jump_cursor_x + len(prompt) <= self.getWindowMaxX() - 2 and self.line_jump_cursor_x >= 0:
+			self.window.chgat(0, self.line_jump_cursor_x + len(prompt), 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 
 		self.manager.update()
 
@@ -125,10 +127,10 @@ class LineJumpBar(Window):
 				break
 
 			self.keepWindowInMainScreen()
-			self.window.addnstr(0, 0, self.line_jump_string, self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
+			self.window.addnstr(0, 0, prompt + self.line_jump_string, self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
 
-			if self.line_jump_cursor_x <= self.getWindowMaxX() - 2 and self.line_jump_cursor_x >= 0:
-				self.window.chgat(0, self.line_jump_cursor_x, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+			if self.line_jump_cursor_x + len(prompt) <= self.getWindowMaxX() - 2 and self.line_jump_cursor_x >= 0:
+				self.window.chgat(0, self.line_jump_cursor_x + len(prompt), 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 
 			self.manager.update()
 

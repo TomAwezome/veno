@@ -152,11 +152,12 @@ class SearchBar(Window):
 		self.keepWindowInMainScreen()
 
 		tab_expand_size = self.config["TabExpandSize"]
-		self.window.addnstr(0, 0, self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
+		prompt = "Search: "
+		self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
 
 		tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
-		if self.search_cursor_x + tab_diff <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
-			self.window.chgat(0, self.search_cursor_x + tab_diff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+		if self.search_cursor_x + tab_diff + len(prompt) <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
+			self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 
 		self.manager.update()
 		while True: # break out of this loop with enter key
@@ -181,11 +182,11 @@ class SearchBar(Window):
 				break
 
 			self.keepWindowInMainScreen()
-			self.window.addnstr(0, 0, self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
+			self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
 
 			tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
-			if self.search_cursor_x + tab_diff <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
-				self.window.chgat(0, self.search_cursor_x + tab_diff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+			if self.search_cursor_x + tab_diff + len(prompt)<= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
+				self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 
 			self.manager.update()
 
@@ -266,11 +267,14 @@ class SearchBar(Window):
 		self.keepWindowInMainScreen()
 
 		tab_expand_size = self.config["TabExpandSize"]
-		self.window.addnstr(0, 0, self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
+
+		prompt = "Replace: "
+
+		self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
 
 		tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
-		if self.search_cursor_x + tab_diff <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
-			self.window.chgat(0, self.search_cursor_x + tab_diff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+		if self.search_cursor_x + tab_diff + len(prompt) <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
+			self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 
 		self.manager.update()
 
@@ -296,11 +300,11 @@ class SearchBar(Window):
 				break
 			
 			self.keepWindowInMainScreen()
-			self.window.addnstr(0, 0, self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
+			self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
 
 			tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
-			if self.search_cursor_x + tab_diff <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
-				self.window.chgat(0, self.search_cursor_x + tab_diff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+			if self.search_cursor_x + tab_diff + len(prompt) <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
+				self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 
 			self.manager.update()
 		
@@ -314,11 +318,13 @@ class SearchBar(Window):
 		self.manager.update()
 		self.keepWindowInMainScreen()
 
-		self.window.addnstr(0, 0, self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
+		prompt = "Replace with: "
+
+		self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
 
 		tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
-		if self.search_cursor_x + tab_diff <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
-			self.window.chgat(0, self.search_cursor_x + tab_diff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+		if self.search_cursor_x + tab_diff + len(prompt) <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
+			self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 
 		self.manager.update()
 
@@ -342,11 +348,11 @@ class SearchBar(Window):
 				break
 			
 			self.keepWindowInMainScreen()
-			self.window.addnstr(0, 0, self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
+			self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
 
 			tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
-			if self.search_cursor_x + tab_diff <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
-				self.window.chgat(0, self.search_cursor_x + tab_diff, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+			if self.search_cursor_x + tab_diff + len(prompt) <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
+				self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 
 			self.manager.update()
 			
@@ -394,6 +400,8 @@ class SearchBar(Window):
 					break
 
 			self.file_window.jumpToLine(search_index_y)
+			self.file_window.moveFilecursorDown() # kludge to keep replace results onscreen since savebar draws overtop FileWindow bottom line
+			self.file_window.moveFilecursorUp() # ""
 			self.file_window.setFilecursorX(search_index_x)
 
 			self.keepWindowInMainScreen()
@@ -410,7 +418,7 @@ class SearchBar(Window):
 				break
 
 			self.window.erase()
-			self.window.addnstr(0, 0, "Replace? (y/n/a) ['a' = All]", self.getWindowMaxX() - 1, self.manager.curses.A_REVERSE)
+			self.window.addnstr(0, 0, "Replace? (y/n/a) ['a' = All]", self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
 
 			self.manager.get("lineNumbers").update()
 
@@ -466,6 +474,8 @@ class SearchBar(Window):
 						break
 
 				self.file_window.jumpToLine(search_index_y)
+				self.file_window.moveFilecursorDown() # kludge to keep replace results onscreen since savebar draws overtop FileWindow bottom line
+				self.file_window.moveFilecursorUp() # ""
 				self.file_window.setFilecursorX(search_index_x)
 
 				self.keepWindowInMainScreen()
