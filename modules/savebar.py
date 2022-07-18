@@ -147,37 +147,16 @@ class SaveBar(Window):
 		self.manager.update()
 		self.keepWindowInMainScreen()
 
-		self.window.erase()
-		self.window.addnstr(0, 0, "Filename?", self.getWindowMaxX() - 1, self.manager.curses.color_pair(4) | self.manager.curses.A_REVERSE)
-
-		self.manager.update()
-
 		self.save_string = self.file_window.file.source
-
-		while True:
-			try:
-				c = self.manager.stdscr.getch()
-			except KeyboardInterrupt:
-				self.window.erase()
-				self.panel.hide()
-				returnval = False
-				return returnval
-
-			if c == -1:
-				continue
-
-			c = self.manager.curses.keyname(c)
-			c = c.decode("utf-8")
-			if c == "^J":
-				break
 
 		# savefile string
 		# keypress loop: begin catching characters
 		self.window.erase()
-		self.window.addnstr(0, 0, self.save_string, self.getWindowMaxX() - 1, self.manager.curses.color_pair(4) | self.manager.curses.A_REVERSE)
+		prompt = "Filename: "
+		self.window.addnstr(0, 0, prompt + self.save_string, self.getWindowMaxX() - 1, self.manager.curses.color_pair(4) | self.manager.curses.A_REVERSE)
 
 		if self.save_cursor_x <= self.getWindowMaxX() - 2 and self.save_cursor_x >= 0:
-			self.window.chgat(0, self.save_cursor_x, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+			self.window.chgat(0, self.save_cursor_x + len(prompt), 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 
 		self.manager.update()
 		while True: # break out of this loop with enter key
@@ -202,10 +181,10 @@ class SaveBar(Window):
 					break
 
 			self.keepWindowInMainScreen()
-			self.window.addnstr(0, 0, self.save_string, self.getWindowMaxX() - 1, self.manager.curses.color_pair(4) | self.manager.curses.A_REVERSE)
+			self.window.addnstr(0, 0, prompt + self.save_string, self.getWindowMaxX() - 1, self.manager.curses.color_pair(4) | self.manager.curses.A_REVERSE)
 
-			if self.save_cursor_x <= self.getWindowMaxX() - 2 and self.save_cursor_x >= 0:
-				self.window.chgat(0, self.save_cursor_x, 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+			if self.save_cursor_x + len(prompt) <= self.getWindowMaxX() - 2 and self.save_cursor_x >= 0:
+				self.window.chgat(0, self.save_cursor_x + len(prompt), 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
 
 			self.manager.update()
 
