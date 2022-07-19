@@ -31,10 +31,13 @@ class Keyboard:
 
 		self.open_bar = self.manager.get("open_bar")
 
+		self.help_window = self.manager.get("help_window")
+
 		## ConfigCustomizer instance for customizer keybindings. (Only used for toggle)
 		self.config_customizer = self.manager.get("config_customizer")
 
 		self.bind()
+		
 	##
 	## @brief      Update. grab key and do something with it. 
 	##
@@ -110,6 +113,8 @@ class Keyboard:
 
 			"KEY_BTAB":  self.file_window.unindentSelectedLines,
 
+			"KEY_F(1)": self.help_window.toggle,
+
 			"^D": self.file_window.deleteLineAtFilecursor,
 			"^J": self.file_window.newLineAtFilecursor,
 			"^W": self.file_window.saveFile,
@@ -136,6 +141,8 @@ class Keyboard:
 
 			"KEY_F(12)": self.debug_window.toggle
 		}
+
+		self.manager.add("keybindings", self.bindings)
 		
 	##
 	## @brief      Change FileWindow instance to which keybindings are bound to the previous instance.

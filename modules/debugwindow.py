@@ -33,8 +33,13 @@ class DebugWindow(Window):
 		if not self.is_open:
 			return
 
+		self.panel.top()
+
 		self.log("Manager Objects:")
 		self.log(list(self.manager.objects.keys()))
+		
+		self.log("KB")
+		self.log(self.manager.get("keybindings"))
 		
 		lines = self.debug_text.split("\n")
 		lines.reverse()
