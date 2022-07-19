@@ -63,19 +63,19 @@ class Engine():
 		self.highlighter = Highlighter(self.manager)
 		self.manager.add("highlighter", self.highlighter)
 		## WindowBar Window instance to print list of windows in use by veno.
-		self.window_bar = WindowBar(self.manager, "windowBar")
+		self.window_bar = WindowBar(self.manager, "window_bar")
 		## LineNumbers Window instance to display next to FileWindow.
-		self.line_numbers = LineNumbersWindow(self.manager, "lineNumbers")
+		self.line_numbers = LineNumbersWindow(self.manager, "line_numbers")
 		## ConfigCustomizer Window instance to allow modifying configuration.
-		self.config_customizer = ConfigCustomizerWindow(self.manager, "configCustomizer")
+		self.config_customizer = ConfigCustomizerWindow(self.manager, "config_customizer")
 		## LineJumpBar Window instance to pop-up for prompting line number to jump to in current FileWindow.
-		self.line_jump_bar = LineJumpBar(self.manager, "lineJumpBar")
+		self.line_jump_bar = LineJumpBar(self.manager, "line_jump_bar")
 		## SaveBar Window instance to pop-up for prompting save filename for current FileWindow.
-		self.save_bar = SaveBar(self.manager, "saveBar")
+		self.save_bar = SaveBar(self.manager, "save_bar")
 		## SearchBar Window instance to pop-up for prompting find (and replace) text for current FileWindow.
-		self.search_bar = SearchBar(self.manager, "searchBar")
+		self.search_bar = SearchBar(self.manager, "search_bar")
 		## DebugWindow instance to print debug information to.
-		self.debug_window = DebugWindow(self.manager, "debugWindow")
+		self.debug_window = DebugWindow(self.manager, "debug_window")
 		## OpenBar Window instance to pop-up for prompting open filename for opening additional file.
 		self.open_bar = OpenBar(self. manager, "open_bar")
 		## Keyboard Manager instance to interpret key input.

@@ -21,18 +21,18 @@ class Keyboard:
 		## FileWindow instance for fileWindow keybindings.
 		self.file_window = self.manager.get("current_file_window")
 
-		self.line_jump_bar = self.manager.get("lineJumpBar")
+		self.line_jump_bar = self.manager.get("line_jump_bar")
 
-		self.save_bar = self.manager.get("saveBar")
+		self.save_bar = self.manager.get("save_bar")
 
-		self.search_bar = self.manager.get("searchBar")
+		self.search_bar = self.manager.get("search_bar")
 
-		self.debug_window = self.manager.get("debugWindow")
+		self.debug_window = self.manager.get("debug_window")
 
 		self.open_bar = self.manager.get("open_bar")
 
 		## ConfigCustomizer instance for customizer keybindings. (Only used for toggle)
-		self.config_customizer = self.manager.get("configCustomizer")
+		self.config_customizer = self.manager.get("config_customizer")
 
 		self.bind()
 	##

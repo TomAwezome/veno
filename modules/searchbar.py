@@ -401,7 +401,7 @@ class SearchBar(Window):
 
 			self.file_window.jumpToLine(search_index_y)
 			self.file_window.moveFilecursorDown() # kludge to keep replace results onscreen since savebar draws overtop FileWindow bottom line
-			self.file_window.moveFilecursorUp() # ""
+			self.file_window.moveFilecursorUp() # "" !! this doesn't work if match at last FileWindow line!!
 			self.file_window.setFilecursorX(search_index_x)
 
 			self.keepWindowInMainScreen()
@@ -420,7 +420,7 @@ class SearchBar(Window):
 			self.window.erase()
 			self.window.addnstr(0, 0, "Replace? (y/n/a) ['a' = All]", self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
 
-			self.manager.get("lineNumbers").update()
+			self.manager.get("line_numbers").update()
 
 			self.manager.update()
 
@@ -475,7 +475,7 @@ class SearchBar(Window):
 
 				self.file_window.jumpToLine(search_index_y)
 				self.file_window.moveFilecursorDown() # kludge to keep replace results onscreen since savebar draws overtop FileWindow bottom line
-				self.file_window.moveFilecursorUp() # ""
+				self.file_window.moveFilecursorUp() # ""  !! this doesn't work if match at last FileWindow line!!
 				self.file_window.setFilecursorX(search_index_x)
 
 				self.keepWindowInMainScreen()

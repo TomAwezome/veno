@@ -591,7 +591,7 @@ class FileWindow(Window):
 		for line in self.file_lines:
 			file_string += line + "\n"
 
-		returnval = self.manager.get("saveBar").save()
+		returnval = self.manager.get("save_bar").save()
 		if returnval == True: # saveBar save filename get success, save file
 			self.file.save(file_string)
 
