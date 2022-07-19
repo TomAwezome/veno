@@ -271,7 +271,7 @@ class ConfigCustomizerWindow(Window):
 			for i in self.manager.objects:
 				if not issubclass(type(self.manager.get(i)), Window):
 					continue
-				if self.manager.get(i).name == "configCustomizer": # name given in engine init
+				if self.manager.get(i).name == "config_customizer": # name given in engine init
 					continue # to avoid recursive loop
 
 				self.manager.get(i).update()
