@@ -29,6 +29,8 @@ class Keyboard:
 
 		self.debug_window = self.manager.get("debugWindow")
 
+		self.open_bar = self.manager.get("open_bar")
+
 		## ConfigCustomizer instance for customizer keybindings. (Only used for toggle)
 		self.config_customizer = self.manager.get("configCustomizer")
 
@@ -112,6 +114,8 @@ class Keyboard:
 			"^J": self.file_window.newLineAtFilecursor,
 			"^W": self.file_window.saveFile,
 			"^I": self.file_window.enterTextAtFilecursor,
+
+			"^O": self.open_bar.openFile,
 
 			"^F": self.search_bar.search,
 			"^L": self.line_jump_bar.jumpToLine,

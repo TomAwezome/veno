@@ -63,5 +63,6 @@ Runs in a terminal window. GUI not yet implemented.
 |Ctrl-K|Copy and store selection in file|
 |Ctrl-X|Cut and store selection from file|
 |Ctrl-V|Paste selection into file|
+|Ctrl-O|Open file|
 |Ctrl-_, Ctrl-/|Toggle config customizer|
 |F12|Toggle debug window|

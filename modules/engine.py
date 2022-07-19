@@ -13,7 +13,7 @@ from modules.linejumpbar import LineJumpBar
 from modules.savebar import SaveBar
 from modules.searchbar import SearchBar
 from modules.debugwindow import DebugWindow
-
+from modules.openbar import OpenBar
 ##
 ## @brief      Veno Engine Class. Built to be easily and swiftly customized.
 ##
@@ -36,12 +36,15 @@ class Engine():
 		self.manager = Manager()												# Load Manager.
 		self.manager.add("config", self.config)
 		self.manager.add("file_window_list", self.file_window_list)
+		
+		self.manager.add("File", File)
+		self.manager.add("FileWindow", FileWindow)
 
 		for filename in filenames:
 			try:
 				file = File(filename)
 				self.files.append(file)											# Load file provided as only arg.
-				file_window = FileWindow(self.manager, "fileWindow", file)		# Create fileWindow.
+				file_window = FileWindow(self.manager, "", file)		# Create fileWindow.
 				self.file_window_list.append(file_window)
 				file_window.update()											# Update fileWindow contents.
 			except IsADirectoryError:
@@ -51,7 +54,7 @@ class Engine():
 		else: # filewindow list can be empty if provided arg is a directory and no other filename args are given
 			file = File("untitled.txt")
 			self.files.append(file)
-			file_window = FileWindow(self.manager, "fileWindow", file)
+			file_window = FileWindow(self.manager, "", file)
 			self.file_window_list.append(file_window)
 			file_window.update()
 			self.manager.add("current_file_window", self.file_window_list[0])
@@ -73,6 +76,8 @@ class Engine():
 		self.search_bar = SearchBar(self.manager, "searchBar")
 		## DebugWindow instance to print debug information to.
 		self.debug_window = DebugWindow(self.manager, "debugWindow")
+		## OpenBar Window instance to pop-up for prompting open filename for opening additional file.
+		self.open_bar = OpenBar(self. manager, "open_bar")
 		## Keyboard Manager instance to interpret key input.
 		self.keys = Keyboard(self.manager)										# Load Keyboard module.
 		self.manager.update()													# Update Panel Manager contents.
@@ -90,6 +95,7 @@ class Engine():
 		self.line_numbers.update()
 		self.highlighter.update()
 		self.config_customizer.update()
+		self.open_bar.update()
 		self.debug_window.update()
 		self.manager.update()
 		self.keys.update()														# Grab key input and interpret through bindings.
