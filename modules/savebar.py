@@ -152,7 +152,7 @@ class SaveBar(Window):
 		# savefile string
 		# keypress loop: begin catching characters
 		self.window.erase()
-		prompt = "Filename: "
+		prompt = "Save Filename: "
 		self.window.addnstr(0, 0, prompt + self.save_string, self.getWindowMaxX() - 1, self.manager.curses.color_pair(4) | self.manager.curses.A_REVERSE)
 
 		if self.save_cursor_x <= self.getWindowMaxX() - 2 and self.save_cursor_x >= 0:
