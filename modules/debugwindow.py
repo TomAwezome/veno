@@ -33,8 +33,8 @@ class DebugWindow(Window):
 		if not self.is_open:
 			return
 
-		self.addData("Manager Objects:")
-		self.addData(list(self.manager.objects.keys()))
+		self.log("Manager Objects:")
+		self.log(list(self.manager.objects.keys()))
 		
 		lines = self.debug_text.split("\n")
 		lines.reverse()
@@ -44,7 +44,7 @@ class DebugWindow(Window):
 			self.window.addnstr(window_y, 1, line, window_max_x - 2, self.manager.curses.color_pair(0))
 			window_y += 1
 
-	def addData(self, data):
+	def log(self, data):
 		self.add_count += 1
 		self.debug_text += f"\nDEBUG MSG {self.add_count}: " + str(data)
 
