@@ -13,6 +13,9 @@ class SearchBar(Window):
 		self.search_cursor_x = 0
 		self.search_string = ""
 
+		self.replace_cursor_x = 0
+		self.replace_string = ""
+
 		self.pattern_matches = None
 		self.next_match = None
 
@@ -312,8 +315,9 @@ class SearchBar(Window):
 		
 	# replacement string
 	# keypress loop: begin catching characters
-		self.search_string = ""
-		self.search_cursor_x = 0
+		self.search_string = self.replace_string
+		cursor_x_last = self.search_cursor_x
+		self.search_cursor_x = self.replace_cursor_x
 
 		self.manager.update()
 		self.keepWindowInMainScreen()
@@ -357,6 +361,10 @@ class SearchBar(Window):
 			self.manager.update()
 			
 		second_string = self.search_string
+		self.replace_string = second_string
+		self.replace_cursor_x = self.search_cursor_x
+		self.search_string = first_string
+		self.search_cursor_x = cursor_x_last
 
 		file_lines = self.file_window.file_lines
 		file_string = '\n'.join(file_lines)
