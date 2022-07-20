@@ -51,6 +51,7 @@ Runs in a terminal window. GUI not yet implemented.
 |Ctrl-W|Save file|
 |Home Key|Go to start of line in file|
 |End Key|Go to end of line in file|
+|F1|Toggle Help Window|
 |F3|Go to start of file|
 |F4|Go to end of file|
 |F5|Go to previous open file|
