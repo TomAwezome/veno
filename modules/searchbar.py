@@ -368,6 +368,8 @@ class SearchBar(Window):
 			self.panel.hide()
 			return
 
+		search_index_y = None # if try block success, this is set to a number, else error and should bail
+
 		self.pattern_matches = pattern.finditer(self.file_window.file.contents)
 		try:
 			self.next_match = next(self.pattern_matches)
@@ -377,6 +379,10 @@ class SearchBar(Window):
 				search_index_x = len(search_lines[len(search_lines) - 1])
 		except StopIteration:
 			pass
+
+		if search_index_y is None:
+			self.panel.hide()
+			return
 
 		if self.next_match:
 			while search_index_y < self.cursor[1]:
