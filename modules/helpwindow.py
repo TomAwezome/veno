@@ -7,7 +7,7 @@ class HelpWindow(Window):
 
 		self.panel.hide()
 		
-		self.help_top_text = " HELP (Press Enter to dismiss Help window) "
+		self.help_top_text = " HELP (Press F1 to dismiss Help window) "
 
 		self.help_header_text = """
 VENO
@@ -32,6 +32,7 @@ Multi-purpose text/code editor meant for easy and vast expandability.
 		self.help_body_text = "Keybindings:\n\n"
 		bindings = self.manager.get("keybindings")
 		items = bindings.items()
+		self.help_body_text += "Ctrl-C:".ljust(21) + "Cancel / Quit (Global Keybinding)\n\n"
 		for key, val in items:
 			key = key.replace("^", "Ctrl-")
 			body_line_left = f"{key}:".ljust(21)
