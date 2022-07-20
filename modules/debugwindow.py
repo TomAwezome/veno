@@ -36,11 +36,16 @@ class DebugWindow(Window):
 		self.panel.top()
 
 		self.log("Manager Objects:")
-		self.log(list(self.manager.objects.keys()))
-		
-		self.log("KB")
-		self.log(self.manager.get("keybindings"))
-		
+		self.log("---------------")
+		objects = list(self.manager.objects.keys())
+		for obj in objects:
+			self.log(f"  {obj}")
+		self.log("---------------")
+
+		if window_max_y - 1 < 1:
+			return
+		self.window.addnstr(0, 1, " DEBUG (Press F12 to dismiss Debug window) ", window_max_x - 2, self.manager.curses.color_pair(0) | self.manager.curses.A_REVERSE)
+
 		lines = self.debug_text.split("\n")
 		lines.reverse()
 		for line in lines:
@@ -51,7 +56,8 @@ class DebugWindow(Window):
 
 	def log(self, data):
 		self.add_count += 1
-		self.debug_text += f"\nDEBUG MSG {self.add_count}: " + str(data)
+		count_text = f"{self.add_count}: ".rjust(5)
+		self.debug_text += f"\nDEBUG MSG " + count_text + str(data)
 
 	def toggle(self):
 		if self.is_open:
