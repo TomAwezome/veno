@@ -37,9 +37,9 @@ class DebugWindow(Window):
 
 		self.log("Manager Objects:")
 		self.log("---------------")
-		objects = list(self.manager.objects.keys())
-		for obj in objects:
-			self.log(f"  {obj}")
+		items = self.manager.objects.items()
+		for key, val in items:
+			self.log(f"  {key}".ljust(24) + f"{val}")
 		self.log("---------------")
 
 		if window_max_y - 1 < 1:
