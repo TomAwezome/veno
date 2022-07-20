@@ -36,11 +36,11 @@ class Engine():
 		self.file_window_list = []
 		## Panel Manager instance for modules.
 		self.manager = Manager()												# Load Manager.
-		self.manager.add("config", self.config)
-		self.manager.add("file_window_list", self.file_window_list)
+		self.manager.set("config", self.config)
+		self.manager.set("file_window_list", self.file_window_list)
 		
-		self.manager.add("File", File)
-		self.manager.add("FileWindow", FileWindow)
+		self.manager.set("File", File)
+		self.manager.set("FileWindow", FileWindow)
 
 		for filename in filenames:
 			try:
@@ -52,18 +52,18 @@ class Engine():
 			except IsADirectoryError:
 				pass
 		if self.file_window_list != []:
-			self.manager.add("current_file_window", self.file_window_list[0])
+			self.manager.set("current_file_window", self.file_window_list[0])
 		else: # filewindow list can be empty if provided arg is a directory and no other filename args are given
 			file = File("untitled.txt")
 			self.files.append(file)
 			file_window = FileWindow(self.manager, "", file)
 			self.file_window_list.append(file_window)
 			file_window.update()
-			self.manager.add("current_file_window", self.file_window_list[0])
+			self.manager.set("current_file_window", self.file_window_list[0])
 
 		## Highlighter instance to colorize FileWindow contents.
 		self.highlighter = Highlighter(self.manager)
-		self.manager.add("highlighter", self.highlighter)
+		self.manager.set("highlighter", self.highlighter)
 		## WindowBar Window instance to print list of windows in use by veno.
 		self.window_bar = WindowBar(self.manager, "window_bar")
 		## LineNumbers Window instance to display next to FileWindow.

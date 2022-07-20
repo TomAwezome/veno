@@ -142,7 +142,7 @@ class Keyboard:
 			"KEY_F(12)": self.debug_window.toggle
 		}
 
-		self.manager.add("keybindings", self.bindings)
+		self.manager.set("keybindings", self.bindings)
 		
 	##
 	## @brief      Change FileWindow instance to which keybindings are bound to the previous instance.
@@ -158,7 +158,7 @@ class Keyboard:
 			self.file_window = file_window_list[file_window_list.index(self.file_window) - 1]
 		else:
 			self.file_window = file_window_list[len(file_window_list) - 1]
-		self.manager.add("current_file_window", self.file_window) # re-set current file window in manager
+		self.manager.set("current_file_window", self.file_window) # re-set current file window in manager
 		self.file_window.panel.top()
 		self.file_window.panel.show()
 		self.file_window.is_modified = True
@@ -179,7 +179,7 @@ class Keyboard:
 			self.file_window = file_window_list[file_window_list.index(self.file_window) + 1]
 		else:
 			self.file_window = file_window_list[0]
-		self.manager.add("current_file_window", self.file_window) # re-set current file window in manager
+		self.manager.set("current_file_window", self.file_window) # re-set current file window in manager
 		self.file_window.panel.top()
 		self.file_window.panel.show()
 		self.file_window.is_modified = True

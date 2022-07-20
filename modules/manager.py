@@ -54,12 +54,12 @@ class Manager:
 	## @brief      Adds a panel.
 	##
 	## @param      self    This object
-	## @param      Window  source Window object
+	## @param      window  source Window object (window.py)
 	## @param      name    name of panel to be used in dictionary as key
 	##
-	def addPanel(self, Window, name):
-		new_panel = self.panel.new_panel(Window.window)
-		self.add(name, Window)
+	def addPanel(self, window, name):
+		new_panel = self.panel.new_panel(window.window)
+		self.set(name, window)
 		return new_panel
 
 	##
@@ -75,12 +75,12 @@ class Manager:
 			return None
 			
 	##
-	## @brief      Add an object to the manager.
+	## @brief      Set an object key/value pair in the manager object dictionary.
 	##
 	## @param      self    This object
-	## @param      name    Name of the object to add.
-	## @param      obj     The object to add
+	## @param      name    Name (key) of the object
+	## @param      obj     The object (value) to add
 	##
-	def add(self, name, obj):
+	def set(self, name, obj):
 		self.objects[name] = obj
 		return obj
