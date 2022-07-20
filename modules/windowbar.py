@@ -20,8 +20,8 @@ class WindowBar(Window):
 
 		self.window.erase()
 		self.intended_x			= 0
-		self.intended_y			= self.getStdscrMaxY()
-		self.intended_width		= self.getStdscrMaxX() - 1
+		self.intended_y			= self.getScreenMaxY()
+		self.intended_width		= self.getScreenMaxX() - 1
 		self.intended_height	= 1
 
 		self.keepWindowInMainScreen()
@@ -54,4 +54,3 @@ class WindowBar(Window):
 
 	def terminate(self):
 		pass
-

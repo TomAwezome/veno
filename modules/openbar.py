@@ -18,8 +18,8 @@ class OpenBar(Window):
 
 		self.window.erase()
 		self.intended_x			= 0
-		self.intended_y			= self.getStdscrMaxY() - 2
-		self.intended_width		= self.getStdscrMaxX() - 1
+		self.intended_y			= self.getScreenMaxY() - 2
+		self.intended_width		= self.getScreenMaxX() - 1
 		self.intended_height	= 1
 
 		self.keepWindowInMainScreen()
@@ -83,8 +83,8 @@ class OpenBar(Window):
 		self.panel.top()
 		self.window.erase()
 		self.intended_x			= 0
-		self.intended_y			= self.getStdscrMaxY() - 2
-		self.intended_width		= self.getStdscrMaxX() - 1
+		self.intended_y			= self.getScreenMaxY() - 2
+		self.intended_width		= self.getScreenMaxX() - 1
 		self.intended_height	= 1
 
 		result = True
@@ -106,7 +106,7 @@ class OpenBar(Window):
 		while True: # break out of this loop with enter key
 			self.window.erase()
 			try:
-				c = self.manager.stdscr.getch()
+				c = self.manager.screen.getch()
 			except KeyboardInterrupt:
 				result = False
 				self.panel.hide()

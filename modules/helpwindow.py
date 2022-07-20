@@ -45,8 +45,8 @@ Multi-purpose text/code editor meant for easy and vast expandability.
 		while True:
 			self.intended_x			= 0
 			self.intended_y			= 0
-			self.intended_width		= self.getStdscrMaxX() - 1
-			self.intended_height	= self.getStdscrMaxY() - 1
+			self.intended_width		= self.getScreenMaxX() - 1
+			self.intended_height	= self.getScreenMaxY() - 1
 
 			self.keepWindowInMainScreen()
 			self.manager.update()
@@ -68,7 +68,7 @@ Multi-purpose text/code editor meant for easy and vast expandability.
 			self.manager.update()
 
 			try:
-				c = self.manager.stdscr.getch()
+				c = self.manager.screen.getch()
 			except KeyboardInterrupt:
 				self.toggle()
 				break
@@ -111,4 +111,3 @@ Multi-purpose text/code editor meant for easy and vast expandability.
 
 	def terminate(self):
 		pass
-

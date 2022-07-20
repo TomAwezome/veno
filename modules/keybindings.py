@@ -47,7 +47,7 @@ class Keyboard:
 		should_exit = False
 
 		try:
-			c = self.manager.stdscr.getch()
+			c = self.manager.screen.getch()
 		except KeyboardInterrupt:
 			c = -1
 			if self.save_bar.confirmExitSave():
@@ -57,7 +57,7 @@ class Keyboard:
 			raise KeyboardInterrupt # TODO make a veno-specific exception that is used for safe shutdown as opposed to a 'panic' force shutdown
 
 		while c != -1:
-			self.manager.stdscr.timeout(20)
+			self.manager.screen.timeout(20)
 			c = self.manager.curses.keyname(c)
 			c = c.decode("utf-8")
 
@@ -70,9 +70,9 @@ class Keyboard:
 			elif c in string.punctuation + string.digits + string.ascii_letters + " \t":
 				self.bindings["printable-character"](c)
 
-			c = self.manager.stdscr.getch()
+			c = self.manager.screen.getch()
 
-		self.manager.stdscr.timeout(-1)
+		self.manager.screen.timeout(-1)
 
 	##
 	## @brief      Terminate Keyboard Manager

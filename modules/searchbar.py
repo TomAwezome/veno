@@ -30,8 +30,8 @@ class SearchBar(Window):
 
 		self.window.erase()
 		self.intended_x			= 0
-		self.intended_y			= self.getStdscrMaxY() - 2
-		self.intended_width		= self.getStdscrMaxX() - 1
+		self.intended_y			= self.getScreenMaxY() - 2
+		self.intended_width		= self.getScreenMaxX() - 1
 		self.intended_height	= 1
 
 		self.keepWindowInMainScreen()
@@ -143,8 +143,8 @@ class SearchBar(Window):
 		self.panel.top()
 		self.window.erase()
 		self.intended_x			= 0 
-		self.intended_y			= self.getStdscrMaxY() - 2
-		self.intended_width		= self.getStdscrMaxX() - 1
+		self.intended_y			= self.getScreenMaxY() - 2
+		self.intended_width		= self.getScreenMaxX() - 1
 		self.intended_height	= 1
 
 		self.keepWindowInMainScreen()
@@ -163,7 +163,7 @@ class SearchBar(Window):
 		while True: # break out of this loop with enter key
 			self.window.erase()
 			try:
-				c = self.manager.stdscr.getch()
+				c = self.manager.screen.getch()
 			except KeyboardInterrupt:
 				self.panel.hide()
 				return
@@ -258,8 +258,8 @@ class SearchBar(Window):
 		self.panel.top()
 		self.window.erase()
 		self.intended_x			= 0
-		self.intended_y			= self.getStdscrMaxY() - 2
-		self.intended_width		= self.getStdscrMaxX() - 1
+		self.intended_y			= self.getScreenMaxY() - 2
+		self.intended_width		= self.getScreenMaxX() - 1
 		self.intended_height	= 1
 
 		self.keepWindowInMainScreen()	
@@ -283,7 +283,7 @@ class SearchBar(Window):
 		while True: # break out of this loop with enter key
 			self.window.erase()
 			try:
-				c = self.manager.stdscr.getch()
+				c = self.manager.screen.getch()
 			except KeyboardInterrupt:
 				self.panel.hide()
 				return
@@ -331,7 +331,7 @@ class SearchBar(Window):
 		while True: # break out of this loop with enter key
 			self.window.erase()
 			try:
-				c = self.manager.stdscr.getch()
+				c = self.manager.screen.getch()
 			except KeyboardInterrupt:
 				self.panel.hide()
 				return
@@ -425,7 +425,7 @@ class SearchBar(Window):
 			self.manager.update()
 
 			try:
-				c = self.manager.stdscr.getch()
+				c = self.manager.screen.getch()
 			except KeyboardInterrupt:
 				break
 			if c == -1:
@@ -503,4 +503,3 @@ class SearchBar(Window):
 
 	def terminate(self):
 		pass
-

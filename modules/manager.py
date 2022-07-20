@@ -15,7 +15,7 @@ class Manager:
 		## panel manager has curses. 
 		self.curses = curses
 		## screen variable
-		self.stdscr = curses.initscr()
+		self.screen = curses.initscr()
 		## main panel object everything else goes on.
 		self.panel = panel
 		## Dictionary of global objects
@@ -27,9 +27,9 @@ class Manager:
 			curses.init_pair(i + 1, i, -1)
 		curses.noecho()
 		curses.cbreak()
-		self.stdscr.keypad(True)
+		self.screen.keypad(True)
 		curses.curs_set(0)
-		self.stdscr.timeout(30)
+		self.screen.timeout(30)
 	##
 	## @brief      Update Panel Manager
 	##
@@ -37,7 +37,7 @@ class Manager:
 	##
 	def update(self):
 		self.panel.update_panels()
-		self.stdscr.refresh()
+		self.screen.refresh()
 
 	##
 	## @brief      Terminate Manager
@@ -46,7 +46,7 @@ class Manager:
 	##
 	def terminate(self):
 		self.curses.nocbreak()
-		self.stdscr.keypad(False)
+		self.screen.keypad(False)
 		self.curses.echo()
 		self.curses.endwin()
 		

@@ -4,8 +4,8 @@ class DebugWindow(Window):
 		Window.__init__(self, manager, name)
 
 		self.intended_y	= self.intended_x = 0
-		self.intended_width		= self.getStdscrMaxX()
-		self.intended_height	= self.getStdscrMaxY() - 5
+		self.intended_width		= self.getScreenMaxX()
+		self.intended_height	= self.getScreenMaxY() - 5
 
 		self.is_open = False
 
@@ -21,8 +21,8 @@ class DebugWindow(Window):
 		self.window.erase()
 		self.intended_x			= 0
 		self.intended_y			= 0
-		self.intended_width		= self.getStdscrMaxX()
-		self.intended_height	= self.getStdscrMaxY() - 5
+		self.intended_width		= self.getScreenMaxX()
+		self.intended_height	= self.getScreenMaxY() - 5
 		self.keepWindowInMainScreen()
 		self.window.box()
 
@@ -69,4 +69,3 @@ class DebugWindow(Window):
 
 	def terminate(self):
 		pass
-

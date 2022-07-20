@@ -17,8 +17,8 @@ class FileWindow(Window):
 
 	def update(self):
 		self.window.erase()
-		self.intended_height = self.getStdscrMaxY() - self.intended_y - 1
-		self.intended_width  = self.getStdscrMaxX() - self.intended_x - 1
+		self.intended_height = self.getScreenMaxY() - self.intended_y - 1
+		self.intended_width  = self.getScreenMaxX() - self.intended_x - 1
 
 		self.keepWindowInMainScreen()
 
