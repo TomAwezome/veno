@@ -135,6 +135,28 @@ class OpenBar(Window):
 		File = self.manager.get("File")
 		FileWindow = self.manager.get("FileWindow")
 		file = File(self.open_string)
+		if not file.exists:
+			self.window.erase()
+			self.window.addnstr(0, 0, "File not found. Begin a new file? (Y/N or Enter/Ctrl-C)", self.getWindowMaxX() - 1, self.manager.curses.color_pair(4) | self.manager.curses.A_REVERSE)
+			self.manager.update()
+			while True: # break out of this loop with enter key
+				self.window.erase()
+				try:
+					c = self.manager.screen.getch()
+				except KeyboardInterrupt:
+					result = False
+					self.panel.hide()
+					return False
+				if c == -1:
+					continue
+				c = self.manager.curses.keyname(c)
+				c = c.decode("utf-8")
+
+				if c.lower() == 'n':
+					return False
+				if c == "^J" or c.lower() == "y":
+					break
+
 		file_window = FileWindow(self.manager, "", file)		# Create fileWindow.
 		self.manager.get("file_window_list").append(file_window)
 
