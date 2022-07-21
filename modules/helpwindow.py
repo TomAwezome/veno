@@ -32,11 +32,12 @@ Multi-purpose text/code editor meant for easy and vast expandability.
 		self.help_body_text = "Keybindings:\n\n"
 		bindings = self.manager.get("keybindings")
 		items = bindings.items()
-		self.help_body_text += "Ctrl-C:".ljust(21) + "Cancel / Quit (Global Keybinding)\n\n"
+		self.help_body_text += "Ctrl-C:".ljust(22) + "Cancel / Quit (Global Keybinding)\n\n"
 		for key, val in items:
 			key = key.replace("^", "Ctrl-")
-			body_line_left = f"{key}:".ljust(21)
-			body_line_right = f"{val}\n"
+			body_line_left = f"{key}:".ljust(22)
+			body_line_right = f"{val}".replace("<bound method ", "")
+			body_line_right = body_line_right[:body_line_right.index(" ")] + "\n"
 			self.help_body_text += body_line_left + body_line_right
 
 		text = self.help_header_text + self.help_body_text
