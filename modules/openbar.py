@@ -153,6 +153,7 @@ class OpenBar(Window):
 				c = c.decode("utf-8")
 
 				if c.lower() == 'n':
+					self.panel.hide()
 					return False
 				if c == "^J" or c.lower() == "y":
 					break
