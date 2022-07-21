@@ -1,4 +1,5 @@
 import string
+
 ##
 ## @brief      Class for keyboard.
 ##
@@ -20,27 +21,44 @@ class Keyboard:
 		## FileWindow instance for fileWindow keybindings.
 		self.file_window = self.manager.get("current_file_window")
 
-		## MagicBar instance for magicBar keybindings.
-		self.magic_bar = self.manager.get("magicBar")
-		
+		self.line_jump_bar = self.manager.get("line_jump_bar")
+
+		self.save_bar = self.manager.get("save_bar")
+
+		self.search_bar = self.manager.get("search_bar")
+
+		self.debug_window = self.manager.get("debug_window")
+
+		self.open_bar = self.manager.get("open_bar")
+
+		self.help_window = self.manager.get("help_window")
+
 		## ConfigCustomizer instance for customizer keybindings. (Only used for toggle)
-		self.config_customizer = self.manager.get("configCustomizer")
-		
+		self.config_customizer = self.manager.get("config_customizer")
+
 		self.bind()
+		
 	##
 	## @brief      Update. grab key and do something with it. 
 	##
 	## @param      self  This object
 	##
 	def update(self):
+		should_exit = False
+
 		try:
-			c = self.manager.stdscr.getch()
+			c = self.manager.screen.getch()
 		except KeyboardInterrupt:
 			c = -1
-			self.magic_bar.confirmExitSave()
+			if self.save_bar.confirmExitSave():
+				should_exit = True
+
+		if should_exit:
+			exception = self.manager.get("EngineException")
+			raise exception
 
 		while c != -1:
-			self.manager.stdscr.timeout(20)
+			self.manager.screen.timeout(20)
 			c = self.manager.curses.keyname(c)
 			c = c.decode("utf-8")
 
@@ -53,9 +71,9 @@ class Keyboard:
 			elif c in string.punctuation + string.digits + string.ascii_letters + " \t":
 				self.bindings["printable-character"](c)
 
-			c = self.manager.stdscr.getch()
+			c = self.manager.screen.getch()
 
-		self.manager.stdscr.timeout(-1)
+		self.manager.screen.timeout(-1)
 
 	##
 	## @brief      Terminate Keyboard Manager
@@ -96,15 +114,19 @@ class Keyboard:
 
 			"KEY_BTAB":  self.file_window.unindentSelectedLines,
 
+			"KEY_F(1)": self.help_window.toggle,
+
 			"^D": self.file_window.deleteLineAtFilecursor,
 			"^J": self.file_window.newLineAtFilecursor,
 			"^W": self.file_window.saveFile,
 			"^I": self.file_window.enterTextAtFilecursor,
 
-			"^F": self.magic_bar.search,
-			"^L": self.magic_bar.gotoLine,
-			"^G": self.magic_bar.searchNext,
-			"^R": self.magic_bar.replace,
+			"^O": self.open_bar.openFile,
+
+			"^F": self.search_bar.search,
+			"^L": self.line_jump_bar.jumpToLine,
+			"^G": self.search_bar.searchNext,
+			"^R": self.search_bar.replace,
 
 			"^_": self.config_customizer.toggle,
 
@@ -116,8 +138,12 @@ class Keyboard:
 			"kRIT5": self.file_window.moveViewportRight,
 			"kLFT5": self.file_window.moveViewportLeft,
 			"kUP5":  self.file_window.moveViewportUp,
-			"kDN5":  self.file_window.moveViewportDown
+			"kDN5":  self.file_window.moveViewportDown,
+
+			"KEY_F(12)": self.debug_window.toggle
 		}
+
+		self.manager.set("keybindings", self.bindings)
 		
 	##
 	## @brief      Change FileWindow instance to which keybindings are bound to the previous instance.
@@ -133,7 +159,7 @@ class Keyboard:
 			self.file_window = file_window_list[file_window_list.index(self.file_window) - 1]
 		else:
 			self.file_window = file_window_list[len(file_window_list) - 1]
-		self.manager.add("current_file_window", self.file_window) # re-set current file window in manager
+		self.manager.set("current_file_window", self.file_window) # re-set current file window in manager
 		self.file_window.panel.top()
 		self.file_window.panel.show()
 		self.file_window.is_modified = True
@@ -154,7 +180,7 @@ class Keyboard:
 			self.file_window = file_window_list[file_window_list.index(self.file_window) + 1]
 		else:
 			self.file_window = file_window_list[0]
-		self.manager.add("current_file_window", self.file_window) # re-set current file window in manager
+		self.manager.set("current_file_window", self.file_window) # re-set current file window in manager
 		self.file_window.panel.top()
 		self.file_window.panel.show()
 		self.file_window.is_modified = True

@@ -17,9 +17,8 @@ class FileWindow(Window):
 
 	def update(self):
 		self.window.erase()
-
-		self.intended_height = self.getStdscrMaxY() - self.intended_y - 1 # set height from intended y to screen bottom edge
-		self.intended_width  = self.getStdscrMaxX() - self.intended_x - 1 # set width from intended x to screen right edge
+		self.intended_height = self.getScreenMaxY() - self.intended_y - 1
+		self.intended_width  = self.getScreenMaxX() - self.intended_x - 1
 		self.keepWindowInMainScreen()
 
 		window_y = 0
@@ -348,7 +347,7 @@ class FileWindow(Window):
 		self.moveViewportToCursorX()
 		self.moveViewportToCursorY()
 
-	def gotoLine(self, line_num, preserve_x = False):
+	def jumpToLine(self, line_num, preserve_x = False):
 		filecursor_x = self.getFilecursorX()
 		filecursor_y = self.getFilecursorY()
 
@@ -369,10 +368,10 @@ class FileWindow(Window):
 			self.moveViewportToCursor()
 
 	def gotoStartOfFile(self):
-		self.gotoLine(0)
+		self.jumpToLine(0)
 
 	def gotoEndOfFile(self):
-		self.gotoLine(len(self.file_lines) - 1)
+		self.jumpToLine(len(self.file_lines) - 1)
 
 	def gotoStartOfLine(self):
 		self.setFilecursorX(0)
@@ -609,8 +608,8 @@ class FileWindow(Window):
 		for line in self.file_lines:
 			file_string += line + "\n"
 
-		returnval = self.manager.get("magicBar").save()
-		if returnval == True: # magicBar save filename get success, save file
+		returnval = self.manager.get("save_bar").save()
+		if returnval == True: # saveBar save filename get success, save file
 			self.file.save(file_string)
 
 		return returnval
@@ -621,12 +620,12 @@ class FileWindow(Window):
 	def scrollDown(self):
 		scroll_amount = self.config["ScrollAmount"]
 		filecursor_y = self.getFilecursorY()
-		self.gotoLine(min(filecursor_y + scroll_amount, len(self.file_lines) - 1))
+		self.jumpToLine(min(filecursor_y + scroll_amount, len(self.file_lines) - 1))
 
 	def scrollUp(self):
 		scroll_amount = self.config["ScrollAmount"]
 		filecursor_y = self.getFilecursorY()
-		self.gotoLine(max(filecursor_y - scroll_amount, 0))
+		self.jumpToLine(max(filecursor_y - scroll_amount, 0))
 
 	def deleteLineAtFilecursor(self):
 		filecursor_x = self.getFilecursorX()

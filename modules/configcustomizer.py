@@ -4,8 +4,8 @@ class ConfigCustomizerWindow(Window):
 		Window.__init__(self, manager, name)
 
 		self.intended_y	= self.intended_x = 0
-		self.intended_width		= self.getStdscrMaxX()
-		self.intended_height	= self.getStdscrMaxY()
+		self.intended_width		= self.getScreenMaxX()
+		self.intended_height	= self.getScreenMaxY()
 
 		self.is_open = False
 
@@ -137,8 +137,8 @@ class ConfigCustomizerWindow(Window):
 		self.current_option = 0
 		self.viewport_y = 0
 		self.intended_x = 0
-		self.intended_width = self.getStdscrMaxX()
-		self.intended_height = self.getStdscrMaxY()
+		self.intended_width = self.getScreenMaxX()
+		self.intended_height = self.getScreenMaxY()
 
 		option_keys = list(d.keys())
 
@@ -146,7 +146,7 @@ class ConfigCustomizerWindow(Window):
 			self.intended_height = len(option_keys) + 3
 			self.intended_width = max(len(str(len(option_keys)) + "\t#"), len("Color Customizer") + 2)
 			# intended_width explained: d.keys will return a number with as many digits..
-			self.intended_x = int(self.getStdscrMaxX() / 2 - (self.intended_width / 2))
+			self.intended_x = int(self.getScreenMaxX() / 2 - (self.intended_width / 2))
 		
 		self.keepWindowInMainScreen()
 		self.window.box()
@@ -199,7 +199,7 @@ class ConfigCustomizerWindow(Window):
 		
 		while True:
 			try:
-				c = self.manager.stdscr.getch()
+				c = self.manager.screen.getch()
 			except KeyboardInterrupt:
 				self.current_option = 0
 				self.viewport_y = 0
@@ -227,15 +227,15 @@ class ConfigCustomizerWindow(Window):
 				if c == "^_":
 					break
 
-			self.intended_width = self.getStdscrMaxX()
-			self.intended_height = self.getStdscrMaxY()
+			self.intended_width = self.getScreenMaxX()
+			self.intended_height = self.getScreenMaxY()
 			self.intended_x = 0
 
 			if name == "Color Customizer":
 				self.intended_height = len(d.keys()) + 3
 				self.intended_width = max(len(str(len(d.keys())) + "\t#"), len("Color Customizer") + 2)
 				# intended_width explained: d.keys will return a number with as many digits..
-				self.intended_x = int(self.getStdscrMaxX() / 2 - (self.intended_width / 2))
+				self.intended_x = int(self.getScreenMaxX() / 2 - (self.intended_width / 2))
 
 			self.keepWindowInMainScreen()
 			self.window.clear()
@@ -271,7 +271,7 @@ class ConfigCustomizerWindow(Window):
 			for i in self.manager.objects:
 				if not issubclass(type(self.manager.get(i)), Window):
 					continue
-				if self.manager.get(i).name == "configCustomizer": # name given in engine init
+				if self.manager.get(i).name == "config_customizer": # name given in engine init
 					continue # to avoid recursive loop
 
 				self.manager.get(i).update()

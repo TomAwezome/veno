@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, curses
 
-stdscr = curses.initscr()
+screen = curses.initscr()
 curses.start_color()
 curses.curs_set(0)
 curses.noecho()
@@ -12,18 +12,18 @@ for i in range(0, curses.COLORS):
 def run(self):
 	while True:
 		try:
-			c = stdscr.getch()
+			c = screen.getch()
 		except:
 			sys.exit(0)
 
 		old = c
 		c = curses.keyname(c)
-		stdscr.clear()
+		screen.clear()
 
-		stdscr.addstr(0, 0, c)
-		stdscr.addstr(1, 0, str(len(c)))
-		stdscr.addstr(2, 0, str(old))
+		screen.addstr(0, 0, c)
+		screen.addstr(1, 0, str(len(c)))
+		screen.addstr(2, 0, str(old))
 
-		stdscr.refresh()
+		screen.refresh()
 
 curses.wrapper(run)

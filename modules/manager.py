@@ -15,7 +15,7 @@ class Manager:
 		## panel manager has curses. 
 		self.curses = curses
 		## screen variable
-		self.stdscr = curses.initscr()
+		self.screen = curses.initscr()
 		## main panel object everything else goes on.
 		self.panel = panel
 		## Dictionary of global objects
@@ -27,9 +27,9 @@ class Manager:
 			curses.init_pair(i + 1, i, -1)
 		curses.noecho()
 		curses.cbreak()
-		self.stdscr.keypad(True)
+		self.screen.keypad(True)
 		curses.curs_set(0)
-		self.stdscr.timeout(30)
+		self.screen.timeout(30)
 	##
 	## @brief      Update Panel Manager
 	##
@@ -37,7 +37,7 @@ class Manager:
 	##
 	def update(self):
 		self.panel.update_panels()
-		self.stdscr.refresh()
+		self.screen.refresh()
 
 	##
 	## @brief      Terminate Manager
@@ -46,7 +46,7 @@ class Manager:
 	##
 	def terminate(self):
 		self.curses.nocbreak()
-		self.stdscr.keypad(False)
+		self.screen.keypad(False)
 		self.curses.echo()
 		self.curses.endwin()
 		
@@ -54,12 +54,12 @@ class Manager:
 	## @brief      Adds a panel.
 	##
 	## @param      self    This object
-	## @param      Window  source Window object
+	## @param      window  source Window object (window.py)
 	## @param      name    name of panel to be used in dictionary as key
 	##
-	def addPanel(self, Window, name):
-		new_panel = self.panel.new_panel(Window.window)
-		self.add(name, Window)
+	def addPanel(self, window, name):
+		new_panel = self.panel.new_panel(window.window)
+		self.set(name, window)
 		return new_panel
 
 	##
@@ -75,12 +75,12 @@ class Manager:
 			return None
 			
 	##
-	## @brief      Add an object to the manager.
+	## @brief      Set an object key/value pair in the manager object dictionary.
 	##
 	## @param      self    This object
-	## @param      name    Name of the object to add.
-	## @param      obj     The object to add
+	## @param      name    Name (key) of the object
+	## @param      obj     The object (value) to add
 	##
-	def add(self, name, obj):
+	def set(self, name, obj):
 		self.objects[name] = obj
 		return obj

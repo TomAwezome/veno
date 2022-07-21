@@ -35,31 +35,35 @@ Runs in a terminal window. GUI not yet implemented.
 
 ## Keybindings
 
- - **Ctrl-C** -- cancel/quit
- - **Printable characters** -- add character at cursor in file
- - **Enter Key, Ctrl-J** -- add newline at cursor in file
- - **Tab Key, Ctrl-I** -- add tab character or equivalent spaces at cursor in file / indent selected lines
- - **Shift-Tab** -- unindent current line / selected lines
- - **Backspace Key, Ctrl-?, Ctrl-H** -- remove previous character at cursor from file
- - **Delete Key** -- remove character at cursor from file
- - **Ctrl-D** -- remove line at cursor from file
- - **Arrow Keys** -- move cursor in file
- - **PageUp, PageDown** -- scroll screen up/down
- - **Ctrl-Arrow Keys** -- move viewport in file. Ctrl-Arrow Keys not supported by all terminals.
- - **Ctrl-W** -- save file
- - **Home Key** -- go to start of line in file
- - **End Key** -- go to end of line in file
- - **F3** -- go to start of file
- - **F4** -- go to end of file
- - **F5** -- go to previous open file
- - **F6** -- go to next open file
- - **Ctrl-L** - go to a line in file
- - **Ctrl-F** -- find regex string in file
- - **Ctrl-G** -- find next match in file
- - **Ctrl-R** -- find and replace string in file
- - **Ctrl-B** -- select text in file
- - **Ctrl-K** -- copy and store selection in file
- - **Ctrl-X** -- cut and store selection from file
- - **Ctrl-V** -- paste selection into file
- - **Ctrl-_, Ctrl-/** -- toggle config customizer.
-
+|Keybinding|Description|
+|:-:|:--|
+|Ctrl-C|Cancel/Quit|
+|printable characters|Add character at cursor in file|
+|Enter Key, Ctrl-J|Add newline at cursor in file|
+|Tab Key, Ctrl-I|Add tab character or equivalent spaces at cursor in file / indent selected lines|
+|Shift-Tab|Unindent current line / selected lines|
+|Backspace Key, Ctrl-?, Ctrl-H|Remove previous character at cursor from file|
+|Delete Key|Remove character at cursor from file|
+|Ctrl-D|Remove line at cursor from file|
+|Arrow Keys|Move cursor in file|
+|PageUp, PageDown|Scroll screen up/down|
+|Ctrl-Arrow Keys|Move viewport in file. Ctrl-Arrow Keys not supported by all terminals.|
+|Ctrl-W|Save file|
+|Home Key|Go to start of line in file|
+|End Key|Go to end of line in file|
+|F1|Toggle Help Window|
+|F3|Go to start of file|
+|F4|Go to end of file|
+|F5|Go to previous open file|
+|F6|Go to next open file|
+|Ctrl-L|Go to a line in file|
+|Ctrl-F|Find regex string in file|
+|Ctrl-G|Find next match in file|
+|Ctrl-R|Find and replace string in file|
+|Ctrl-B|Select text in file|
+|Ctrl-K|Copy and store selection in file|
+|Ctrl-X|Cut and store selection from file|
+|Ctrl-V|Paste selection into file|
+|Ctrl-O|Open file|
+|Ctrl-_, Ctrl-/|Toggle config customizer|
+|F12|Toggle debug window|

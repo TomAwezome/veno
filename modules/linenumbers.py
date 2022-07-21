@@ -38,7 +38,7 @@ class LineNumbersWindow(Window):
 		self.intended_width = len(str(total_lines)) + 2
 
 		self.file_window.intended_x		= len(str(total_lines)) + 1
-		self.file_window.intended_width	= self.getStdscrMaxX() - self.file_window.intended_x - 1
+		self.file_window.intended_width	= self.getScreenMaxX() - self.file_window.intended_x - 1
 		self.file_window.keepWindowInMainScreen()
 
 		self.intended_x			= self.file_window.getWindowBegX() - self.intended_width + 1
