@@ -143,6 +143,7 @@ class Keyboard:
 			"kUP5":  self.file_window.moveViewportUp,
 			"kDN5":  self.file_window.moveViewportDown,
 
+			"KEY_F(9)": self.closeFileWindow,
 			"KEY_F(12)": self.debug_window.toggle,
 			"^[": self.leave
 		}
@@ -190,3 +191,18 @@ class Keyboard:
 		self.file_window.is_modified = True
 		self.file_window.copy_lines = old_copy_lines
 		self.bind() # kludge ... bindings array holds function pointers to specific FileWindow object instances... we have to rebind to keep this implementation...
+
+	##
+	## @brief      Close FileWindow instance.
+	##
+	## @param      self  This object
+	##
+	def closeFileWindow(self):
+		file_window_to_remove = self.manager.get("current_file_window")
+		self.selectNextFileWindow()
+		if file_window_to_remove is not self.manager.get("current_file_window"):
+			window_list = self.manager.get("file_window_list")
+			window_list.remove(file_window_to_remove)
+		else:
+			pass # TODO do something different if trying to close last filewindow in active list
+

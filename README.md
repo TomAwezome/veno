@@ -56,6 +56,7 @@ Runs in a terminal window. GUI not yet implemented.
 |F4|Go to end of file|
 |F5|Go to previous open file|
 |F6|Go to next open file|
+|F9|Close file|
 |Ctrl-L|Go to a line in file|
 |Ctrl-F|Find regex string in file|
 |Ctrl-G|Find next match in file|
