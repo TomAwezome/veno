@@ -82,5 +82,8 @@ class Manager:
 	## @param      obj     The object (value) to add
 	##
 	def set(self, name, obj):
+		if name == "" or name is None:
+			return None
 		self.objects[name] = obj
 		return obj
+
