@@ -54,7 +54,8 @@ class Keyboard:
 				should_exit = True
 
 		if should_exit:
-			raise KeyboardInterrupt # TODO make a veno-specific exception that is used for safe shutdown as opposed to a 'panic' force shutdown
+			exception = self.manager.get("EngineException")
+			raise exception
 
 		while c != -1:
 			self.manager.screen.timeout(20)

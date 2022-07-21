@@ -7,13 +7,18 @@ prof = cProfile.Profile()
 prof.enable()
 """
 
+class EngineException(Exception):
+	pass
+
 from modules.engine import Engine
 engine = Engine()
+
+engine.setException(EngineException)
 
 while True:
 	try:
 		engine.turn()
-	except KeyboardInterrupt:
+	except EngineException:
 		engine.terminate()
 		break
 	except:

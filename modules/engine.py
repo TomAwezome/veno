@@ -28,6 +28,8 @@ class Engine():
 	def __init__(self):
 		filenames = self.parseArgs().filename or ["untitled.txt"]
 
+		self.exception = Exception
+
 		## Config instance for editor.
 		self.config = Config(filenames[0])
 		## File instance list to be used by editor.
@@ -104,6 +106,11 @@ class Engine():
 		self.help_window.update()
 		self.manager.update()
 		self.keys.update()														# Grab key input and interpret through bindings.
+
+	def setException(self, e):
+		self.exception = e
+		self.manager.set("EngineException", e)
+
 	##
 	## @brief      Parses arguments given via command line
 	##
