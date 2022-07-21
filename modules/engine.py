@@ -15,6 +15,7 @@ from modules.searchbar import SearchBar
 from modules.debugwindow import DebugWindow
 from modules.openbar import OpenBar
 from modules.helpwindow import HelpWindow
+from modules.diffwindow import DiffWindow
 
 ##
 ## @brief      Veno Engine Class. Built to be easily and swiftly customized.
@@ -84,6 +85,8 @@ class Engine():
 		self.open_bar = OpenBar(self.manager, "open_bar")
 		## HelpWindow instance to pop-up for displaying basic Help information.
 		self.help_window = HelpWindow(self.manager, "help_window")
+		## DiffWindow instance to pop-up for displaying diff of file on disk vs file in editor.
+		self.diff_window = DiffWindow(self.manager, "diff_window")
 		## Keyboard Manager instance to interpret key input.
 		self.keys = Keyboard(self.manager)										# Load Keyboard module.
 		self.manager.update()													# Update Panel Manager contents.
@@ -104,6 +107,7 @@ class Engine():
 		self.open_bar.update()
 		self.debug_window.update()
 		self.help_window.update()
+		self.diff_window.update()
 		self.manager.update()
 		self.keys.update()														# Grab key input and interpret through bindings.
 

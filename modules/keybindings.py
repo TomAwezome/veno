@@ -33,6 +33,8 @@ class Keyboard:
 
 		self.help_window = self.manager.get("help_window")
 
+		self.diff_window = self.manager.get("diff_window")
+
 		## ConfigCustomizer instance for customizer keybindings. (Only used for toggle)
 		self.config_customizer = self.manager.get("config_customizer")
 
@@ -115,6 +117,8 @@ class Keyboard:
 			"KEY_BTAB":  self.file_window.unindentSelectedLines,
 
 			"KEY_F(1)": self.help_window.toggle,
+
+			"^T": self.diff_window.toggle,
 
 			"^D": self.file_window.deleteLineAtFilecursor,
 			"^J": self.file_window.newLineAtFilecursor,
