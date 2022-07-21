@@ -5,7 +5,7 @@ class DiffWindow(Window):
 	def __init__(self, manager, name):
 		Window.__init__(self, manager, name)
 
-		## FileWindow instance SearchBar is attached to.
+		## FileWindow instance DiffWindow is attached to.
 		self.file_window = self.manager.get("current_file_window")
 
 		self.is_open = False
