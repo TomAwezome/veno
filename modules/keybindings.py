@@ -46,18 +46,11 @@ class Keyboard:
 	## @param      self  This object
 	##
 	def update(self):
-		should_exit = False
-
 		try:
 			c = self.manager.screen.getch()
 		except KeyboardInterrupt:
 			c = -1
-			if self.save_bar.confirmExitSave():
-				should_exit = True
-
-		if should_exit:
-			exception = self.manager.get("EngineException")
-			raise exception
+			self.leave()
 
 		while c != -1:
 			self.manager.screen.timeout(20)
@@ -76,6 +69,12 @@ class Keyboard:
 			c = self.manager.screen.getch()
 
 		self.manager.screen.timeout(-1)
+
+	def leave(self):
+		if not self.save_bar.confirmExitSave():
+			return
+		exception = self.manager.get("EngineException")
+		raise exception
 
 	##
 	## @brief      Terminate Keyboard Manager
@@ -144,7 +143,8 @@ class Keyboard:
 			"kUP5":  self.file_window.moveViewportUp,
 			"kDN5":  self.file_window.moveViewportDown,
 
-			"KEY_F(12)": self.debug_window.toggle
+			"KEY_F(12)": self.debug_window.toggle,
+			"^[": self.leave
 		}
 
 		self.manager.set("keybindings", self.bindings)
