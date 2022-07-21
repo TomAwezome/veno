@@ -198,6 +198,9 @@ class Keyboard:
 	## @param      self  This object
 	##
 	def closeFileWindow(self):
+		if not self.save_bar.confirmExitSave():
+			# TODO clean up how this confirm is handled and then revise above logic in leave()
+			return
 		file_window_to_remove = self.manager.get("current_file_window")
 		self.selectNextFileWindow()
 		if file_window_to_remove is not self.manager.get("current_file_window"):
