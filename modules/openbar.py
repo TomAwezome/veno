@@ -110,7 +110,7 @@ class OpenBar(Window):
 			except KeyboardInterrupt:
 				result = False
 				self.panel.hide()
-				break
+				return result
 			if c == -1:
 				continue
 			c = self.manager.curses.keyname(c)
