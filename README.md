@@ -62,6 +62,7 @@ Runs in a terminal window. GUI not yet implemented.
 |Ctrl-G|Find next match in file|
 |Ctrl-R|Find and replace string in file|
 |Ctrl-B|Select text in file|
+|Ctrl-A|Select all text in file|
 |Ctrl-K|Copy and store selection in file|
 |Ctrl-X|Cut and store selection from file|
 |Ctrl-V|Paste selection into file|

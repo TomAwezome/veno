@@ -109,6 +109,12 @@ class FileWindow(Window):
 			self.is_select_on = False
 			self.select_position = []
 
+	def selectAll(self):
+		self.is_select_on = True
+		self.select_position = [0, 0]
+		self.gotoEndOfFile()
+		self.gotoEndOfLine()		
+
 	def copySelect(self, toggle=True):
 		filecursor_x = self.getFilecursorX()
 		filecursor_y = self.getFilecursorY()

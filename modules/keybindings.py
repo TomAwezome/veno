@@ -133,6 +133,7 @@ class Keyboard:
 
 			"^_": self.config_customizer.toggle,
 
+			"^A": self.file_window.selectAll,
 			"^B": self.file_window.toggleSelect,
 			"^K": self.file_window.copySelect,
 			"^V": self.file_window.pasteAtFilecursor,
