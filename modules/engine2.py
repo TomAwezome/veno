@@ -124,8 +124,7 @@ class Engine():
 	def get(self, name):
 		if name in self.global_objects:
 			return self.global_objects[name]
-		else:
-			return None
+		return None
 
 	##
 	## @brief      Set an object key/value pair in the engine object dictionary.
@@ -147,8 +146,7 @@ class Engine():
 	## @param      window  source Window object (window.py)
 	##
 	def addPanel(self, window):
-		new_panel = self.panel.new_panel(window.window)
-		return new_panel
+		return self.panel.new_panel(window.window)
 
 	##
 	## @brief      terminate engine
