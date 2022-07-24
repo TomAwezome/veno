@@ -23,6 +23,7 @@ MODULE_IMPORT_ORDER = [
 ]
 
 MODULE_UPDATE_ORDER = [
+	"keybindings",
 #	"windowbar",
 #	"linejumpbar",
 #	"savebar",
@@ -35,8 +36,6 @@ MODULE_UPDATE_ORDER = [
 #	"debugwindow",
 	"helpwindow",
 #	"diffwindow",
-#	"manager",
-	"keybindings",
 ]
 
 ##
@@ -92,8 +91,8 @@ class Engine():
 	##
 	def turn(self):
 		for module_name in MODULE_UPDATE_ORDER:
-			if module_name in self.module_instances:
-				self.module_instances[module_name].update()
+			self.module_instances[module_name].update()
+		self.update()
 
 	##
 	## @brief      Update curses panels
@@ -151,7 +150,6 @@ class Engine():
 	##
 	def addPanel(self, window):
 		new_panel = self.panel.new_panel(window.window)
-#		self.set(name, window)
 		return new_panel
 
 	##
