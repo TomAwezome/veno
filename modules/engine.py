@@ -1,41 +1,49 @@
 import argparse # load arg parser module for file input
 import importlib
 import inspect
+import curses
+import curses.panel as panel
 
+## List of modules to NOT call __init__ during module import, and NOT call terminate() during program shutdown.
+## These modules will only globally store class definition, without creating instances.
+MODULE_INIT_EXCLUDES = ["file", "filewindow"]
+
+## List of modules to import.
+## Unless specified in the excludes list, imported module's class __init__ is called to create global module instances.
 MODULE_IMPORT_ORDER = [
 	"config",
-	"manager",
-#	"file",
-#	"filewindow",
+	"file",
+	"filewindow",
+	"filewindowmanager",
 #	"syntaxhighlighting",
-	"windowbar",
-	"linenumbers",
-	"configcustomizer",
-	"linejumpbar",
-	"savebar",
-	"searchbar",
+#	"windowbar",
+#	"linenumbers",
+#	"configcustomizer",
+#	"linejumpbar",
+#	"savebar",
+#	"searchbar",
 	"debugwindow",
-	"openbar",
+#	"openbar",
 	"helpwindow",
-	"diffwindow",
+#	"diffwindow",
 	"keybindings",
 ]
 
+# List of modules to call update() method on each Engine.turn().
 MODULE_UPDATE_ORDER = [
-	"windowbar",
-	"linejumpbar",
-	"savebar",
-	"searchbar",
-#	"manager.get(\"current_file_window\")", # ??
-	"linenumbers",
-	"syntaxhighlighting",
-	"configcustomizer",
-	"openbar",
+	"keybindings",
+#	"windowbar",
+#	"linejumpbar",
+#	"savebar",
+#	"searchbar",
+	"filewindowmanager",
+#	"linenumbers",
+#	"syntaxhighlighting",
+#	"configcustomizer",
+#	"openbar",
 	"debugwindow",
 	"helpwindow",
-	"diffwindow",
-	"manager",
-	"keybindings",
+#	"diffwindow",
 ]
 
 ##
@@ -48,115 +56,65 @@ class Engine():
 	## @param      self  This object
 	##
 	def __init__(self):
+		self.curses = curses
+
+		## screen variable
+		self.screen = curses.initscr()
+		## main panel object everything else goes on.
+		self.panel = panel
+
+		curses.start_color()
+		curses.use_default_colors()
+		for i in range(0,curses.COLORS):
+			curses.init_pair(i + 1, i, -1)
+		curses.noecho()
+		curses.cbreak()
+		self.screen.keypad(True)
+		curses.curs_set(0)
+		self.screen.timeout(30)
+
+		self.filenames = self.parseArgs().filename or ["untitled.txt"]
 
 		## Dictionary of global objects
-		self.objects = {}
+		self.global_objects = {}
 
 		self.module_list = []
 		self.module_classes  = {}
+		self.module_instances = {}
 		for module_name in MODULE_IMPORT_ORDER:
 			m = importlib.import_module("modules." + module_name)
 			self.module_list.append(m)
-			self.module_classes[module_name] = inspect.getmembers(m, inspect.isclass)[0]
-
-		self.module_instances = {}
-		for module_name, class_tuple in self.module_classes.items():
-			print(module_name, class_tuple)
-			obj = class_tuple[1](self) # call imported module class's __init__ with Engine as arg
-
-
-		"""
-		filenames = self.parseArgs().filename or ["untitled.txt"]
+			self.module_classes[module_name] = class_tuple = inspect.getmembers(m, inspect.isclass)[0]
+			if module_name not in MODULE_INIT_EXCLUDES:
+				self.module_instances[module_name] = obj = class_tuple[1](self) # call imported module class's __init__ with Engine as arg
+				self.set(module_name, obj)
+			else:
+				self.set(class_tuple[1].__name__, class_tuple[1]) # put module class definition into global objects dictionary with module class name as key
 
 		self.exception = Exception
 
-		## Config instance for editor.
-		self.config = Config(filenames[0])
-		## File instance list to be used by editor.
-		self.files = []
-		## FileWindow instance list.
-		self.file_window_list = []
-		## Panel Manager instance for modules.
-		self.manager = Manager()												# Load Manager.
-		self.manager.set("config", self.config)
-		self.manager.set("file_window_list", self.file_window_list)
-		
-		self.manager.set("File", File)
-		self.manager.set("FileWindow", FileWindow)
-
-		for filename in filenames:
-			try:
-				file = File(filename)
-				self.files.append(file)											# Load file provided as only arg.
-				file_window = FileWindow(self.manager, "", file)		# Create fileWindow.
-				self.file_window_list.append(file_window)
-				file_window.update()											# Update fileWindow contents.
-			except IsADirectoryError:
-				pass
-		if self.file_window_list != []:
-			self.manager.set("current_file_window", self.file_window_list[0])
-		else: # filewindow list can be empty if provided arg is a directory and no other filename args are given
-			file = File("untitled.txt")
-			self.files.append(file)
-			file_window = FileWindow(self.manager, "", file)
-			self.file_window_list.append(file_window)
-			file_window.update()
-			self.manager.set("current_file_window", self.file_window_list[0])
-
-		## Highlighter instance to colorize FileWindow contents.
-		self.highlighter = Highlighter(self.manager)
-		self.manager.set("highlighter", self.highlighter)
-		## WindowBar Window instance to print list of windows in use by veno.
-		self.window_bar = WindowBar(self.manager, "window_bar")
-		## LineNumbers Window instance to display next to FileWindow.
-		self.line_numbers = LineNumbersWindow(self.manager, "line_numbers")
-		## ConfigCustomizer Window instance to allow modifying configuration.
-		self.config_customizer = ConfigCustomizerWindow(self.manager, "config_customizer")
-		## LineJumpBar Window instance to pop-up for prompting line number to jump to in current FileWindow.
-		self.line_jump_bar = LineJumpBar(self.manager, "line_jump_bar")
-		## SaveBar Window instance to pop-up for prompting save filename for current FileWindow.
-		self.save_bar = SaveBar(self.manager, "save_bar")
-		## SearchBar Window instance to pop-up for prompting find (and replace) text for current FileWindow.
-		self.search_bar = SearchBar(self.manager, "search_bar")
-		## DebugWindow instance to print debug information to.
-		self.debug_window = DebugWindow(self.manager, "debug_window")
-		## OpenBar Window instance to pop-up for prompting open filename for opening additional file.
-		self.open_bar = OpenBar(self.manager, "open_bar")
-		## HelpWindow instance to pop-up for displaying basic Help information.
-		self.help_window = HelpWindow(self.manager, "help_window")
-		## DiffWindow instance to pop-up for displaying diff of file on disk vs file in editor.
-		self.diff_window = DiffWindow(self.manager, "diff_window")
-		## Keyboard Manager instance to interpret key input.
-		self.keys = Keyboard(self.manager)										# Load Keyboard module.
-		self.manager.update()													# Update Panel Manager contents.
-		"""
 	##
 	## @brief      Turn the engine once.
 	##
 	## @param      self  This object
 	##
 	def turn(self):
-		"""
-		self.window_bar.update()
-		self.line_jump_bar.update()
-		self.save_bar.update()
-		self.search_bar.update()
-		self.manager.get("current_file_window").update()
-		self.line_numbers.update()
-		self.highlighter.update()
-		self.config_customizer.update()
-		self.open_bar.update()
-		self.debug_window.update()
-		self.help_window.update()
-		self.diff_window.update()
-		self.manager.update()
-		self.keys.update()														# Grab key input and interpret through bindings.
-		"""
+		for module_name in MODULE_UPDATE_ORDER:
+			self.module_instances[module_name].update()
+		self.update()
+
+	##
+	## @brief      Update curses panels
+	##
+	## @param      self  This object
+	##
+	def update(self):
+		self.panel.update_panels()
+		self.screen.refresh()
+
 	def setException(self, e):
-		"""
 		self.exception = e
-		self.manager.set("EngineException", e)
-		"""
+		self.set("EngineException", e)
 
 	##
 	## @brief      Parses arguments given via command line
@@ -175,11 +133,10 @@ class Engine():
 	## @param      name    Name of the object to get.
 	##
 	def get(self, name):
-		if name in self.objects:
-			return self.objects[name]
-		else:
-			return None
-			
+		if name in self.global_objects:
+			return self.global_objects[name]
+		return None
+
 	##
 	## @brief      Set an object key/value pair in the engine object dictionary.
 	##
@@ -190,8 +147,17 @@ class Engine():
 	def set(self, name, obj):
 		if name == "" or name is None:
 			return None
-		self.objects[name] = obj
+		self.global_objects[name] = obj
 		return obj
+
+	##
+	## @brief      Adds a panel.
+	##
+	## @param      self    This object
+	## @param      window  source Window object (window.py)
+	##
+	def addPanel(self, window):
+		return self.panel.new_panel(window.window)
 
 	##
 	## @brief      terminate engine
@@ -199,11 +165,12 @@ class Engine():
 	## @param      self  This object
 	##
 	def terminate(self):														# Terminate all modules in reverse order of initialization.
-		"""
-		self.keys.terminate()
-		for file_window in self.file_window_list:
-			file_window.terminate()
-		self.manager.terminate()
-		for file in self.files:
-			file.terminate()
-		"""
+		self.curses.nocbreak()
+		self.screen.keypad(False)
+		self.curses.echo()
+		self.curses.endwin()
+		MODULE_IMPORT_ORDER.reverse()
+		for module_name in MODULE_IMPORT_ORDER:
+			if module_name not in MODULE_INIT_EXCLUDES:
+				self.module_instances[module_name].terminate()
+
