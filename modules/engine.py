@@ -1,21 +1,42 @@
 import argparse # load arg parser module for file input
+import importlib
+import inspect
 
-from modules.config import Config
-from modules.file import File
-from modules.manager import Manager
-from modules.filewindow import FileWindow
-from modules.keybindings import Keyboard
-from modules.syntaxhighlighting import Highlighter
-from modules.windowbar import WindowBar
-from modules.linenumbers import LineNumbersWindow
-from modules.configcustomizer import ConfigCustomizerWindow
-from modules.linejumpbar import LineJumpBar
-from modules.savebar import SaveBar
-from modules.searchbar import SearchBar
-from modules.debugwindow import DebugWindow
-from modules.openbar import OpenBar
-from modules.helpwindow import HelpWindow
-from modules.diffwindow import DiffWindow
+MODULE_IMPORT_ORDER = [
+	"config",
+	"manager",
+	"file",
+	"filewindow",
+	"syntaxhighlighting",
+	"windowbar",
+	"linenumbers",
+	"configcustomizer",
+	"linejumpbar",
+	"savebar",
+	"searchbar",
+	"debugwindow",
+	"openbar",
+	"helpwindow",
+	"diffwindow",
+	"keybindings",
+]
+
+MODULE_UPDATE_ORDER = [
+	"windowbar",
+	"linejumpbar",
+	"savebar",
+	"searchbar",
+#	"manager.get(\"current_file_window\")", # ??
+	"linenumbers",
+	"syntaxhighlighting",
+	"configcustomizer",
+	"openbar",
+	"debugwindow",
+	"helpwindow",
+	"diffwindow",
+	"manager",
+	"keybindings",
+]
 
 ##
 ## @brief      Veno Engine Class. Built to be easily and swiftly customized.
@@ -27,6 +48,18 @@ class Engine():
 	## @param      self  This object
 	##
 	def __init__(self):
+		self.module_list = []
+		self.module_classes  = {}
+		for module_name in MODULE_IMPORT_ORDER:
+			m = importlib.import_module("modules." + module_name)
+			self.module_list.append(m)
+			self.module_classes[module_name] = inspect.getmembers(m, inspect.isclass)[0]
+
+		self.module_instances = {}
+		for module_name, class_tuple in self.module_classes.items():
+			print(module_name, class_tuple)
+			obj = class_tuple[1](self) # call imported module class's __init__ with Engine as arg
+		"""
 		filenames = self.parseArgs().filename or ["untitled.txt"]
 
 		self.exception = Exception
@@ -90,12 +123,14 @@ class Engine():
 		## Keyboard Manager instance to interpret key input.
 		self.keys = Keyboard(self.manager)										# Load Keyboard module.
 		self.manager.update()													# Update Panel Manager contents.
+		"""
 	##
 	## @brief      Turn the engine once.
 	##
 	## @param      self  This object
 	##
 	def turn(self):
+		"""
 		self.window_bar.update()
 		self.line_jump_bar.update()
 		self.save_bar.update()
@@ -110,10 +145,12 @@ class Engine():
 		self.diff_window.update()
 		self.manager.update()
 		self.keys.update()														# Grab key input and interpret through bindings.
-
+		"""
 	def setException(self, e):
+		"""
 		self.exception = e
 		self.manager.set("EngineException", e)
+		"""
 
 	##
 	## @brief      Parses arguments given via command line
@@ -130,9 +167,11 @@ class Engine():
 	## @param      self  This object
 	##
 	def terminate(self):														# Terminate all modules in reverse order of initialization.
+		"""
 		self.keys.terminate()
 		for file_window in self.file_window_list:
 			file_window.terminate()
 		self.manager.terminate()
 		for file in self.files:
 			file.terminate()
+		"""
