@@ -15,7 +15,7 @@ MODULE_IMPORT_ORDER = [
 #	"linejumpbar",
 #	"savebar",
 #	"searchbar",
-#	"debugwindow",
+	"debugwindow",
 #	"openbar",
 	"helpwindow",
 #	"diffwindow",
@@ -33,7 +33,7 @@ MODULE_UPDATE_ORDER = [
 #	"syntaxhighlighting",
 #	"configcustomizer",
 #	"openbar",
-#	"debugwindow",
+	"debugwindow",
 	"helpwindow",
 #	"diffwindow",
 ]
@@ -65,21 +65,19 @@ class Engine():
 		curses.curs_set(0)
 		self.screen.timeout(30)
 
+		filenames = self.parseArgs().filename or ["untitled.txt"]
+
 		## Dictionary of global objects
 		self.global_objects = {}
 
 		self.module_list = []
 		self.module_classes  = {}
+		self.module_instances = {}
 		for module_name in MODULE_IMPORT_ORDER:
 			m = importlib.import_module("modules." + module_name)
 			self.module_list.append(m)
-			self.module_classes[module_name] = inspect.getmembers(m, inspect.isclass)[0]
-
-		self.module_instances = {}
-		for module_name, class_tuple in self.module_classes.items():
-			print(module_name, class_tuple)
-			obj = class_tuple[1](self) # call imported module class's __init__ with Engine as arg
-			self.module_instances[module_name] = obj
+			self.module_classes[module_name] = class_tuple = inspect.getmembers(m, inspect.isclass)[0]
+			self.module_instances[module_name] = obj = class_tuple[1](self) # call imported module class's __init__ with Engine as arg
 			self.set(module_name, obj)
 
 		self.exception = Exception
@@ -162,3 +160,7 @@ class Engine():
 		self.screen.keypad(False)
 		self.curses.echo()
 		self.curses.endwin()
+		MODULE_IMPORT_ORDER.reverse()
+		for module_name in MODULE_IMPORT_ORDER:
+			self.module_instances[module_name].terminate()
+

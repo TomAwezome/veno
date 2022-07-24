@@ -27,7 +27,7 @@ class Keyboard:
 
 		self.search_bar = self.engine.get("search_bar")
 
-		self.debug_window = self.engine.get("debug_window")
+		self.debug_window = self.engine.get("debugwindow")
 
 		self.open_bar = self.engine.get("open_bar")
 
@@ -92,6 +92,7 @@ class Keyboard:
 	def bind(self):
 		self.bindings = {
 			"KEY_F(1)": self.help_window.toggle,
+			"KEY_F(12)": self.debug_window.toggle,
 			"^[": self.leave
 		}
 		"""
