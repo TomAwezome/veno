@@ -5,7 +5,7 @@ import curses
 import curses.panel as panel
 
 ## List of modules to NOT call __init__ during module import, and NOT call terminate() during program shutdown.
-## These modules will only globally store module and class definition, without creating instances.
+## These modules will only globally store class definition, without creating instances.
 MODULE_INIT_EXCLUDES = ["file", "filewindow"]
 
 ## List of modules to import.
@@ -14,6 +14,7 @@ MODULE_IMPORT_ORDER = [
 	"config",
 	"file",
 	"filewindow",
+	"filewindowmanager",
 #	"syntaxhighlighting",
 #	"windowbar",
 #	"linenumbers",
@@ -35,7 +36,7 @@ MODULE_UPDATE_ORDER = [
 #	"linejumpbar",
 #	"savebar",
 #	"searchbar",
-#	"self.get(\"current_file_window\")", # ??
+	"filewindowmanager",
 #	"linenumbers",
 #	"syntaxhighlighting",
 #	"configcustomizer",

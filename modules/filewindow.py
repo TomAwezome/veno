@@ -1,12 +1,12 @@
 from modules.window import Window
 class FileWindow(Window):
-	def __init__(self, manager, name, file):
-		Window.__init__(self, manager, name)
+	def __init__(self, engine, file):
+		Window.__init__(self, engine)
 		self.viewport	= [0, 0] # [X, Y]
 		self.filecursor = [0, 0] # [X, Y]
 		self.file		= file
 		self.file_lines	= self.file.contents.splitlines()
-		self.config		= self.manager.get("config").options
+		self.config		= self.engine.get("config").options
 
 		self.is_modified		= True ## i.e. Modified since last highlight. Variable used for speed optimization of syntax highlighting algorithm.
 		self.select_position	= []
@@ -32,7 +32,7 @@ class FileWindow(Window):
 		for line in self.file_lines[viewport_y:viewport_y + window_max_y]:
 			line = line.expandtabs(tab_expand_size)[viewport_x:]
 
-			self.window.addnstr(window_y, 0, line, window_max_x - 1, self.manager.curses.color_pair(0))
+			self.window.addnstr(window_y, 0, line, window_max_x - 1, self.engine.curses.color_pair(0))
 			window_y += 1
 
 		self.drawCursor()
@@ -57,7 +57,7 @@ class FileWindow(Window):
 			cursorY = filecursor_y - viewport_y
 
 			if cursorX <= window_max_x - 2 and cursorX >= 0:
-				self.window.chgat(cursorY, cursorX, 1, self.manager.curses.color_pair(3) | self.manager.curses.A_REVERSE)
+				self.window.chgat(cursorY, cursorX, 1, self.engine.curses.color_pair(3) | self.engine.curses.A_REVERSE)
 
 # FUNCTIONS TO BE CALLED EXTERNALLY
 
@@ -597,7 +597,7 @@ class FileWindow(Window):
 		for line in self.file_lines:
 			file_string += line + "\n"
 
-		returnval = self.manager.get("save_bar").save()
+		returnval = self.engine.get("save_bar").save()
 		if returnval == True: # saveBar save filename get success, save file
 			self.file.save(file_string)
 
