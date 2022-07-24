@@ -10,11 +10,11 @@ class Highlighter:
 	## @brief      Constructs this Highlighter object.
 	##
 	## @param      self     This object
-	## @param      manager  The manager to allow access to drawing on window object in FileWindow
+	## @param      engine  The engine to allow access to drawing on window object in FileWindow
 	##
-	def __init__(self, manager):
-		## The manager to allow access to drawing on window object in FileWindow. TODO: replace manager with Window variable to further scale Highlighter
-		self.manager = manager
+	def __init__(self, engine):
+		## The engine to allow access to drawing on window object in FileWindow. TODO: replace engine with Window variable to further scale Highlighter
+		self.engine = engine
 
 		## Pygments formatter IRCFormatter
 		self.irc = IRCFormatter
@@ -23,10 +23,10 @@ class Highlighter:
 		self.lexer = None
 
 		## color_map dictionary with format of {"highlighterColorCode":RenderedColorCode}
-		self.color_map = self.manager.get("config").options["ColorMap"]
+		self.color_map = self.engine.get("config").options["ColorMap"]
 		
 		## FileWindow highlighter is attached to.
-		self.file_window = self.manager.get("current_file_window")
+		self.file_window = self.engine.get("current_file_window")
 		
 		try:
 			try:
@@ -50,7 +50,7 @@ class Highlighter:
 	##
 	def update(self):
 
-		self.file_window = self.manager.get("current_file_window")
+		self.file_window = self.engine.get("current_file_window")
 
 		viewport_x = self.file_window.getViewportX()
 		viewport_y = self.file_window.getViewportY()
@@ -58,7 +58,7 @@ class Highlighter:
 		window_max_x = self.file_window.getWindowMaxX()
 		window_code_lines = self.file_window.file_lines
 		window_code_string = '\n'.join(window_code_lines)
-		tab_expand_size = self.manager.get("config").options["TabExpandSize"]
+		tab_expand_size = self.engine.get("config").options["TabExpandSize"]
 
 		if self.lexer and self.file_window.is_modified:
 			highlighted_code_string = pygments.highlight(window_code_string, self.lexer, self.irc())
@@ -159,7 +159,7 @@ class Highlighter:
 					color_instances -= 1
 				for row in color_data:
 					if row != []:
-						self.file_window.window.chgat(window_y - viewport_y, row[1], row[2], self.manager.curses.color_pair(self.color_map[str(int(row[0]))]) | self.manager.curses.A_BOLD)
+						self.file_window.window.chgat(window_y - viewport_y, row[1], row[2], self.engine.curses.color_pair(self.color_map[str(int(row[0]))]) | self.engine.curses.A_BOLD)
 			window_y += 1
 			if window_y > viewport_y + window_max_y-1:
 				break
@@ -181,7 +181,7 @@ class Highlighter:
 	##
 	def drawSelect(self):
 
-		self.file_window = self.manager.get("current_file_window")
+		self.file_window = self.engine.get("current_file_window")
 
 		filecursor_x = self.file_window.getFilecursorX()
 		filecursor_y = self.file_window.getFilecursorY()
@@ -190,7 +190,7 @@ class Highlighter:
 		viewport_x = self.file_window.getViewportX()
 		viewport_y = self.file_window.getViewportY()
 		window_max_y = self.file_window.getWindowMaxY()
-		tab_expand_size = self.manager.get("config").options["TabExpandSize"]
+		tab_expand_size = self.engine.get("config").options["TabExpandSize"]
 
 		if self.file_window.is_select_on:
 
@@ -227,7 +227,7 @@ class Highlighter:
 							chgx = start_x - viewport_x + tab_diff
 							chgl = len(line[start_x:end_x].expandtabs(tab_expand_size))
 
-						self.file_window.window.chgat(start_y - viewport_y, chgx, chgl, self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
+						self.file_window.window.chgat(start_y - viewport_y, chgx, chgl, self.engine.curses.color_pair(5) | self.engine.curses.A_REVERSE)
 
 					elif start_y == viewport_y + y_offset:
 					# elif line is line that select starts on
@@ -243,7 +243,7 @@ class Highlighter:
 							chgx = start_x - viewport_x + tab_diff
 							chgl = len(line[start_x:].expandtabs(tab_expand_size))
 
-						self.file_window.window.chgat(y_offset, chgx, chgl, self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
+						self.file_window.window.chgat(y_offset, chgx, chgl, self.engine.curses.color_pair(5) | self.engine.curses.A_REVERSE)
 						# chgat blue from start[0] to end of line
 
 					elif end_y == viewport_y + y_offset:
@@ -252,7 +252,7 @@ class Highlighter:
 						if chgl < 0: # as viewport scrolls right, highlight length calculation dips into negative once start and end are both off screen.
 							chgl = 0 # this nulls the length argument of the chgat function, so anything from here is ensured not to change any characters.
 
-						self.file_window.window.chgat(y_offset, 0, chgl, self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
+						self.file_window.window.chgat(y_offset, 0, chgl, self.engine.curses.color_pair(5) | self.engine.curses.A_REVERSE)
 						# chgat blue from start to end[0] of line
 
 					else:
@@ -261,7 +261,7 @@ class Highlighter:
 						if chgl < 0: # as viewport scrolls right, highlight length calculation dips into negative once start and end are both off screen.
 							chgl = 0 # this nulls the length argument of the chgat function, so anything from here is ensured not to change any characters.
 
-						self.file_window.window.chgat(y_offset, 0, chgl, self.manager.curses.color_pair(5) | self.manager.curses.A_REVERSE)
+						self.file_window.window.chgat(y_offset, 0, chgl, self.engine.curses.color_pair(5) | self.engine.curses.A_REVERSE)
 						# chgat blue whole line
 
 				y_offset += 1

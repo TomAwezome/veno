@@ -11,7 +11,7 @@ class Manager:
 	##
 	## @param      self  This object
 	##
-	def __init__(self):
+	def __init__(self, engine):
 		## panel manager has curses. 
 		self.curses = curses
 		## screen variable

@@ -5,9 +5,9 @@ import inspect
 MODULE_IMPORT_ORDER = [
 	"config",
 	"manager",
-	"file",
-	"filewindow",
-	"syntaxhighlighting",
+#	"file",
+#	"filewindow",
+#	"syntaxhighlighting",
 	"windowbar",
 	"linenumbers",
 	"configcustomizer",
@@ -48,6 +48,10 @@ class Engine():
 	## @param      self  This object
 	##
 	def __init__(self):
+
+		## Dictionary of global objects
+		self.objects = {}
+
 		self.module_list = []
 		self.module_classes  = {}
 		for module_name in MODULE_IMPORT_ORDER:
@@ -59,6 +63,8 @@ class Engine():
 		for module_name, class_tuple in self.module_classes.items():
 			print(module_name, class_tuple)
 			obj = class_tuple[1](self) # call imported module class's __init__ with Engine as arg
+
+
 		"""
 		filenames = self.parseArgs().filename or ["untitled.txt"]
 
@@ -161,6 +167,32 @@ class Engine():
 		parser = argparse.ArgumentParser()										#
 		parser.add_argument("filename", nargs='*')								# create program parameter, filename/path
 		return parser.parse_args()												#
+
+	##
+	## @brief      Get an object.
+	##
+	## @param      self    This object
+	## @param      name    Name of the object to get.
+	##
+	def get(self, name):
+		if name in self.objects:
+			return self.objects[name]
+		else:
+			return None
+			
+	##
+	## @brief      Set an object key/value pair in the engine object dictionary.
+	##
+	## @param      self    This object
+	## @param      name    Name (key) of the object
+	## @param      obj     The object (value) to add
+	##
+	def set(self, name, obj):
+		if name == "" or name is None:
+			return None
+		self.objects[name] = obj
+		return obj
+
 	##
 	## @brief      terminate engine
 	##
