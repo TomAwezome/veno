@@ -8,35 +8,35 @@ class Keyboard:
 	## @brief      Constructs this Keyboard object.
 	##
 	## @param      self     This object
-	## @param      manager  The manager to allow scheduling actions in external Windows
+	## @param      engine  The engine to allow scheduling actions in external Windows
 	##
-	def __init__(self, manager):
+	def __init__(self, engine):
 
-		## The manager to allow scheduling actions in external Windows.
-		self.manager = manager
+		## The engine to allow scheduling actions in external Windows.
+		self.engine = engine
 
 		## The binding dictionary. Bindings saved as "keyname": function instance.
 		self.bindings = {}
 
 		## FileWindow instance for fileWindow keybindings.
-		self.file_window = self.manager.get("current_file_window")
+		self.file_window = self.engine.get("current_file_window")
 
-		self.line_jump_bar = self.manager.get("line_jump_bar")
+		self.line_jump_bar = self.engine.get("line_jump_bar")
 
-		self.save_bar = self.manager.get("save_bar")
+		self.save_bar = self.engine.get("save_bar")
 
-		self.search_bar = self.manager.get("search_bar")
+		self.search_bar = self.engine.get("search_bar")
 
-		self.debug_window = self.manager.get("debug_window")
+		self.debug_window = self.engine.get("debug_window")
 
-		self.open_bar = self.manager.get("open_bar")
+		self.open_bar = self.engine.get("open_bar")
 
-		self.help_window = self.manager.get("help_window")
+		self.help_window = self.engine.get("helpwindow")
 
-		self.diff_window = self.manager.get("diff_window")
+		self.diff_window = self.engine.get("diff_window")
 
 		## ConfigCustomizer instance for customizer keybindings. (Only used for toggle)
-		self.config_customizer = self.manager.get("config_customizer")
+		self.config_customizer = self.engine.get("config_customizer")
 
 		self.bind()
 		
@@ -47,14 +47,14 @@ class Keyboard:
 	##
 	def update(self):
 		try:
-			c = self.manager.screen.getch()
+			c = self.engine.screen.getch()
 		except KeyboardInterrupt:
 			c = -1
 			self.leave()
 
 		while c != -1:
-			self.manager.screen.timeout(20)
-			c = self.manager.curses.keyname(c)
+			self.engine.screen.timeout(20)
+			c = self.engine.curses.keyname(c)
 			c = c.decode("utf-8")
 
 			if c in self.bindings:
@@ -66,14 +66,14 @@ class Keyboard:
 			elif c in string.punctuation + string.digits + string.ascii_letters + " \t":
 				self.bindings["printable-character"](c)
 
-			c = self.manager.screen.getch()
+			c = self.engine.screen.getch()
 
-		self.manager.screen.timeout(-1)
+		self.engine.screen.timeout(-1)
 
 	def leave(self):
 		if not self.save_bar.confirmExitSave():
 			return
-		exception = self.manager.get("EngineException")
+		exception = self.engine.get("EngineException")
 		raise exception
 
 	##
@@ -90,6 +90,11 @@ class Keyboard:
 	## @param      self  This object
 	##
 	def bind(self):
+		self.bindings = {
+			"KEY_F(1)": self.help_window.toggle,
+			"^[": self.leave
+		}
+		"""
 		self.bindings = {
 			"KEY_UP":    self.file_window.moveFilecursorUp,
 			"KEY_DOWN":  self.file_window.moveFilecursorDown,
@@ -148,8 +153,9 @@ class Keyboard:
 			"KEY_F(12)": self.debug_window.toggle,
 			"^[": self.leave
 		}
+		"""
 
-		self.manager.set("keybindings", self.bindings)
+		self.engine.set("bindings", self.bindings)
 		
 	##
 	## @brief      Change FileWindow instance to which keybindings are bound to the previous instance.
@@ -157,15 +163,15 @@ class Keyboard:
 	## @param      self  This object
 	##
 	def selectPrevFileWindow(self):
-		self.file_window = self.manager.get("current_file_window")
+		self.file_window = self.engine.get("current_file_window")
 		self.file_window.panel.hide()
 		old_copy_lines = self.file_window.copy_lines # share copied text globally across fileWindows
-		file_window_list = self.manager.get("file_window_list")
+		file_window_list = self.engine.get("file_window_list")
 		if file_window_list.index(self.file_window) - 1 >= 0:
 			self.file_window = file_window_list[file_window_list.index(self.file_window) - 1]
 		else:
 			self.file_window = file_window_list[len(file_window_list) - 1]
-		self.manager.set("current_file_window", self.file_window) # re-set current file window in manager
+		self.engine.set("current_file_window", self.file_window) # re-set current file window in engine
 		self.file_window.panel.top()
 		self.file_window.panel.show()
 		self.file_window.is_modified = True
@@ -178,15 +184,15 @@ class Keyboard:
 	## @param      self  This object
 	##
 	def selectNextFileWindow(self):
-		self.file_window = self.manager.get("current_file_window")
+		self.file_window = self.engine.get("current_file_window")
 		self.file_window.panel.hide()
 		old_copy_lines = self.file_window.copy_lines # share copied text globally across fileWindows
-		file_window_list = self.manager.get("file_window_list")
+		file_window_list = self.engine.get("file_window_list")
 		if file_window_list.index(self.file_window) + 1 < len(file_window_list):
 			self.file_window = file_window_list[file_window_list.index(self.file_window) + 1]
 		else:
 			self.file_window = file_window_list[0]
-		self.manager.set("current_file_window", self.file_window) # re-set current file window in manager
+		self.engine.set("current_file_window", self.file_window) # re-set current file window in engine
 		self.file_window.panel.top()
 		self.file_window.panel.show()
 		self.file_window.is_modified = True
@@ -202,11 +208,10 @@ class Keyboard:
 		if not self.save_bar.confirmExitSave():
 			# TODO clean up how this confirm is handled and then revise above logic in leave()
 			return
-		file_window_to_remove = self.manager.get("current_file_window")
+		file_window_to_remove = self.engine.get("current_file_window")
 		self.selectNextFileWindow()
-		if file_window_to_remove is not self.manager.get("current_file_window"):
-			window_list = self.manager.get("file_window_list")
+		if file_window_to_remove is not self.engine.get("current_file_window"):
+			window_list = self.engine.get("file_window_list")
 			window_list.remove(file_window_to_remove)
 		else:
 			pass # TODO do something different if trying to close last filewindow in active list
-

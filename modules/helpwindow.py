@@ -1,7 +1,7 @@
 from modules.window import Window
 class HelpWindow(Window):
-	def __init__(self, manager, name):
-		Window.__init__(self, manager, name)
+	def __init__(self, engine):
+		Window.__init__(self, engine)
 
 		self.is_open = False
 
@@ -30,7 +30,7 @@ Multi-purpose text/code editor meant for easy and vast expandability.
 		self.panel.top()
 
 		self.help_body_text = "Keybindings:\n\n"
-		bindings = self.manager.get("keybindings")
+		bindings = self.engine.get("bindings")
 		items = bindings.items()
 		self.help_body_text += "Ctrl-C:".ljust(22) + "Cancel / Quit (Global Keybinding)\n\n"
 		for key, val in items:
@@ -50,7 +50,7 @@ Multi-purpose text/code editor meant for easy and vast expandability.
 			self.intended_height	= self.getScreenMaxY() - 1
 
 			self.keepWindowInMainScreen()
-			self.manager.update()
+			self.engine.update()
 
 			self.window.erase()
 
@@ -59,24 +59,24 @@ Multi-purpose text/code editor meant for easy and vast expandability.
 			window_max_x = self.getWindowMaxX()
 			self.window.box()
 			if window_max_y - 1 > 1:
-				self.window.addnstr(0, 1, self.help_top_text, window_max_x - 2, self.manager.curses.color_pair(0) | self.manager.curses.A_REVERSE)
+				self.window.addnstr(0, 1, self.help_top_text, window_max_x - 2, self.engine.curses.color_pair(0) | self.engine.curses.A_REVERSE)
 			for line in lines[self.view_y:]:
 				if window_y >= window_max_y - 1:
 					break
-				self.window.addnstr(window_y, 1, line, window_max_x - 2, self.manager.curses.color_pair(4))
+				self.window.addnstr(window_y, 1, line, window_max_x - 2, self.engine.curses.color_pair(4))
 				window_y += 1
 
-			self.manager.update()
+			self.engine.update()
 
 			try:
-				c = self.manager.screen.getch()
+				c = self.engine.screen.getch()
 			except KeyboardInterrupt:
 				self.toggle()
 				break
 			if c == -1:
 				continue
 
-			c = self.manager.curses.keyname(c)
+			c = self.engine.curses.keyname(c)
 			c = c.decode("utf-8")
 
 			if c in self.bindings:

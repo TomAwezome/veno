@@ -1,15 +1,15 @@
 class Window:
-	def __init__(self, manager, name):
-		self.manager = manager
-		self.name = name
+	def __init__(self, engine):
+		self.engine = engine
+		self.name = None
 		self.intended_x			= 0 #  
 		self.intended_y			= 0 # default
 		self.intended_width		= 1 # values
 		self.intended_height	= 1	# 
-		self.window = manager.curses.newwin(self.intended_height, self.intended_width, self.intended_y, self.intended_x)
+		self.window = engine.curses.newwin(self.intended_height, self.intended_width, self.intended_y, self.intended_x)
 		self.window.erase()
 		self.keepWindowInMainScreen()
-		self.panel = self.manager.addPanel(self, self.name)
+		self.panel = self.engine.addPanel(self)
 
 	def update(self):
 		self.window.erase()
@@ -32,24 +32,24 @@ class Window:
 		return self.window.getbegyx()[1]
 
 	def getScreenMaxY(self):
-		return self.manager.screen.getmaxyx()[0]
+		return self.engine.screen.getmaxyx()[0]
 		
 	def getScreenMaxX(self):
-		return self.manager.screen.getmaxyx()[1]
+		return self.engine.screen.getmaxyx()[1]
 
 	def getScreenBegY(self):
-		return self.manager.screen.getbegyx()[0]
+		return self.engine.screen.getbegyx()[0]
 		
 	def getScreenBegX(self):
-		return self.manager.screen.getbegyx()[1]
+		return self.engine.screen.getbegyx()[1]
 
 	def keepWindowInMainScreen(self):
 		offscreen_y = 0
 		offscreen_x = 0
 		is_offscreen = False
 		is_window_altered = False
-		screen_max_x = self.manager.screen.getmaxyx()[1]
-		screen_max_y = self.manager.screen.getmaxyx()[0]
+		screen_max_x = self.engine.screen.getmaxyx()[1]
+		screen_max_y = self.engine.screen.getmaxyx()[0]
 
 		# if actual window does not fit in main screen
 		if screen_max_y <= self.getWindowMaxY() + self.getWindowBegY():
@@ -138,4 +138,4 @@ class Window:
 			is_window_altered = True
 
 		if is_window_altered:
-			self.manager.screen.erase()
+			self.engine.screen.erase()

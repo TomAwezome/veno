@@ -11,6 +11,8 @@ class Config:
 	## @param      self    This object
 	##
 	def __init__(self, engine):
+		self.engine = engine
+
 		self.default_options = {
 			"TabExpandSize": 4,
 			"TabLength": 4,
@@ -75,8 +77,6 @@ class Config:
 		if extension in self.options["LanguageOverrides"]:
 			self.options = {**self.options, **self.options["LanguageOverrides"][extension]}
 		"""
-
-		engine.set("config", self)
 
 	def save(self):
 		self.text = json.dumps(self.options, sort_keys=True, indent=4, separators=(',', ': '))
