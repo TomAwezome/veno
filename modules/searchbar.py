@@ -2,13 +2,13 @@ import re, string
 
 from modules.window import Window
 class SearchBar(Window):
-	def __init__(self, manager, name):
-		Window.__init__(self, manager, name)
+	def __init__(self, engine):
+		Window.__init__(self, engine)
 		
 		## FileWindow instance SearchBar is attached to.
-		self.file_window = self.manager.get("current_file_window")
+		self.file_window = self.engine.get("current_file_window")
 		
-		self.config = self.manager.get("config").options
+		self.config = self.engine.get("config").options
 
 		self.search_cursor_x = 0
 		self.search_string = ""
@@ -27,7 +27,7 @@ class SearchBar(Window):
 		self.panel.hide()
 
 	def update(self):
-		self.file_window = self.manager.get("current_file_window")
+		self.file_window = self.engine.get("current_file_window")
 
 		self.cursor = self.file_window.filecursor
 
@@ -38,10 +38,10 @@ class SearchBar(Window):
 		self.intended_height	= 1
 
 		self.keepWindowInMainScreen()
-		self.manager.update()
+		self.engine.update()
 		self.keepWindowInMainScreen()
 
-		self.manager.update()
+		self.engine.update()
 
 	def bind(self):
 		self.search_bindings = {
@@ -151,22 +151,22 @@ class SearchBar(Window):
 		self.intended_height	= 1
 
 		self.keepWindowInMainScreen()
-		self.manager.update()
+		self.engine.update()
 		self.keepWindowInMainScreen()
 
 		tab_expand_size = self.config["TabExpandSize"]
 		prompt = "Search: "
-		self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
+		self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.engine.curses.color_pair(7) | self.engine.curses.A_REVERSE)
 
 		tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
 		if self.search_cursor_x + tab_diff + len(prompt) <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
-			self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+			self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
 
-		self.manager.update()
+		self.engine.update()
 		while True: # break out of this loop with enter key
 			self.window.erase()
 			try:
-				c = self.manager.screen.getch()
+				c = self.engine.screen.getch()
 			except KeyboardInterrupt:
 				self.panel.hide()
 				return
@@ -174,7 +174,7 @@ class SearchBar(Window):
 			if c == -1:
 				continue
 
-			c = self.manager.curses.keyname(c)
+			c = self.engine.curses.keyname(c)
 			c = c.decode("utf-8")
 
 			if c in self.search_bindings:
@@ -185,13 +185,13 @@ class SearchBar(Window):
 				break
 
 			self.keepWindowInMainScreen()
-			self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
+			self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.engine.curses.color_pair(7) | self.engine.curses.A_REVERSE)
 
 			tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
 			if self.search_cursor_x + tab_diff + len(prompt)<= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
-				self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+				self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
 
-			self.manager.update()
+			self.engine.update()
 
 		try:
 			pattern = re.compile(self.search_string)
@@ -266,33 +266,33 @@ class SearchBar(Window):
 		self.intended_height	= 1
 
 		self.keepWindowInMainScreen()	
-		self.manager.update()
+		self.engine.update()
 		self.keepWindowInMainScreen()
 
 		tab_expand_size = self.config["TabExpandSize"]
 
 		prompt = "Replace: "
 
-		self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
+		self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.engine.curses.color_pair(7) | self.engine.curses.A_REVERSE)
 
 		tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
 		if self.search_cursor_x + tab_diff + len(prompt) <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
-			self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+			self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
 
-		self.manager.update()
+		self.engine.update()
 
 	# search string
 	# keypress loop: begin catching characters
 		while True: # break out of this loop with enter key
 			self.window.erase()
 			try:
-				c = self.manager.screen.getch()
+				c = self.engine.screen.getch()
 			except KeyboardInterrupt:
 				self.panel.hide()
 				return
 			if c == -1:
 				continue
-			c = self.manager.curses.keyname(c)
+			c = self.engine.curses.keyname(c)
 			c = c.decode("utf-8")
 
 			if c in self.search_bindings:
@@ -303,13 +303,13 @@ class SearchBar(Window):
 				break
 			
 			self.keepWindowInMainScreen()
-			self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
+			self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.engine.curses.color_pair(7) | self.engine.curses.A_REVERSE)
 
 			tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
 			if self.search_cursor_x + tab_diff + len(prompt) <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
-				self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+				self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
 
-			self.manager.update()
+			self.engine.update()
 		
 		first_string = self.search_string
 		
@@ -319,29 +319,29 @@ class SearchBar(Window):
 		cursor_x_last = self.search_cursor_x
 		self.search_cursor_x = self.replace_cursor_x
 
-		self.manager.update()
+		self.engine.update()
 		self.keepWindowInMainScreen()
 
 		prompt = "Replace with: "
 
-		self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
+		self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.engine.curses.color_pair(7) | self.engine.curses.A_REVERSE)
 
 		tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
 		if self.search_cursor_x + tab_diff + len(prompt) <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
-			self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+			self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
 
-		self.manager.update()
+		self.engine.update()
 
 		while True: # break out of this loop with enter key
 			self.window.erase()
 			try:
-				c = self.manager.screen.getch()
+				c = self.engine.screen.getch()
 			except KeyboardInterrupt:
 				self.panel.hide()
 				return
 			if c == -1:
 				continue
-			c = self.manager.curses.keyname(c)
+			c = self.engine.curses.keyname(c)
 			c = c.decode("utf-8")
 
 			if c in self.search_bindings:
@@ -352,13 +352,13 @@ class SearchBar(Window):
 				break
 			
 			self.keepWindowInMainScreen()
-			self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
+			self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.engine.curses.color_pair(7) | self.engine.curses.A_REVERSE)
 
 			tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
 			if self.search_cursor_x + tab_diff + len(prompt) <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
-				self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+				self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
 
-			self.manager.update()
+			self.engine.update()
 			
 		second_string = self.search_string
 		self.replace_string = second_string
@@ -423,28 +423,28 @@ class SearchBar(Window):
 		self.file_window.is_modified = True
 		self.file_window.update() # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
 
-		self.manager.get("highlighter").update()
+		self.engine.get("syntaxhighlighting").update()
 
-		self.manager.update()
+		self.engine.update()
 
 		while True: # break out of this loop with enter key
 			if not self.next_match:
 				break
 
 			self.window.erase()
-			self.window.addnstr(0, 0, "Replace? (y/n/a) ['a' = All]", self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
+			self.window.addnstr(0, 0, "Replace? (y/n/a) ['a' = All]", self.getWindowMaxX() - 1, self.engine.curses.color_pair(7) | self.engine.curses.A_REVERSE)
 
-			self.manager.get("line_numbers").update()
+			self.engine.get("linenumbers").update()
 
-			self.manager.update()
+			self.engine.update()
 
 			try:
-				c = self.manager.screen.getch()
+				c = self.engine.screen.getch()
 			except KeyboardInterrupt:
 				break
 			if c == -1:
 				continue
-			c = self.manager.curses.keyname(c)
+			c = self.engine.curses.keyname(c)
 			c = c.decode("utf-8")
 
 			if c in self.replace_bindings:
@@ -499,9 +499,9 @@ class SearchBar(Window):
 			self.file_window.is_modified = True
 			self.file_window.update() # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
 
-			self.manager.get("highlighter").update()
+			self.engine.get("syntaxhighlighting").update()
 
-			self.manager.update()
+			self.engine.update()
 
 		self.window.erase()
 		self.keepWindowInMainScreen()
@@ -509,9 +509,9 @@ class SearchBar(Window):
 		self.file_window.is_modified = True
 		self.file_window.update() # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
 
-		self.manager.get("highlighter").update()
+		self.engine.get("syntaxhighlighting").update()
 
-		self.manager.update()
+		self.engine.update()
 
 		self.panel.hide()
 

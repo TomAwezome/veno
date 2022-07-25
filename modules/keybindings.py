@@ -25,7 +25,7 @@ class Keyboard:
 
 		self.save_bar = self.engine.get("savebar")
 
-		self.search_bar = self.engine.get("search_bar")
+		self.search_bar = self.engine.get("searchbar")
 
 		self.debug_window = self.engine.get("debugwindow")
 
@@ -120,6 +120,9 @@ class Keyboard:
 
 			"^T": self.diff_window.toggle,
 			"^L": self.line_jump_bar.jumpToLine,
+			"^F": self.search_bar.search,
+			"^G": self.search_bar.searchNext,
+			"^R": self.search_bar.replace,
 
 			"^D": self.file_window.deleteLineAtFilecursor,
 			"^J": self.file_window.newLineAtFilecursor,
@@ -144,10 +147,6 @@ class Keyboard:
 		}
 		"""
 		self.bindings = {
-
-			"^F": self.search_bar.search,
-			"^G": self.search_bar.searchNext,
-			"^R": self.search_bar.replace,
 
 			"^_": self.config_customizer.toggle,
 		}
