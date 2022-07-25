@@ -17,7 +17,7 @@ MODULE_IMPORT_ORDER = [
 	"filewindow",
 	"filewindowmanager",
 	"syntaxhighlighting",
-#	"windowbar",
+	"windowbar",
 	"linenumbers",
 	"configcustomizer",
 	"linejumpbar",
@@ -33,7 +33,7 @@ MODULE_IMPORT_ORDER = [
 # List of modules to call update() method on each Engine.turn().
 MODULE_UPDATE_ORDER = [
 	"keybindings",
-#	"windowbar",
+	"windowbar",
 	"linejumpbar",
 	"savebar",
 	"searchbar",
@@ -53,7 +53,7 @@ MODULE_CLASSES = {
 	"filewindow": "FileWindow",
 	"filewindowmanager": "FileWindowManager",
 	"syntaxhighlighting": "Highlighter",
-#	"windowbar": "WindowBar",
+	"windowbar": "WindowBar",
 	"linenumbers": "LineNumbersWindow",
 	"configcustomizer": "ConfigCustomizerWindow",
 	"linejumpbar": "LineJumpBar",
