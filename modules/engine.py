@@ -76,18 +76,11 @@ class Engine():
 	## @param      self  This object
 	##
 	def __init__(self):
-		nonexistent_import_modules = []
-
-		nonexistent_import_modules = [name for name in MODULE_IMPORT_ORDER if importlib.util.find_spec("modules." + name) == None]
-		for module_name in nonexistent_import_modules:
+		for module_name in [name for name in MODULE_IMPORT_ORDER if importlib.util.find_spec("modules." + name) == None]:
 			self.errorPrompt(f"[{module_name}] in 'import' list: FILE NOT FOUND.", "import", module_name)
-
-		missing_import_modules = [name for name in MODULE_UPDATE_ORDER if name not in MODULE_IMPORT_ORDER]
-		for module_name in missing_import_modules:
+		for module_name in [name for name in MODULE_UPDATE_ORDER if name not in MODULE_IMPORT_ORDER]:
 			self.errorPrompt(f"[{module_name}] in 'update' list: NOT FOUND in 'import' list.", "update", module_name)
-
-		missing_class_modules = [name for name in MODULE_IMPORT_ORDER if name not in MODULE_CLASSES]
-		for module_name in missing_class_modules:
+		for module_name in [name for name in MODULE_IMPORT_ORDER if name not in MODULE_CLASSES]:
 			self.errorPrompt(f"[{module_name}] in 'import' list: NO VALUE in 'module class' dictionary.", "import", module_name)
 
 		self.curses = curses
