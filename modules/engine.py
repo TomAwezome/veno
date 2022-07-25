@@ -56,6 +56,34 @@ class Engine():
 	## @param      self  This object
 	##
 	def __init__(self):
+		nonexistent_import_modules = []
+		for module_name in MODULE_IMPORT_ORDER:
+			if importlib.util.find_spec("modules." + module_name) == None:
+				nonexistent_import_modules.append(module_name)
+		for module_name in nonexistent_import_modules:
+			response = ""
+			while response != "y" and response != "n":
+				print(f"\n[{module_name}] in 'import' list: FILE NOT FOUND.")
+				response = input("Remove from 'import' list for this launch? (y/n) ")
+			if response == "y":
+				MODULE_IMPORT_ORDER.remove(module_name)
+			else:
+				exit(-1)
+
+		missing_import_modules = []
+		for module_name in MODULE_UPDATE_ORDER:
+			if module_name not in MODULE_IMPORT_ORDER:
+				missing_import_modules.append(module_name)
+		for module_name in missing_import_modules:
+			response = ""
+			while response != "y" and response != "n":
+				print(f"\n[{module_name}] in 'update' list: NOT FOUND in 'import' list.")
+				response = input("Remove from 'update' list for this launch?  (y/n) ")
+			if response == "y":
+				MODULE_UPDATE_ORDER.remove(module_name)
+			else:
+				exit(-1)
+
 		self.curses = curses
 
 		## screen variable
