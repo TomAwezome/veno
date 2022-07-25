@@ -2,11 +2,11 @@ from difflib import unified_diff as diff
 
 from modules.window import Window
 class DiffWindow(Window):
-	def __init__(self, manager, name):
-		Window.__init__(self, manager, name)
+	def __init__(self, engine):
+		Window.__init__(self, engine)
 
 		## FileWindow instance DiffWindow is attached to.
-		self.file_window = self.manager.get("current_file_window")
+		self.file_window = self.engine.get("current_file_window")
 
 		self.is_open = False
 
@@ -24,9 +24,9 @@ class DiffWindow(Window):
 
 		self.panel.top()
 
-		self.file_window = self.manager.get("current_file_window")
+		self.file_window = self.engine.get("current_file_window")
 		
-		File = self.manager.get("File")
+		File = self.engine.get("File")
 		file = File(self.file_window.file.source)
 		disk_file_lines = file.contents.splitlines()
 		
@@ -42,7 +42,7 @@ class DiffWindow(Window):
 			self.intended_height	= self.getScreenMaxY() - 1
 
 			self.keepWindowInMainScreen()
-			self.manager.update()
+			self.engine.update()
 
 			self.window.erase()
 			self.window.box()
@@ -53,25 +53,25 @@ class DiffWindow(Window):
 
 			if window_max_y - 1 < 1:
 				return
-			self.window.addnstr(0, 1, " DIFF (Press Ctrl-T to dismiss Diff window) ", window_max_x - 2, self.manager.curses.color_pair(0) | self.manager.curses.A_REVERSE)
+			self.window.addnstr(0, 1, " DIFF (Press Ctrl-T to dismiss Diff window) ", window_max_x - 2, self.engine.curses.color_pair(0) | self.engine.curses.A_REVERSE)
 
 			for line in diff_lines[self.view_y:]:
 				if window_y >= window_max_y - 1:
 					break
-				self.window.addnstr(window_y, 1, line, window_max_x - 2, self.manager.curses.color_pair(0))
+				self.window.addnstr(window_y, 1, line, window_max_x - 2, self.engine.curses.color_pair(0))
 				window_y += 1
 
-			self.manager.update()
+			self.engine.update()
 
 			try:
-				c = self.manager.screen.getch()
+				c = self.engine.screen.getch()
 			except KeyboardInterrupt:
 				self.toggle()
 				break
 			if c == -1:
 				continue
 
-			c = self.manager.curses.keyname(c)
+			c = self.engine.curses.keyname(c)
 			c = c.decode("utf-8")
 
 			if c in self.bindings:
@@ -107,4 +107,3 @@ class DiffWindow(Window):
 
 	def terminate(self):
 		pass
-

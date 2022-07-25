@@ -26,7 +26,7 @@ MODULE_IMPORT_ORDER = [
 	"debugwindow",
 #	"openbar",
 	"helpwindow",
-#	"diffwindow",
+	"diffwindow",
 	"keybindings",
 ]
 
@@ -44,7 +44,7 @@ MODULE_UPDATE_ORDER = [
 #	"openbar",
 	"debugwindow",
 	"helpwindow",
-#	"diffwindow",
+	"diffwindow",
 ]
 
 ##
