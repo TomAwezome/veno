@@ -35,6 +35,8 @@ class Keyboard:
 
 		self.diff_window = self.engine.get("diffwindow")
 
+		self.syntax_highlighting = self.engine.get("syntaxhighlighting")
+
 		## ConfigCustomizer instance for customizer keybindings. (Only used for toggle)
 		self.config_customizer = self.engine.get("configcustomizer")
 
@@ -169,6 +171,7 @@ class Keyboard:
 		self.file_window.is_modified = True
 		self.file_window.copy_lines = old_copy_lines
 		self.bind() # kludge ... bindings array holds function pointers to specific FileWindow object instances... we have to rebind to keep this implementation...
+		self.syntax_highlighting.updateLexer()
 
 	##
 	## @brief      Change FileWindow instance to which keybindings are bound to the next instance.
@@ -190,6 +193,7 @@ class Keyboard:
 		self.file_window.is_modified = True
 		self.file_window.copy_lines = old_copy_lines
 		self.bind() # kludge ... bindings array holds function pointers to specific FileWindow object instances... we have to rebind to keep this implementation...
+		self.syntax_highlighting.updateLexer()
 
 	##
 	## @brief      Close FileWindow instance.

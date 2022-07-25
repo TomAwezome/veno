@@ -27,22 +27,27 @@ class Highlighter:
 		
 		## FileWindow highlighter is attached to.
 		self.file_window = self.engine.get("current_file_window")
-		
+
+		self.updateLexer()
+
+	##
+	## @brief      Update active Lexer that syntax highlighter is using. Called by Keybindings module when changing FileWindow.
+	##
+	## @param      self  This object
+	##
+	def updateLexer(self):
+		self.file_window = self.engine.get("current_file_window")		
 		try:
 			try:
-				self.lexer = lexers.guess_lexer_for_filename(
-						self.file_window.file.source,
-						self.file_window.file.contents
-					)
+				self.lexer = lexers.guess_lexer_for_filename(self.file_window.file.source, self.file_window.file.contents)
 			except:
-				self.lexer = lexers.guess_lexer(
-						self.file_window.file.contents
-					)
+				self.lexer = lexers.guess_lexer(self.file_window.file.contents)
 			if self.lexer.name == "PHP":
 				self.lexer = lexers.PhpLexer(startinline=True)
 		except:
 			pass
 		self.file_window.is_modified = True
+
 	##
 	## @brief      Update syntax highlighting on fileWindow
 	##
@@ -265,3 +270,4 @@ class Highlighter:
 						# chgat blue whole line
 
 				y_offset += 1
+
