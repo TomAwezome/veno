@@ -206,8 +206,7 @@ class Engine():
 
 	def errorPrompt(self, prompt, list_name, module_name):
 		response = ""
-		prompt_footer = f"\nRemove from '{list_name}' list for this launch? (y/n) "
-		prompt = "\n" + str(prompt) + prompt_footer
+		prompt = "\n" + str(prompt) + f"\nRemove from '{list_name}' list for this launch? (y/n) "
 		while response != "y" and response != "n":
 			response = input(prompt)
 		if response == "y":
