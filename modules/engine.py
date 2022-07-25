@@ -3,6 +3,7 @@ import importlib
 import inspect
 import curses
 import curses.panel as panel
+import traceback
 
 ## List of modules to NOT call __init__ during module import, and NOT call terminate() during program shutdown.
 ## These modules will only globally store class definition, without creating instances.
@@ -114,7 +115,15 @@ class Engine():
 			self.module_list.append(m)
 			self.module_classes[module_name] = class_tuple = inspect.getmembers(m, inspect.isclass)[0]
 			if module_name not in MODULE_INIT_EXCLUDES:
-				self.module_instances[module_name] = obj = class_tuple[1](self) # call imported module class's __init__ with Engine as arg
+				try:
+					self.module_instances[module_name] = obj = class_tuple[1](self) # call imported module class's __init__ with Engine as arg
+				except:
+					self.terminate()
+					print(f"\n[{module_name}] in 'import' list: ERROR during initialization.\n")
+					traceback.print_exc()
+					print("")
+					exit(-1)
+
 				self.set(module_name, obj)
 			else:
 				self.set(class_tuple[1].__name__, class_tuple[1]) # put module class definition into global objects dictionary with module class name as key
@@ -200,5 +209,6 @@ class Engine():
 		MODULE_IMPORT_ORDER.reverse()
 		for module_name in MODULE_IMPORT_ORDER:
 			if module_name not in MODULE_INIT_EXCLUDES:
-				self.module_instances[module_name].terminate()
+				if module_name in self.module_instances:
+					self.module_instances[module_name].terminate()
 

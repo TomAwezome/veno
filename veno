@@ -33,7 +33,7 @@ while True:
 		break
 	except:
 		engine.terminate()
-		str(traceback.print_exc())  # Print the exception
+		traceback.print_exc()  # Print the exception
 		break
 
 profPrintStats()
