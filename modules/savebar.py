@@ -2,13 +2,13 @@ import string
 
 from modules.window import Window
 class SaveBar(Window):
-	def __init__(self, manager, name):
-		Window.__init__(self, manager, name)
+	def __init__(self, engine):
+		Window.__init__(self, engine)
 
 		## FileWindow instance SaveBar is attached to.
-		self.file_window = self.manager.get("current_file_window")
+		self.file_window = self.engine.get("current_file_window")
 
-		self.config = self.manager.get("config").options
+		self.config = self.engine.get("config").options
 
 		self.save_cursor_x = 0
 		self.save_string = self.file_window.file.source
@@ -20,7 +20,7 @@ class SaveBar(Window):
 		self.panel.hide()
 
 	def update(self):
-		self.file_window = self.manager.get("current_file_window")
+		self.file_window = self.engine.get("current_file_window")
 
 		self.cursor = self.file_window.filecursor
 
@@ -31,10 +31,10 @@ class SaveBar(Window):
 		self.intended_height	= 1
 
 		self.keepWindowInMainScreen()
-		self.manager.update()
+		self.engine.update()
 		self.keepWindowInMainScreen()
 
-		self.manager.update()
+		self.engine.update()
 
 	def bind(self):
 
@@ -97,7 +97,7 @@ class SaveBar(Window):
 		self.intended_height	= 1
 
 		self.keepWindowInMainScreen()
-		self.manager.update()
+		self.engine.update()
 		self.keepWindowInMainScreen()
 
 		result = False
@@ -106,19 +106,19 @@ class SaveBar(Window):
 			self.keepWindowInMainScreen()
 
 			self.window.erase()
-			self.window.addnstr(0, 0, "Save before exit? (Y/N or Enter/Ctrl-C)", self.getWindowMaxX() - 1, self.manager.curses.color_pair(4) | self.manager.curses.A_REVERSE)
+			self.window.addnstr(0, 0, "Save before exit? (Y/N or Enter/Ctrl-C)", self.getWindowMaxX() - 1, self.engine.curses.color_pair(4) | self.engine.curses.A_REVERSE)
 
-			self.manager.update()
+			self.engine.update()
 
 			try:
-				c = self.manager.screen.getch()
+				c = self.engine.screen.getch()
 			except KeyboardInterrupt:
 				result = True # (Ctrl-C to refuse exit save)
 				break
 			if c == -1:
 				continue
 
-			c = self.manager.curses.keyname(c)
+			c = self.engine.curses.keyname(c)
 			c = c.decode("utf-8")
 			if c.lower() == 'n':
 				result = True
@@ -144,7 +144,7 @@ class SaveBar(Window):
 		returnval = True
 
 		self.keepWindowInMainScreen()
-		self.manager.update()
+		self.engine.update()
 		self.keepWindowInMainScreen()
 
 		self.save_string = self.file_window.file.source
@@ -153,23 +153,23 @@ class SaveBar(Window):
 		# keypress loop: begin catching characters
 		self.window.erase()
 		prompt = "Save Filename: "
-		self.window.addnstr(0, 0, prompt + self.save_string, self.getWindowMaxX() - 1, self.manager.curses.color_pair(4) | self.manager.curses.A_REVERSE)
+		self.window.addnstr(0, 0, prompt + self.save_string, self.getWindowMaxX() - 1, self.engine.curses.color_pair(4) | self.engine.curses.A_REVERSE)
 
 		if self.save_cursor_x <= self.getWindowMaxX() - 2 and self.save_cursor_x >= 0:
-			self.window.chgat(0, self.save_cursor_x + len(prompt), 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+			self.window.chgat(0, self.save_cursor_x + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
 
-		self.manager.update()
+		self.engine.update()
 		while True: # break out of this loop with enter key
 			self.window.erase()
 			try:
-				c = self.manager.screen.getch()
+				c = self.engine.screen.getch()
 			except KeyboardInterrupt:
 				returnval = False
 				self.panel.hide()
 				break
 			if c == -1:
 				continue
-			c = self.manager.curses.keyname(c)
+			c = self.engine.curses.keyname(c)
 			c = c.decode("utf-8")
 
 			if c in self.save_bindings:
@@ -181,12 +181,12 @@ class SaveBar(Window):
 					break
 
 			self.keepWindowInMainScreen()
-			self.window.addnstr(0, 0, prompt + self.save_string, self.getWindowMaxX() - 1, self.manager.curses.color_pair(4) | self.manager.curses.A_REVERSE)
+			self.window.addnstr(0, 0, prompt + self.save_string, self.getWindowMaxX() - 1, self.engine.curses.color_pair(4) | self.engine.curses.A_REVERSE)
 
 			if self.save_cursor_x + len(prompt) <= self.getWindowMaxX() - 2 and self.save_cursor_x >= 0:
-				self.window.chgat(0, self.save_cursor_x + len(prompt), 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+				self.window.chgat(0, self.save_cursor_x + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
 
-			self.manager.update()
+			self.engine.update()
 
 		self.file_window.file.source = self.save_string
 		self.panel.hide()

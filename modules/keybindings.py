@@ -23,7 +23,7 @@ class Keyboard:
 
 		self.line_jump_bar = self.engine.get("line_jump_bar")
 
-		self.save_bar = self.engine.get("save_bar")
+		self.save_bar = self.engine.get("savebar")
 
 		self.search_bar = self.engine.get("search_bar")
 
