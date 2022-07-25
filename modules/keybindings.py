@@ -91,12 +91,6 @@ class Keyboard:
 	##
 	def bind(self):
 		self.bindings = {
-			"KEY_F(1)": self.help_window.toggle,
-			"KEY_F(12)": self.debug_window.toggle,
-			"^[": self.leave
-		}
-		"""
-		self.bindings = {
 			"KEY_UP":    self.file_window.moveFilecursorUp,
 			"KEY_DOWN":  self.file_window.moveFilecursorDown,
 			"KEY_LEFT":  self.file_window.moveFilecursorLeft,
@@ -121,23 +115,10 @@ class Keyboard:
 
 			"KEY_BTAB":  self.file_window.unindentSelectedLines,
 
-			"KEY_F(1)": self.help_window.toggle,
-
-			"^T": self.diff_window.toggle,
-
 			"^D": self.file_window.deleteLineAtFilecursor,
 			"^J": self.file_window.newLineAtFilecursor,
 			"^W": self.file_window.saveFile,
 			"^I": self.file_window.enterTextAtFilecursor,
-
-			"^O": self.open_bar.openFile,
-
-			"^F": self.search_bar.search,
-			"^L": self.line_jump_bar.jumpToLine,
-			"^G": self.search_bar.searchNext,
-			"^R": self.search_bar.replace,
-
-			"^_": self.config_customizer.toggle,
 
 			"^A": self.file_window.selectAll,
 			"^B": self.file_window.toggleSelect,
@@ -151,8 +132,23 @@ class Keyboard:
 			"kDN5":  self.file_window.moveViewportDown,
 
 			"KEY_F(9)": self.closeFileWindow,
+			"KEY_F(1)": self.help_window.toggle,
 			"KEY_F(12)": self.debug_window.toggle,
 			"^[": self.leave
+		}
+		"""
+		self.bindings = {
+
+			"^T": self.diff_window.toggle,
+
+			"^O": self.open_bar.openFile,
+
+			"^F": self.search_bar.search,
+			"^L": self.line_jump_bar.jumpToLine,
+			"^G": self.search_bar.searchNext,
+			"^R": self.search_bar.replace,
+
+			"^_": self.config_customizer.toggle,
 		}
 		"""
 
