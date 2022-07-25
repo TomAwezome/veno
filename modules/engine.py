@@ -33,6 +33,7 @@ MODULE_IMPORT_ORDER = [
 # List of modules to call update() method on each Engine.turn().
 MODULE_UPDATE_ORDER = [
 	"keybindings",
+	"config",
 	"windowbar",
 	"linejumpbar",
 	"savebar",

@@ -72,11 +72,15 @@ class Config:
 			self.options = self.default_options
 			file.close()
 
-		"""
-		extension = os.path.splitext(filename)[1][1:]
+		extension = os.path.splitext(self.engine.filenames[0])[1][1:]
 		if extension in self.options["LanguageOverrides"]:
 			self.options = {**self.options, **self.options["LanguageOverrides"][extension]}
-		"""
+
+	def update(self):
+		current_filename = self.engine.get("current_file_window").file.source
+		extension = os.path.splitext(current_filename)[1][1:]
+		if extension in self.options["LanguageOverrides"]:
+			self.options = {**self.options, **self.options["LanguageOverrides"][extension]}
 
 	def save(self):
 		self.text = json.dumps(self.options, sort_keys=True, indent=4, separators=(',', ': '))

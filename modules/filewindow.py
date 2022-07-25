@@ -22,6 +22,8 @@ class FileWindow(Window):
 
 		self.keepWindowInMainScreen()
 
+		self.config = self.engine.get("config").options
+
 		window_y = 0
 		tab_expand_size = self.config["TabExpandSize"]
 		viewport_y = self.getViewportY()
