@@ -77,47 +77,18 @@ class Engine():
 	##
 	def __init__(self):
 		nonexistent_import_modules = []
-		for module_name in MODULE_IMPORT_ORDER:
-			if importlib.util.find_spec("modules." + module_name) == None:
-				nonexistent_import_modules.append(module_name)
+
+		nonexistent_import_modules = [name for name in MODULE_IMPORT_ORDER if importlib.util.find_spec("modules." + name) == None]
 		for module_name in nonexistent_import_modules:
-			response = ""
-			while response != "y" and response != "n":
-				print(f"\n[{module_name}] in 'import' list: FILE NOT FOUND.")
-				response = input("Remove from 'import' list for this launch? (y/n) ")
-			if response == "y":
-				MODULE_IMPORT_ORDER.remove(module_name)
-			else:
-				exit(-1)
+			self.errorPrompt(f"[{module_name}] in 'import' list: FILE NOT FOUND.", "import", module_name)
 
-		missing_import_modules = []
-		for module_name in MODULE_UPDATE_ORDER:
-			if module_name not in MODULE_IMPORT_ORDER:
-				missing_import_modules.append(module_name)
+		missing_import_modules = [name for name in MODULE_UPDATE_ORDER if name not in MODULE_IMPORT_ORDER]
 		for module_name in missing_import_modules:
-			response = ""
-			while response != "y" and response != "n":
-				print(f"\n[{module_name}] in 'update' list: NOT FOUND in 'import' list.")
-				response = input("Remove from 'update' list for this launch?  (y/n) ")
-			if response == "y":
-				MODULE_UPDATE_ORDER.remove(module_name)
-			else:
-				exit(-1)
+			self.errorPrompt(f"[{module_name}] in 'update' list: NOT FOUND in 'import' list.", "update", module_name)
 
-		missing_class_modules = []
-		for module_name in MODULE_IMPORT_ORDER:
-			if module_name not in MODULE_CLASSES:
-				missing_class_modules.append(module_name)
+		missing_class_modules = [name for name in MODULE_IMPORT_ORDER if name not in MODULE_CLASSES]
 		for module_name in missing_class_modules:
-			response = ""
-			while response != "y" and response != "n":
-				print(f"\n[{module_name}] in 'import' list: NO VALUE in 'module class' dictionary.")
-				response = input("Remove from 'import' list for this launch? (y/n) ")
-			if response == "y":
-				MODULE_IMPORT_ORDER.remove(module_name)
-			else:
-				exit(-1)
-
+			self.errorPrompt(f"[{module_name}] in 'import' list: NO VALUE in 'module class' dictionary.", "import", module_name)
 
 		self.curses = curses
 
@@ -148,11 +119,7 @@ class Engine():
 			try:
 				m = importlib.import_module("modules." + module_name)
 			except:
-				self.terminate()
-				print(f"\n[{module_name}] in 'import' list: ERROR during import.\n")
-				traceback.print_exc()
-				print("")
-				exit(-1)
+				self.panic(f"[{module_name}] in 'import' list: ERROR during import.\n")
 			self.module_list.append(m)
 			class_tuple_list = inspect.getmembers(m, inspect.isclass)
 			class_tuple = None
@@ -161,20 +128,20 @@ class Engine():
 					class_tuple = c_t
 					break
 			if class_tuple == None:
-				self.terminate()
-				print(f"\n[{module_name}] in 'import' list: class <{MODULE_CLASSES[module_name]}> NOT FOUND.\n")
-				print(f"Possible typo? Check MODULE_CLASSES in engine.py, and check {module_name}.py\n")
-				exit(-1)
+				self.panic(f"[{module_name}] in 'import' list: class <{MODULE_CLASSES[module_name]}> NOT FOUND.\n"
+					"Possible typo? Check MODULE_CLASSES in engine.py, and check {module_name}.py", False)
 			self.module_classes[module_name] = class_tuple
 			if module_name not in MODULE_INIT_EXCLUDES:
+				class_function_list = inspect.getmembers(class_tuple[1], inspect.isfunction)
+				class_function_name_list = [name for name, obj in class_function_list]
+				if "terminate" not in class_function_name_list:
+					self.panic(f"[{module_name}] in 'import' list: {MODULE_CLASSES[module_name]}.terminate() function NOT FOUND.", False)
+				if module_name in MODULE_UPDATE_ORDER and "update" not in class_function_name_list:
+					self.panic(f"[{module_name}] in 'import' list: {MODULE_CLASSES[module_name]}.update() function NOT FOUND.", False)
 				try:
 					self.module_instances[module_name] = obj = class_tuple[1](self) # call imported module class's __init__ with Engine as arg
 				except:
-					self.terminate()
-					print(f"\n[{module_name}] in 'import' list: ERROR during initialization.\n")
-					traceback.print_exc()
-					print("")
-					exit(-1)
+					self.panic(f"[{module_name}] in 'import' list: ERROR during initialization.")
 
 				self.set(module_name, obj)
 			else:
@@ -247,6 +214,29 @@ class Engine():
 	##
 	def addPanel(self, window):
 		return self.panel.new_panel(window.window)
+
+
+	def errorPrompt(self, prompt, list_name, module_name):
+		response = ""
+		prompt_footer = f"\nRemove from '{list_name}' list for this launch? (y/n) "
+		prompt = "\n" + str(prompt) + prompt_footer
+		while response != "y" and response != "n":
+			response = input(prompt)
+		if response == "y":
+			if list_name == "import":
+				MODULE_IMPORT_ORDER.remove(module_name)
+			elif list_name == "update":
+				MODULE_UPDATE_ORDER.remove(module_name)
+		else:
+			exit(-1)
+
+	def panic(self, prompt, is_exception=True):
+		self.terminate()
+		print("\n" + str(prompt) + "\n")
+		if is_exception:
+			traceback.print_exc()
+		print("")
+		exit(-1)
 
 	##
 	## @brief      terminate engine
