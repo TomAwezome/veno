@@ -2,8 +2,8 @@ import string
 
 from modules.window import Window
 class OpenBar(Window):
-	def __init__(self, manager, name):
-		Window.__init__(self, manager, name)
+	def __init__(self, engine):
+		Window.__init__(self, engine)
 
 		self.open_cursor_x = 0
 		self.open_string = ""
@@ -23,10 +23,10 @@ class OpenBar(Window):
 		self.intended_height	= 1
 
 		self.keepWindowInMainScreen()
-		self.manager.update()
+		self.engine.update()
 		self.keepWindowInMainScreen()
 
-		self.manager.update()
+		self.engine.update()
 
 	def bind(self):
 
@@ -90,30 +90,30 @@ class OpenBar(Window):
 		result = True
 		
 		self.keepWindowInMainScreen()
-		self.manager.update()
+		self.engine.update()
 		self.keepWindowInMainScreen()
 
 		# openfile string
 		# keypress loop: begin catching characters
 		self.window.erase()
 		prompt = "Open Filename: "
-		self.window.addnstr(0, 0, prompt + self.open_string, self.getWindowMaxX() - 1, self.manager.curses.color_pair(4) | self.manager.curses.A_REVERSE)
+		self.window.addnstr(0, 0, prompt + self.open_string, self.getWindowMaxX() - 1, self.engine.curses.color_pair(4) | self.engine.curses.A_REVERSE)
 
 		if self.open_cursor_x <= self.getWindowMaxX() - 2 and self.open_cursor_x >= 0:
-			self.window.chgat(0, self.open_cursor_x + len(prompt), 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+			self.window.chgat(0, self.open_cursor_x + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
 
-		self.manager.update()
+		self.engine.update()
 		while True: # break out of this loop with enter key
 			self.window.erase()
 			try:
-				c = self.manager.screen.getch()
+				c = self.engine.screen.getch()
 			except KeyboardInterrupt:
 				result = False
 				self.panel.hide()
 				return result
 			if c == -1:
 				continue
-			c = self.manager.curses.keyname(c)
+			c = self.engine.curses.keyname(c)
 			c = c.decode("utf-8")
 
 			if c in self.open_bindings:
@@ -125,31 +125,31 @@ class OpenBar(Window):
 					break
 
 			self.keepWindowInMainScreen()
-			self.window.addnstr(0, 0, prompt + self.open_string, self.getWindowMaxX() - 1, self.manager.curses.color_pair(4) | self.manager.curses.A_REVERSE)
+			self.window.addnstr(0, 0, prompt + self.open_string, self.getWindowMaxX() - 1, self.engine.curses.color_pair(4) | self.engine.curses.A_REVERSE)
 
 			if self.open_cursor_x + len(prompt) <= self.getWindowMaxX() - 2 and self.open_cursor_x >= 0:
-				self.window.chgat(0, self.open_cursor_x + len(prompt), 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+				self.window.chgat(0, self.open_cursor_x + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
 
-			self.manager.update()
+			self.engine.update()
 
-		File = self.manager.get("File")
-		FileWindow = self.manager.get("FileWindow")
+		File = self.engine.get("File")
+		FileWindow = self.engine.get("FileWindow")
 		file = File(self.open_string)
 		if not file.exists:
 			self.window.erase()
-			self.window.addnstr(0, 0, "File not found. Begin a new file? (Y/N or Enter/Ctrl-C)", self.getWindowMaxX() - 1, self.manager.curses.color_pair(4) | self.manager.curses.A_REVERSE)
-			self.manager.update()
+			self.window.addnstr(0, 0, "File not found. Begin a new file? (Y/N or Enter/Ctrl-C)", self.getWindowMaxX() - 1, self.engine.curses.color_pair(4) | self.engine.curses.A_REVERSE)
+			self.engine.update()
 			while True: # break out of this loop with enter key
 				self.window.erase()
 				try:
-					c = self.manager.screen.getch()
+					c = self.engine.screen.getch()
 				except KeyboardInterrupt:
 					result = False
 					self.panel.hide()
 					return False
 				if c == -1:
 					continue
-				c = self.manager.curses.keyname(c)
+				c = self.engine.curses.keyname(c)
 				c = c.decode("utf-8")
 
 				if c.lower() == 'n':
@@ -158,8 +158,8 @@ class OpenBar(Window):
 				if c == "^J" or c.lower() == "y":
 					break
 
-		file_window = FileWindow(self.manager, "", file)		# Create fileWindow.
-		self.manager.get("file_window_list").append(file_window)
+		file_window = FileWindow(self.engine, file) # Create fileWindow.
+		self.engine.get("file_window_list").append(file_window)
 
 		self.panel.hide()
 		

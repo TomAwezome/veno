@@ -29,7 +29,7 @@ class Keyboard:
 
 		self.debug_window = self.engine.get("debugwindow")
 
-		self.open_bar = self.engine.get("open_bar")
+		self.open_bar = self.engine.get("openbar")
 
 		self.help_window = self.engine.get("helpwindow")
 
@@ -115,6 +115,9 @@ class Keyboard:
 
 			"KEY_BTAB":  self.file_window.unindentSelectedLines,
 
+
+			"^O": self.open_bar.openFile,
+
 			"^T": self.diff_window.toggle,
 			"^L": self.line_jump_bar.jumpToLine,
 
@@ -141,8 +144,6 @@ class Keyboard:
 		}
 		"""
 		self.bindings = {
-
-			"^O": self.open_bar.openFile,
 
 			"^F": self.search_bar.search,
 			"^G": self.search_bar.searchNext,
