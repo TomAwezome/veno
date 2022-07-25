@@ -2,13 +2,13 @@ import string
 
 from modules.window import Window
 class LineJumpBar(Window):
-	def __init__(self, manager, name):
-		Window.__init__(self, manager, name)
+	def __init__(self, engine):
+		Window.__init__(self, engine)
 
 		## FileWindow instance LineJumpBar is attached to.
-		self.file_window = self.manager.get("current_file_window")
+		self.file_window = self.engine.get("current_file_window")
 
-		self.config = self.manager.get("config").options
+		self.config = self.engine.get("config").options
 
 		self.line_jump_cursor_x = 0
 		self.line_jump_string = ""
@@ -20,7 +20,7 @@ class LineJumpBar(Window):
 		self.panel.hide()
 
 	def update(self):
-		self.file_window = self.manager.get("current_file_window")
+		self.file_window = self.engine.get("current_file_window")
 
 		self.cursor = self.file_window.filecursor
 
@@ -31,10 +31,10 @@ class LineJumpBar(Window):
 		self.intended_height	= 1
 
 		self.keepWindowInMainScreen()
-		self.manager.update()
+		self.engine.update()
 		self.keepWindowInMainScreen()
 
-		self.manager.update()
+		self.engine.update()
 
 
 	def bind(self):
@@ -96,27 +96,27 @@ class LineJumpBar(Window):
 		self.intended_height	= 1
 
 		self.keepWindowInMainScreen()
-		self.manager.update()
+		self.engine.update()
 
 		prompt = "Line: "
 
-		self.window.addnstr(0, 0, prompt + self.line_jump_string, self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
+		self.window.addnstr(0, 0, prompt + self.line_jump_string, self.getWindowMaxX() - 1, self.engine.curses.color_pair(7) | self.engine.curses.A_REVERSE)
 
 		if self.line_jump_cursor_x + len(prompt) <= self.getWindowMaxX() - 2 and self.line_jump_cursor_x >= 0:
-			self.window.chgat(0, self.line_jump_cursor_x + len(prompt), 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+			self.window.chgat(0, self.line_jump_cursor_x + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
 
-		self.manager.update()
+		self.engine.update()
 
 		while True: # break out of this loop with enter key
 			self.window.erase()
 			try:
-				c = self.manager.screen.getch()
+				c = self.engine.screen.getch()
 			except KeyboardInterrupt:
 				self.panel.hide()
 				return
 			if c == -1:
 				continue
-			c = self.manager.curses.keyname(c)
+			c = self.engine.curses.keyname(c)
 			c = c.decode("utf-8")
 
 			if c in self.line_jump_bindings:
@@ -127,12 +127,12 @@ class LineJumpBar(Window):
 				break
 
 			self.keepWindowInMainScreen()
-			self.window.addnstr(0, 0, prompt + self.line_jump_string, self.getWindowMaxX() - 1, self.manager.curses.color_pair(7) | self.manager.curses.A_REVERSE)
+			self.window.addnstr(0, 0, prompt + self.line_jump_string, self.getWindowMaxX() - 1, self.engine.curses.color_pair(7) | self.engine.curses.A_REVERSE)
 
 			if self.line_jump_cursor_x + len(prompt) <= self.getWindowMaxX() - 2 and self.line_jump_cursor_x >= 0:
-				self.window.chgat(0, self.line_jump_cursor_x + len(prompt), 1, self.manager.curses.color_pair(2) | self.manager.curses.A_REVERSE)
+				self.window.chgat(0, self.line_jump_cursor_x + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
 
-			self.manager.update()
+			self.engine.update()
 
 		if self.line_jump_string != "":
 			lineNumber = int(self.line_jump_string)

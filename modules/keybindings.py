@@ -21,7 +21,7 @@ class Keyboard:
 		## FileWindow instance for fileWindow keybindings.
 		self.file_window = self.engine.get("current_file_window")
 
-		self.line_jump_bar = self.engine.get("line_jump_bar")
+		self.line_jump_bar = self.engine.get("linejumpbar")
 
 		self.save_bar = self.engine.get("savebar")
 
@@ -116,6 +116,7 @@ class Keyboard:
 			"KEY_BTAB":  self.file_window.unindentSelectedLines,
 
 			"^T": self.diff_window.toggle,
+			"^L": self.line_jump_bar.jumpToLine,
 
 			"^D": self.file_window.deleteLineAtFilecursor,
 			"^J": self.file_window.newLineAtFilecursor,
@@ -144,7 +145,6 @@ class Keyboard:
 			"^O": self.open_bar.openFile,
 
 			"^F": self.search_bar.search,
-			"^L": self.line_jump_bar.jumpToLine,
 			"^G": self.search_bar.searchNext,
 			"^R": self.search_bar.replace,
 

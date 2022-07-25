@@ -20,7 +20,7 @@ MODULE_IMPORT_ORDER = [
 #	"windowbar",
 	"linenumbers",
 #	"configcustomizer",
-#	"linejumpbar",
+	"linejumpbar",
 	"savebar",
 #	"searchbar",
 	"debugwindow",
@@ -34,7 +34,7 @@ MODULE_IMPORT_ORDER = [
 MODULE_UPDATE_ORDER = [
 	"keybindings",
 #	"windowbar",
-#	"linejumpbar",
+	"linejumpbar",
 	"savebar",
 #	"searchbar",
 	"filewindowmanager",
