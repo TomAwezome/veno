@@ -35,7 +35,7 @@ class DebugWindow(Window):
 
 		self.panel.top()
 
-		self.log("Manager Objects:")
+		self.log("Global Objects:")
 		self.log("---------------")
 		items = self.engine.global_objects.items()
 		for key, val in items:
