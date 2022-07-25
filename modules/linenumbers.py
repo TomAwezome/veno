@@ -1,10 +1,10 @@
 from modules.window import Window
 class LineNumbersWindow(Window):
-	def __init__(self, manager, name):
-		Window.__init__(self, manager, name)
+	def __init__(self, engine):
+		Window.__init__(self, engine)
 
 		## FileWindow instance that LineNumbersWindow is attached to.
-		self.file_window = self.manager.get("current_file_window")
+		self.file_window = self.engine.get("current_file_window")
 
 		self.intended_y			= self.file_window.getWindowBegY()
 		self.intended_width		= 5
@@ -23,9 +23,9 @@ class LineNumbersWindow(Window):
 	def update(self):
 		self.window.erase()
 
-		self.file_window = self.manager.get("current_file_window")
+		self.file_window = self.engine.get("current_file_window")
 		
-		if not self.manager.get("config").options["ShowLineNumbers"]:
+		if not self.engine.get("config").options["ShowLineNumbers"]:
 			self.file_window.intended_x	= 0
 			self.file_window.window.mvwin(self.file_window.intended_y, self.file_window.intended_x)
 			self.file_window.keepWindowInMainScreen()
@@ -55,7 +55,7 @@ class LineNumbersWindow(Window):
 		if self.intended_width <= self.getWindowMaxX():
 			while window_y < self.getWindowMaxY() and window_y + current_line < total_lines:
 				line_number_string = str(current_line + window_y + 1)
-				self.window.addstr(window_y, 0, line_number_string + (" " * (len(str(total_lines)) - len(line_number_string))) + " ", self.manager.curses.A_REVERSE)
+				self.window.addstr(window_y, 0, line_number_string + (" " * (len(str(total_lines)) - len(line_number_string))) + " ", self.engine.curses.A_REVERSE)
 				window_y += 1
 
 	def terminate(self):
