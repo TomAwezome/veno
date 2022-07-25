@@ -36,7 +36,7 @@ class Keyboard:
 		self.diff_window = self.engine.get("diffwindow")
 
 		## ConfigCustomizer instance for customizer keybindings. (Only used for toggle)
-		self.config_customizer = self.engine.get("config_customizer")
+		self.config_customizer = self.engine.get("configcustomizer")
 
 		self.bind()
 		
@@ -115,6 +115,7 @@ class Keyboard:
 
 			"KEY_BTAB":  self.file_window.unindentSelectedLines,
 
+			"^_": self.config_customizer.toggle,
 
 			"^O": self.open_bar.openFile,
 
@@ -145,12 +146,6 @@ class Keyboard:
 			"KEY_F(12)": self.debug_window.toggle,
 			"^[": self.leave
 		}
-		"""
-		self.bindings = {
-
-			"^_": self.config_customizer.toggle,
-		}
-		"""
 
 		self.engine.set("bindings", self.bindings)
 		

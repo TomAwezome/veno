@@ -1,7 +1,7 @@
 from modules.window import Window
 class ConfigCustomizerWindow(Window):
-	def __init__(self, manager, name):
-		Window.__init__(self, manager, name)
+	def __init__(self, engine):
+		Window.__init__(self, engine)
 
 		self.intended_y	= self.intended_x = 0
 		self.intended_width		= self.getScreenMaxX()
@@ -21,7 +21,7 @@ class ConfigCustomizerWindow(Window):
 		self.viewport_y = 0
 
 		## Config instance.
-		self.config = self.manager.get("config")
+		self.config = self.engine.get("config")
 		## ConfigCustomizer keybindings dictionary stores functions
 		self.bindings = {}
 
@@ -157,7 +157,7 @@ class ConfigCustomizerWindow(Window):
 		if self.getWindowMaxY() <= 2 or self.getWindowMaxX() <= 2:
 			return # window is too small to print anything so quit while we're ahead.
 
-		self.window.addnstr(1, 1, name, self.getWindowMaxX() - 2, self.manager.curses.A_STANDOUT)
+		self.window.addnstr(1, 1, name, self.getWindowMaxX() - 2, self.engine.curses.A_STANDOUT)
 			
 		# Explaining some possibly hard to read code;
 		# this for loop increments i over a range of 1...windowMaxY to do the following with i:
@@ -186,20 +186,20 @@ class ConfigCustomizerWindow(Window):
 				self.window.addnstr(i + 1, 1, line_string, self.getWindowMaxX() - 2)
 
 				if name == "Color Customizer" and self.getWindowMaxX() > len(line_string) + 1:
-					self.window.chgat(i + 1, color_highlight_index, len(option_value_string), self.manager.curses.color_pair(option_value))
+					self.window.chgat(i + 1, color_highlight_index, len(option_value_string), self.engine.curses.color_pair(option_value))
 
 			else: # it is a dict or list
 				self.window.addnstr(i + 1, 1, object_string, self.getWindowMaxX() - 2)
 
 			if self.current_option == option_index:
-				self.window.chgat(i + 1, 1, min(self.getWindowMaxX() - 2, len(option_string)), self.manager.curses.color_pair(3) | self.manager.curses.A_REVERSE)
+				self.window.chgat(i + 1, 1, min(self.getWindowMaxX() - 2, len(option_string)), self.engine.curses.color_pair(3) | self.engine.curses.A_REVERSE)
 
 		self.window.box()
-		self.manager.update()
+		self.engine.update()
 		
 		while True:
 			try:
-				c = self.manager.screen.getch()
+				c = self.engine.screen.getch()
 			except KeyboardInterrupt:
 				self.current_option = 0
 				self.viewport_y = 0
@@ -214,7 +214,7 @@ class ConfigCustomizerWindow(Window):
 			if c == -1:
 				continue
 
-			c = self.manager.curses.keyname(c)
+			c = self.engine.curses.keyname(c)
 			c = c.decode("utf-8")
 			if self.getWindowMaxY() <= 2 or self.getWindowMaxX() <= 2:
 				#self.toggle() # window is too small to print anything so quit while we're ahead.
@@ -240,7 +240,7 @@ class ConfigCustomizerWindow(Window):
 			self.keepWindowInMainScreen()
 			self.window.clear()
 			
-			self.window.addnstr(1, 1, name, self.getWindowMaxX() - 2, self.manager.curses.A_STANDOUT)
+			self.window.addnstr(1, 1, name, self.getWindowMaxX() - 2, self.engine.curses.A_STANDOUT)
 			for i in range(1, self.getWindowMaxY() - 1): # for each line of window after title text				
 				tab_expand_size = self.config.options["TabExpandSize"]
 				option_index = i + self.viewport_y - 1				
@@ -258,29 +258,29 @@ class ConfigCustomizerWindow(Window):
 				if option_type != "dict" and option_type != "list":
 					self.window.addnstr(i + 1, 1, line_string, self.getWindowMaxX() - 2)
 					if name == "Color Customizer" and self.getWindowMaxX() > len(line_string) + 1:
-						self.window.chgat(i + 1, color_highlight_index, len(option_value_string), self.manager.curses.color_pair(option_value))
+						self.window.chgat(i + 1, color_highlight_index, len(option_value_string), self.engine.curses.color_pair(option_value))
 
 				else: # it is a dict or list
 					self.window.addnstr(i + 1, 1, object_string, self.getWindowMaxX() - 2)
 
 				if self.current_option == option_index:
-					self.window.chgat(i + 1, 1, min(self.getWindowMaxX() - 2, len(option_string)), self.manager.curses.color_pair(3) | self.manager.curses.A_REVERSE)
+					self.window.chgat(i + 1, 1, min(self.getWindowMaxX() - 2, len(option_string)), self.engine.curses.color_pair(3) | self.engine.curses.A_REVERSE)
 
 			self.window.box()
 				
-			for i in self.manager.objects:
-				if not issubclass(type(self.manager.get(i)), Window):
+			for i in self.engine.global_objects:
+				if not issubclass(type(self.engine.get(i)), Window):
 					continue
-				if self.manager.get(i).name == "config_customizer": # name given in engine init
+				if i == "configcustomizer": # this module file name
 					continue # to avoid recursive loop
 
-				self.manager.get(i).update()
+				self.engine.get(i).update()
 
-			self.manager.get("highlighter").update()
-			self.manager.update()
+			self.engine.get("syntaxhighlighting").update()
+			self.engine.update()
 
 		self.config.save()
-		self.manager.update()
+		self.engine.update()
 
 	def terminate(self):
 		pass
