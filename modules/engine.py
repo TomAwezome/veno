@@ -47,6 +47,25 @@ MODULE_UPDATE_ORDER = [
 	"diffwindow",
 ]
 
+MODULE_CLASSES = {
+	"config": "Config",
+	"file": "File",
+	"filewindow": "FileWindow",
+	"filewindowmanager": "FileWindowManager",
+	"syntaxhighlighting": "Highlighter",
+#	"windowbar": "WindowBar",
+	"linenumbers": "LineNumbersWindow",
+	"configcustomizer": "ConfigCustomizerWindow",
+	"linejumpbar": "LineJumpBar",
+	"savebar": "SaveBar",
+	"searchbar": "SearchBar",
+	"debugwindow": "DebugWindow",
+	"openbar": "OpenBar",
+	"helpwindow": "HelpWindow",
+	"diffwindow": "DiffWindow",
+	"keybindings": "Keyboard",
+}
+
 ##
 ## @brief      Veno Engine Class. Built to be easily and swiftly customized.
 ##
@@ -85,6 +104,21 @@ class Engine():
 			else:
 				exit(-1)
 
+		missing_class_modules = []
+		for module_name in MODULE_IMPORT_ORDER:
+			if module_name not in MODULE_CLASSES:
+				missing_class_modules.append(module_name)
+		for module_name in missing_class_modules:
+			response = ""
+			while response != "y" and response != "n":
+				print(f"\n[{module_name}] in 'import' list: NO VALUE in 'module class' dictionary.")
+				response = input("Remove from 'import' list for this launch? (y/n) ")
+			if response == "y":
+				MODULE_IMPORT_ORDER.remove(module_name)
+			else:
+				exit(-1)
+
+
 		self.curses = curses
 
 		## screen variable
@@ -120,7 +154,18 @@ class Engine():
 				print("")
 				exit(-1)
 			self.module_list.append(m)
-			self.module_classes[module_name] = class_tuple = inspect.getmembers(m, inspect.isclass)[0]
+			class_tuple_list = inspect.getmembers(m, inspect.isclass)
+			class_tuple = None
+			for c_t in class_tuple_list:
+				if c_t[0] == MODULE_CLASSES[module_name]:
+					class_tuple = c_t
+					break
+			if class_tuple == None:
+				self.terminate()
+				print(f"\n[{module_name}] in 'import' list: class <{MODULE_CLASSES[module_name]}> NOT FOUND.\n")
+				print(f"Possible typo? Check MODULE_CLASSES in engine.py, and check {module_name}.py\n")
+				exit(-1)
+			self.module_classes[module_name] = class_tuple
 			if module_name not in MODULE_INIT_EXCLUDES:
 				try:
 					self.module_instances[module_name] = obj = class_tuple[1](self) # call imported module class's __init__ with Engine as arg
