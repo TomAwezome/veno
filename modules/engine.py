@@ -114,31 +114,26 @@ class Engine():
 			except:
 				self.panic(f"[{module_name}] in 'import' list: ERROR during import.\n")
 			self.module_list.append(m)
-			class_tuple_list = inspect.getmembers(m, inspect.isclass)
-			class_tuple = None
-			for c_t in class_tuple_list:
-				if c_t[0] == MODULE_CLASSES[module_name]:
-					class_tuple = c_t
-					break
-			if class_tuple == None:
-				self.panic(f"[{module_name}] in 'import' list: class <{MODULE_CLASSES[module_name]}> NOT FOUND.\n"
+			module_class_name = MODULE_CLASSES[module_name]
+			class_definition = ([c for n, c in inspect.getmembers(m, inspect.isclass) if n == module_class_name] or [None])[0]
+			if class_definition == None:
+				self.panic(f"[{module_name}] in 'import' list: class <{module_class_name}> NOT FOUND.\n"
 					"Possible typo? Check MODULE_CLASSES in engine.py, and check {module_name}.py", False)
-			self.module_classes[module_name] = class_tuple
+			self.module_classes[module_name] = (module_class_name, class_definition)
 			if module_name not in MODULE_INIT_EXCLUDES:
-				class_function_list = inspect.getmembers(class_tuple[1], inspect.isfunction)
-				class_function_name_list = [name for name, obj in class_function_list]
+				class_function_name_list = [n for n, f in inspect.getmembers(class_definition, inspect.isfunction)]
 				if "terminate" not in class_function_name_list:
-					self.panic(f"[{module_name}] in 'import' list: {MODULE_CLASSES[module_name]}.terminate() function NOT FOUND.", False)
+					self.panic(f"[{module_name}] in 'import' list: {module_class_name}.terminate() function NOT FOUND.", False)
 				if module_name in MODULE_UPDATE_ORDER and "update" not in class_function_name_list:
-					self.panic(f"[{module_name}] in 'import' list: {MODULE_CLASSES[module_name]}.update() function NOT FOUND.", False)
+					self.panic(f"[{module_name}] in 'import' list: {module_class_name}.update() function NOT FOUND.", False)
 				try:
-					self.module_instances[module_name] = obj = class_tuple[1](self) # call imported module class's __init__ with Engine as arg
+					self.module_instances[module_name] = class_instance = class_definition(self) # call imported module class's __init__ with Engine as arg
 				except:
 					self.panic(f"[{module_name}] in 'import' list: ERROR during initialization.")
 
-				self.set(module_name, obj)
+				self.set(module_name, class_instance)
 			else:
-				self.set(class_tuple[1].__name__, class_tuple[1]) # put module class definition into global objects dictionary with module class name as key
+				self.set(module_class_name, class_definition) # put module class definition into global objects dictionary with module class name as key
 
 		self.exception = Exception
 
@@ -207,7 +202,6 @@ class Engine():
 	##
 	def addPanel(self, window):
 		return self.panel.new_panel(window.window)
-
 
 	def errorPrompt(self, prompt, list_name, module_name):
 		response = ""
