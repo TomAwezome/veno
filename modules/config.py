@@ -1,5 +1,6 @@
 import json, os
 from pathlib import Path
+import copy
 
 ##
 ## @brief      Class for config stuff.
@@ -72,6 +73,8 @@ class Config:
 			self.options = self.default_options
 			file.close()
 
+		self.standard_options = copy.deepcopy(self.options) # backup a 'standard' config to use for filetypes with no overrides
+
 		extension = os.path.splitext(self.engine.filenames[0])[1][1:]
 		if extension in self.options["LanguageOverrides"]:
 			self.options = {**self.options, **self.options["LanguageOverrides"][extension]}
@@ -81,6 +84,8 @@ class Config:
 		extension = os.path.splitext(current_filename)[1][1:]
 		if extension in self.options["LanguageOverrides"]:
 			self.options = {**self.options, **self.options["LanguageOverrides"][extension]}
+		else:
+			self.options = {**self.options, **self.standard_options}
 
 	def save(self):
 		self.text = json.dumps(self.options, sort_keys=True, indent=4, separators=(',', ': '))
