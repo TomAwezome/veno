@@ -111,7 +111,14 @@ class Engine():
 		self.module_classes  = {}
 		self.module_instances = {}
 		for module_name in MODULE_IMPORT_ORDER:
-			m = importlib.import_module("modules." + module_name)
+			try:
+				m = importlib.import_module("modules." + module_name)
+			except:
+				self.terminate()
+				print(f"\n[{module_name}] in 'import' list: ERROR during import.\n")
+				traceback.print_exc()
+				print("")
+				exit(-1)
 			self.module_list.append(m)
 			self.module_classes[module_name] = class_tuple = inspect.getmembers(m, inspect.isclass)[0]
 			if module_name not in MODULE_INIT_EXCLUDES:
