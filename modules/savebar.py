@@ -131,6 +131,8 @@ class SaveBar(Window):
 				else: # Ctrl-C to exit confirmExitSave and return to file
 					break
 
+		self.panel.hide()
+
 		return result
 
 	def save(self):
