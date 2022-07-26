@@ -35,12 +35,3 @@ class File:
 			file.write(fileString)
 			file.close()
 
-	##
-	## @brief      Terminate this File
-	##
-	## @param      self  This object
-	##
-	## @return     None
-	##
-	def terminate(self):
-		pass
