@@ -25,6 +25,7 @@ engine = Engine()
 
 engine.setException(EngineException)
 
+result = 0
 while True:
 	try:
 		engine.turn()
@@ -33,8 +34,18 @@ while True:
 		break
 	except:
 		engine.terminate()
-		traceback.print_exc()  # Print the exception
+		highlight = engine.get("pygments_func_highlight")
+		if highlight is not None:
+			lexer = engine.get("pygments_pytb_lexer")
+			formatter = engine.get("pygments_term_formatter")
+			trace_text = "".join(traceback.format_exc())
+			trace = highlight(trace_text, lexer, formatter)
+			print(trace)
+		else:
+			traceback.print_exc()  # Print the exception
+		result = -1
 		break
 
 profPrintStats()
-sys.exit(0)
+sys.exit(result)
+

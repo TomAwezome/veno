@@ -221,7 +221,15 @@ class Engine():
 		self.terminate()
 		print("\n" + str(prompt) + "\n")
 		if is_exception:
-			traceback.print_exc()
+			highlight = self.get("pygments_func_highlight")
+			if highlight is not None:
+				lexer = self.get("pygments_pytb_lexer")
+				formatter = self.get("pygments_term_formatter")
+				trace_text = "".join(traceback.format_exc())
+				trace = highlight(trace_text, lexer, formatter)
+				print(trace)
+			else:
+				traceback.print_exc()  # Print the exception
 		print("")
 		exit(-1)
 

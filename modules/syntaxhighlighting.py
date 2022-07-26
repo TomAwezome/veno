@@ -1,6 +1,7 @@
 import pygments
 import pygments.lexers as lexers
 from pygments.formatters import IRCFormatter
+from pygments.formatters import TerminalFormatter
 
 ##
 ## @brief      Class for highlighter.
@@ -17,7 +18,7 @@ class Highlighter:
 		self.engine = engine
 
 		## Pygments formatter IRCFormatter
-		self.irc = IRCFormatter
+		self.irc = IRCFormatter()
 
 		## Lexer for filetype
 		self.lexer = None
@@ -27,6 +28,10 @@ class Highlighter:
 		
 		## FileWindow highlighter is attached to.
 		self.file_window = self.engine.get("current_file_window")
+
+		self.engine.set("pygments_term_formatter", TerminalFormatter())
+		self.engine.set("pygments_pytb_lexer", lexers.get_lexer_by_name("pytb"))
+		self.engine.set("pygments_func_highlight", pygments.highlight)
 
 		self.updateLexer()
 
@@ -66,7 +71,7 @@ class Highlighter:
 		tab_expand_size = self.engine.get("config").options["TabExpandSize"]
 
 		if self.lexer and self.file_window.is_modified:
-			highlighted_code_string = pygments.highlight(window_code_string, self.lexer, self.irc())
+			highlighted_code_string = pygments.highlight(window_code_string, self.lexer, self.irc)
 			## **Highlighted** code lines from window_code_lines (which is default defined as file_lines[viewport_y:viewport_y + window_max_y])
 			self.highlighted_code_lines = highlighted_code_string.split('\n')
 			leading_newlines = 0
