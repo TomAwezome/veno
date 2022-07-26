@@ -27,13 +27,16 @@ class DiffWindow(Window):
 		self.file_window = self.engine.get("current_file_window")
 		
 		File = self.engine.get("File")
-		file = File(self.file_window.file.source)
+		filename = self.file_window.file.source
+		file = File(filename)
 		disk_file_lines = file.contents.splitlines()
 		
-		diff_result = diff(disk_file_lines, self.file_window.file_lines, "File on disk", "File in memory")
+		diff_result = diff(disk_file_lines, self.file_window.file_lines, f"File on disk   [ {filename} ]", f"File in memory [ {filename} ]")
 		diff_lines = []
 		for line in diff_result:
 			diff_lines.append(line)
+		if diff_lines == []:
+			diff_lines = ["", f"No differences between file on disk and file in memory. [ {filename} ]"]
 		
 		while True:
 			self.intended_x			= 0
@@ -53,7 +56,7 @@ class DiffWindow(Window):
 
 			if window_max_y - 1 < 1:
 				return
-			self.window.addnstr(0, 1, " DIFF (Press Ctrl-T to dismiss Diff window) ", window_max_x - 2, self.engine.curses.color_pair(0) | self.engine.curses.A_REVERSE)
+			self.window.addnstr(0, 1, " DIFF (Press Ctrl-T/Ctrl-C/Enter/Space to dismiss, scroll with arrow keys)", window_max_x - 2, self.engine.curses.color_pair(0) | self.engine.curses.A_REVERSE)
 
 			for line in diff_lines[self.view_y:]:
 				if window_y >= window_max_y - 1:
@@ -77,7 +80,7 @@ class DiffWindow(Window):
 			if c in self.bindings:
 				self.bindings[c]()
 
-			if c == "^J" or c == "^T":
+			if c == "^J" or c == "^T" or c == " ":
 				self.toggle()
 				break
 

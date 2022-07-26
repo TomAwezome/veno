@@ -7,7 +7,7 @@ class HelpWindow(Window):
 
 		self.panel.hide()
 		
-		self.help_top_text = " HELP (Press F1 to dismiss Help window) "
+		self.help_top_text = " HELP (Press F1/Ctrl-C/Enter/Space to dismiss, scroll with arrow keys) "
 
 		self.help_header_text = """
 VENO
@@ -82,7 +82,7 @@ Multi-purpose text/code editor meant for easy and vast expandability.
 			if c in self.bindings:
 				self.bindings[c]()
 
-			if c == "^J" or c == "KEY_F(1)":
+			if c == "^J" or c == "KEY_F(1)" or c == " ":
 				self.toggle()
 				break
 

@@ -72,9 +72,10 @@ class Keyboard:
 
 		self.engine.screen.timeout(-1)
 
-	def leave(self):
-		if not self.save_bar.confirmExitSave():
-			return
+	def leave(self, confirm=True):
+		if confirm:
+			if not self.save_bar.confirmExitSave():
+				return
 		exception = self.engine.get("EngineException")
 		raise exception
 
@@ -201,8 +202,7 @@ class Keyboard:
 	## @param      self  This object
 	##
 	def closeFileWindow(self):
-		if not self.save_bar.confirmExitSave():
-			# TODO clean up how this confirm is handled and then revise above logic in leave()
+		if not self.save_bar.confirmCloseSave():
 			return
 		file_window_to_remove = self.engine.get("current_file_window")
 		self.selectNextFileWindow()
@@ -210,4 +210,5 @@ class Keyboard:
 			window_list = self.engine.get("file_window_list")
 			window_list.remove(file_window_to_remove)
 		else:
-			pass # TODO do something different if trying to close last filewindow in active list
+			self.leave(confirm=False)
+

@@ -21,12 +21,12 @@ MODULE_IMPORT_ORDER = [
 	"linenumbers",
 	"configcustomizer",
 	"linejumpbar",
+	"diffwindow",
 	"savebar",
 	"searchbar",
 	"debugwindow",
 	"openbar",
 	"helpwindow",
-	"diffwindow",
 	"keybindings",
 ]
 
@@ -113,7 +113,7 @@ class Engine():
 			try:
 				m = importlib.import_module("modules." + module_name)
 			except:
-				self.panic(f"[{module_name}] in 'import' list: ERROR during import.\n")
+				self.panic(f"[{module_name}] in 'import' list: ERROR during import.")
 			self.module_list.append(m)
 			module_class_name = MODULE_CLASSES[module_name]
 			class_definition = ([c for n, c in inspect.getmembers(m, inspect.isclass) if n == module_class_name] or [None])[0]
