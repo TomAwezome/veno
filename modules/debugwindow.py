@@ -9,8 +9,7 @@ class DebugWindow(Window):
 
 		self.is_open = False
 
-		self.debug_text = ""
-		self.add_count = 0
+		self.debug = self.engine.get("debug")
 
 		self.window.erase()
 		self.keepWindowInMainScreen()
@@ -35,29 +34,24 @@ class DebugWindow(Window):
 
 		self.panel.top()
 
-		self.log("Global Objects:")
-		self.log("---------------")
-		items = self.engine.global_objects.items()
-		for key, val in items:
-			self.log(f"  {key}".ljust(24) + f"{val}")
-		self.log("---------------")
-
 		if window_max_y - 1 < 1:
 			return
 		self.window.addnstr(0, 1, " DEBUG (Press F12 to dismiss) ", window_max_x - 2, self.engine.curses.color_pair(0) | self.engine.curses.A_REVERSE)
 
-		lines = self.debug_text.split("\n")
+		self.debug.log("Global Objects:")
+		self.debug.log("---------------")
+		items = self.engine.global_objects.items()
+		for key, val in items:
+			self.debug.log(f"  {key}".ljust(24) + f"{val}")
+		self.debug.log("---------------")
+
+		lines = self.debug.text.split("\n")
 		lines.reverse()
 		for line in lines:
 			if window_y >= window_max_y - 1:
 				break
 			self.window.addnstr(window_y, 1, line, window_max_x - 2, self.engine.curses.color_pair(0))
 			window_y += 1
-
-	def log(self, data):
-		self.add_count += 1
-		count_text = f"{self.add_count}: ".rjust(5)
-		self.debug_text += f"\nDEBUG MSG " + count_text + str(data)
 
 	def toggle(self):
 		if self.is_open:
@@ -69,3 +63,4 @@ class DebugWindow(Window):
 
 	def terminate(self):
 		pass
+		

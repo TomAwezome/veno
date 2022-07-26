@@ -12,6 +12,7 @@ MODULE_INIT_EXCLUDES = ["file", "filewindow"]
 ## List of modules to import.
 ## Unless specified in the excludes list, imported module's class __init__ is called to create global module instances.
 MODULE_IMPORT_ORDER = [
+	"debug",
 	"config",
 	"file",
 	"filewindow",
@@ -65,6 +66,7 @@ MODULE_CLASSES = {
 	"helpwindow": "HelpWindow",
 	"diffwindow": "DiffWindow",
 	"keybindings": "Keyboard",
+	"debug": "Debug",
 }
 
 ##
