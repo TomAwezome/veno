@@ -148,7 +148,7 @@ class SearchBar(Window):
 
 		self.config = self.engine.get("config").options
 
-		tab_expand_size = self.config["TabExpandSize"]
+		tab_expand_size = self.config["TabSize"]
 		prompt = "Search: "
 
 		while True: # break out of this loop with enter key
@@ -261,7 +261,7 @@ class SearchBar(Window):
 
 		self.config = self.engine.get("config").options
 
-		tab_expand_size = self.config["TabExpandSize"]
+		tab_expand_size = self.config["TabSize"]
 		prompt = "Replace: "
 
 		# search string

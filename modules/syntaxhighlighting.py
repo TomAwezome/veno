@@ -68,7 +68,7 @@ class Highlighter:
 		window_max_x = self.file_window.getWindowMaxX()
 		window_code_lines = self.file_window.file_lines
 		window_code_string = '\n'.join(window_code_lines)
-		tab_expand_size = self.engine.get("config").options["TabExpandSize"]
+		tab_expand_size = self.engine.get("config").options["TabSize"]
 
 		if self.lexer and self.file_window.is_modified:
 			highlighted_code_string = pygments.highlight(window_code_string, self.lexer, self.irc)
@@ -200,7 +200,7 @@ class Highlighter:
 		viewport_x = self.file_window.getViewportX()
 		viewport_y = self.file_window.getViewportY()
 		window_max_y = self.file_window.getWindowMaxY()
-		tab_expand_size = self.engine.get("config").options["TabExpandSize"]
+		tab_expand_size = self.engine.get("config").options["TabSize"]
 
 		if self.file_window.is_select_on:
 
@@ -275,4 +275,3 @@ class Highlighter:
 						# chgat blue whole line
 
 				y_offset += 1
-

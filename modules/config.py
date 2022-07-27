@@ -15,8 +15,8 @@ class Config:
 		self.engine = engine
 
 		self.default_options = {
-			"TabExpandSize": 4,
-			"TabLength": 4,
+			"TabSize": 4,
+			"TabCharMode": True,
 			"LineWrapLength": 40,
 			"AutoIndent": True,
 			"ShowLineNumbers": True,
@@ -28,10 +28,10 @@ class Config:
 			"ScrollAmount": 20,
 			"LanguageOverrides": {
 				"py": {
-					"TabLength": "char"
+					"TabCharMode": True,
 				},
 				"js": {
-					"TabLength": 2
+					"TabSize": 2,
 				}
 			},
 			"ColorMap": {

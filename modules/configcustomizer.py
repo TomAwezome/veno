@@ -68,15 +68,7 @@ class ConfigCustomizerWindow(Window):
 		option_keys = list(d.keys())
 		datatype = str(type(d[option_keys[self.current_option]])).split("'")[1]
 
-		if option_keys[self.current_option] == "TabLength":
-			# custom TabLength config logic
-			if datatype == "int": # if TabLength is currently already an integer
-				if d[option_keys[self.current_option]] > 1:
-					d[option_keys[self.current_option]] -= 1
-				else: # no TabLength zero, char instead
-					d[option_keys[self.current_option]] = "char"
-
-		elif datatype == "bool":
+		if datatype == "bool":
 			d[option_keys[self.current_option]] = not d[option_keys[self.current_option]]
 
 		elif datatype == "int":
@@ -87,13 +79,7 @@ class ConfigCustomizerWindow(Window):
 		option_keys = list(d.keys())
 		datatype = str(type(d[option_keys[self.current_option]])).split("'")[1]
 
-		if option_keys[self.current_option] == "TabLength": # custom TabLength config logic
-			if d[option_keys[self.current_option]] == "char":
-				d[option_keys[self.current_option]] = 1
-			elif datatype == "int": # if TabLength is currently already an integer
-				d[option_keys[self.current_option]] += 1
-
-		elif datatype == "bool":
+		if datatype == "bool":
 			d[option_keys[self.current_option]] = not d[option_keys[self.current_option]]
 
 		elif datatype == "int":
@@ -169,7 +155,7 @@ class ConfigCustomizerWindow(Window):
 		# 4) if current line in loop is one with current_option on it, highlight the key text
 
 		for i in range(1, self.getWindowMaxY() - 1): # for each line of window after title text
-			tab_expand_size = self.config.options["TabExpandSize"]
+			tab_expand_size = self.config.options["TabSize"]
 			option_index = i + self.viewport_y - 1
 			if option_index >= len(option_keys):
 				break
@@ -244,7 +230,7 @@ class ConfigCustomizerWindow(Window):
 			self.window.clear()
 			
 			for i in range(1, self.getWindowMaxY() - 1): # for each line of window after title text				
-				tab_expand_size = self.config.options["TabExpandSize"]
+				tab_expand_size = self.config.options["TabSize"]
 				option_index = i + self.viewport_y - 1				
 				if option_index >= len(option_keys):
 					break

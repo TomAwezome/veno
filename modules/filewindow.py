@@ -25,7 +25,7 @@ class FileWindow(Window):
 		self.config = self.engine.get("config").options
 
 		window_y = 0
-		tab_expand_size = self.config["TabExpandSize"]
+		tab_expand_size = self.config["TabSize"]
 		viewport_y = self.getViewportY()
 		viewport_x = self.getViewportX()
 		window_max_y = self.getWindowMaxY()
@@ -40,7 +40,7 @@ class FileWindow(Window):
 		self.drawCursor()
 
 	def drawCursor(self):
-		tab_expand_size = self.config["TabExpandSize"]
+		tab_expand_size = self.config["TabSize"]
 		filecursor_y = self.getFilecursorY()
 		filecursor_x = self.getFilecursorX()
 		viewport_y = self.getViewportY()
@@ -309,7 +309,7 @@ class FileWindow(Window):
 		self.moveViewportToCursor()
 
 	def moveViewportToCursorX(self):
-		tab_expand_size = self.config["TabExpandSize"]
+		tab_expand_size = self.config["TabSize"]
 		filecursor_y = self.getFilecursorY()
 		filecursor_x = self.getFilecursorX()
 		viewport_x = self.getViewportX()
@@ -377,8 +377,8 @@ class FileWindow(Window):
 		filecursor_x = self.getFilecursorX()
 
 		indent_text = "\t"
-		if self.config["TabLength"] != "char":
-			indent_text = str(self.config["TabLength"])
+		if not self.config["TabCharMode"]:
+			indent_text = ' ' * self.config["TabSize"]
 
 		if self.is_select_on:
 			select_y = self.getSelectY()
@@ -525,8 +525,8 @@ class FileWindow(Window):
 
 	def enterTextAtFilecursor(self, text):
 		if text == "\t":
-			if self.config["TabLength"] != "char":
-				text = " " * self.config["TabLength"]
+			if not self.config["TabCharMode"]:
+				text = " " * self.config["TabSize"]
 			if self.is_select_on:
 				self.indentSelectedLines(text)
 				return
