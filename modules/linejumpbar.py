@@ -59,16 +59,16 @@ class LineJumpBar(Window):
 
 	def backspaceAtLineJumpCursor(self):
 		if self.line_jump_cursor_x > 0:
-			search_string_left = self.line_jump_string[:self.line_jump_cursor_x - 1]
-			search_string_right = self.line_jump_string[self.line_jump_cursor_x:]
-			self.line_jump_string = search_string_left + search_string_right
+			line_jump_string_left = self.line_jump_string[:self.line_jump_cursor_x - 1]
+			line_jump_string_right = self.line_jump_string[self.line_jump_cursor_x:]
+			self.line_jump_string = line_jump_string_left + line_jump_string_right
 			self.line_jump_cursor_x -= 1
 
 	def deleteAtLineJumpCursor(self):
 		if self.line_jump_cursor_x + 1 <= len(self.line_jump_string): # if there is text to the right of our cursor
-			search_string_left = self.line_jump_string[:self.line_jump_cursor_x]
-			search_string_right = self.line_jump_string[self.line_jump_cursor_x + 1:]
-			self.line_jump_string = search_string_left + search_string_right
+			line_jump_string_left = self.line_jump_string[:self.line_jump_cursor_x]
+			line_jump_string_right = self.line_jump_string[self.line_jump_cursor_x + 1:]
+			self.line_jump_string = line_jump_string_left + line_jump_string_right
 
 	def moveLineJumpCursorToStart(self):
 		if self.line_jump_cursor_x > 0:
@@ -79,9 +79,9 @@ class LineJumpBar(Window):
 			self.line_jump_cursor_x = len(self.line_jump_string)
 
 	def enterDigitAtLineJumpCursor(self, digit):
-		search_string_left = self.line_jump_string[:self.line_jump_cursor_x] + digit
-		search_string_right = self.line_jump_string[self.line_jump_cursor_x:]
-		self.line_jump_string = search_string_left + search_string_right
+		line_jump_string_left = self.line_jump_string[:self.line_jump_cursor_x] + digit
+		line_jump_string_right = self.line_jump_string[self.line_jump_cursor_x:]
+		self.line_jump_string = line_jump_string_left + line_jump_string_right
 		self.line_jump_cursor_x += 1
 
 	def jumpToLine(self):
@@ -142,4 +142,3 @@ class LineJumpBar(Window):
 
 	def terminate(self):
 		pass
-
