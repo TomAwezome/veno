@@ -46,8 +46,9 @@ Runs in a terminal window. GUI not yet implemented.
 |Delete Key|Remove character at cursor from file|
 |Ctrl-D|Remove line at cursor from file|
 |Arrow Keys|Move cursor in file|
-|PageUp, PageDown|Scroll screen up/down|
-|Ctrl-Arrow Keys|Move viewport in file. Ctrl-Arrow Keys not supported by all terminals.|
+|PageUp, PageDown|Scroll cursor up/down|
+|Alt-PageUp, Alt-PageDown|Scroll viewport up/down|
+|Ctrl-Arrow Keys|Move viewport up/down/left/right.  (Ctrl-Arrow Keys not supported by all terminals)|
 |Ctrl-W|Save file|
 |Home Key|Go to start of line in file|
 |End Key|Go to end of line in file|

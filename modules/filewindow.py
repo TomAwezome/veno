@@ -243,7 +243,7 @@ class FileWindow(Window):
 					self.newLineAtFilecursor(auto_indent_override=False)
 
 				i += 1
-			
+
 	def moveViewportDown(self):
 		self.setViewportY(self.getViewportY() + 1)
 
@@ -261,6 +261,14 @@ class FileWindow(Window):
 
 		if viewport_x > 0:
 			self.setViewportX(viewport_x - 1)
+
+	def scrollViewportDown(self):
+		scroll_amount = self.config["ScrollAmount"]
+		self.setViewportY(self.getViewportY() + scroll_amount)
+
+	def scrollViewportUp(self):
+		scroll_amount = self.config["ScrollAmount"]
+		self.setViewportY(max(0, self.getViewportY() - scroll_amount))
 
 	def moveFilecursorUp(self):
 		if self.getFilecursorY() > 0:
@@ -608,12 +616,12 @@ class FileWindow(Window):
 	def searchForText(self):
 		pass
 
-	def scrollDown(self):
+	def scrollFilecursorDown(self):
 		scroll_amount = self.config["ScrollAmount"]
 		filecursor_y = self.getFilecursorY()
 		self.jumpToLine(min(filecursor_y + scroll_amount, len(self.file_lines) - 1))
 
-	def scrollUp(self):
+	def scrollFilecursorUp(self):
 		scroll_amount = self.config["ScrollAmount"]
 		filecursor_y = self.getFilecursorY()
 		self.jumpToLine(max(filecursor_y - scroll_amount, 0))

@@ -117,8 +117,10 @@ class Keyboard:
 			"KEY_F(5)":  self.selectPrevFileWindow,
 			"KEY_F(6)":  self.selectNextFileWindow,
 			"KEY_HOME":  self.file_window.gotoStartOfLine,
-			"KEY_NPAGE": self.file_window.scrollDown,
-			"KEY_PPAGE": self.file_window.scrollUp,
+			"KEY_NPAGE": self.file_window.scrollFilecursorDown,
+			"KEY_PPAGE": self.file_window.scrollFilecursorUp,
+			"kPRV3":     self.file_window.scrollViewportUp,
+			"kNXT3":     self.file_window.scrollViewportDown,
 
 			"KEY_BTAB":  self.file_window.unindentSelectedLines,
 
