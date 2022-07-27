@@ -26,7 +26,6 @@ class FileWindowManager:
 
 	def update(self):
 		self.engine.get("current_file_window").update()
-		pass
 
 	def terminate(self):
 		for file_window in self.file_window_list:
