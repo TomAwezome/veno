@@ -8,6 +8,8 @@ class DiffWindow(Window):
 		## FileWindow instance DiffWindow is attached to.
 		self.file_window = self.engine.get("current_file_window")
 
+		self.config = self.engine.get("config").options
+
 		self.is_open = False
 
 		self.panel.hide()
@@ -24,6 +26,10 @@ class DiffWindow(Window):
 
 		self.panel.top()
 
+		self.config = self.engine.get("config").options
+
+		tab_expand_size = self.config["TabSize"]
+
 		self.file_window = self.engine.get("current_file_window")
 		
 		File = self.engine.get("File")
@@ -34,7 +40,7 @@ class DiffWindow(Window):
 		diff_result = diff(disk_file_lines, self.file_window.file_lines, f"File on disk   [ {filename} ]", f"File in memory [ {filename} ]")
 		diff_lines = []
 		for line in diff_result:
-			diff_lines.append(line)
+			diff_lines.append(line.expandtabs(tab_expand_size))
 		if diff_lines == []:
 			diff_lines = ["", f"No differences between file on disk and file in memory. [ {filename} ]"]
 		
