@@ -5,6 +5,8 @@ class RunWindow(Window):
 	def __init__(self, engine):
 		Window.__init__(self, engine)
 
+		self.config = self.engine.get("config").options
+
 		self.run_cursor_x = 0
 		self.run_string = ""
 		self.run_output = ""
@@ -100,6 +102,8 @@ class RunWindow(Window):
 
 		self.keepWindowInMainScreen()
 		self.engine.update()
+		
+		self.config = self.engine.get("config").options
 
 		prompt = "Run command: "
 
@@ -178,6 +182,7 @@ class RunWindow(Window):
 				if window_max_y - 1 > 1:
 					self.window.addnstr(0, 1, self.top_text, window_max_x - 2, self.engine.curses.color_pair(0) | self.engine.curses.A_REVERSE)
 				for line in lines[self.view_y:]:
+					line = line.expandtabs(self.config["TabSize"])
 					if window_y >= window_max_y - 1:
 						break
 					self.window.addnstr(window_y, 1, line, window_max_x - 2, self.engine.curses.color_pair(0))
