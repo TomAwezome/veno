@@ -37,12 +37,6 @@ class Window:
 	def getScreenMaxX(self):
 		return self.engine.screen.getmaxyx()[1]
 
-	def getScreenBegY(self):
-		return self.engine.screen.getbegyx()[0]
-		
-	def getScreenBegX(self):
-		return self.engine.screen.getbegyx()[1]
-
 	def keepWindowInMainScreen(self):
 		offscreen_y = 0
 		offscreen_x = 0
