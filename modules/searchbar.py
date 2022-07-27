@@ -7,6 +7,8 @@ class SearchBar(Window):
 		
 		## FileWindow instance SearchBar is attached to.
 		self.file_window = self.engine.get("current_file_window")
+
+		self.cursor = self.file_window.filecursor
 		
 		self.config = self.engine.get("config").options
 
@@ -108,16 +110,6 @@ class SearchBar(Window):
 	def pasteAtSearchCursor(self):
 		if self.file_window.copy_lines != []:
 			paste_string = "\\n".join(self.file_window.copy_lines)
-
-# TODO: make a config option or class member boolean for regex Find mode to fix this?
-#	if the following lines are commented, Find breaks; uncommented, pasting LOC into Find field will work with regex,
-#	but if pasting into Replace field, resulting text has garbage extra \ symbols ...
-
-			paste_string = paste_string.replace("(", "\(").replace("[", "\[").replace("{", "\{") # replacements
-			paste_string = paste_string.replace(")", "\)").replace("]", "\]").replace("}", "\}") # for regex: ()[]{}|?+*$^.
-			paste_string = paste_string.replace("|", "\|").replace("?", "\?").replace("+", "\+").replace("\t", "\\t")
-			paste_string = paste_string.replace("*", "\*").replace("$", "\$").replace("^", "\^").replace(".", "\.")
-
 			search_string_left = self.search_string[:self.search_cursor_x] + paste_string
 			search_string_right = self.search_string[self.search_cursor_x:]
 			self.search_string = search_string_left + search_string_right
@@ -154,6 +146,8 @@ class SearchBar(Window):
 		self.engine.update()
 		self.keepWindowInMainScreen()
 
+		self.config = self.engine.get("config").options
+
 		tab_expand_size = self.config["TabExpandSize"]
 		prompt = "Search: "
 
@@ -187,7 +181,10 @@ class SearchBar(Window):
 			elif c == "^J": # enter key
 				break
 		try:
-			pattern = re.compile(self.search_string)
+			pattern_string = self.search_string
+			if not self.config["FindRegexMode"]:
+				pattern_string = re.escape(pattern_string)
+			pattern = re.compile(pattern_string)
 		except:
 			self.panel.hide()
 			return
@@ -262,6 +259,8 @@ class SearchBar(Window):
 		self.engine.update()
 		self.keepWindowInMainScreen()
 
+		self.config = self.engine.get("config").options
+
 		tab_expand_size = self.config["TabExpandSize"]
 		prompt = "Replace: "
 
@@ -296,6 +295,9 @@ class SearchBar(Window):
 				break
 		
 		first_string = self.search_string
+		first_pattern_string = first_string
+		if not self.config["FindRegexMode"]:
+			first_pattern_string = re.escape(first_string)
 		
 		# replacement string
 		# keypress loop: begin catching characters
@@ -337,6 +339,9 @@ class SearchBar(Window):
 				break
 
 		second_string = self.search_string
+		second_pattern_string = second_string
+		if not self.config["ReplaceRegexMode"]:
+			second_pattern_string = re.escape(second_string)
 		self.replace_string = second_string
 		self.replace_cursor_x = self.search_cursor_x
 		self.search_string = first_string
@@ -347,7 +352,7 @@ class SearchBar(Window):
 
 		# next we'll find the first occurence (relative to our cursor) of our to-be-replaced string, and move the file cursor there and have our current nexMatch be that occurence
 		try:
-			pattern = re.compile(first_string)
+			pattern = re.compile(first_pattern_string)
 		except:
 			self.panel.hide()
 			return
@@ -424,7 +429,7 @@ class SearchBar(Window):
 			c = c.decode("utf-8")
 
 			if c in self.replace_bindings:
-				self.replace_bindings[c](first_string, second_string)
+				self.replace_bindings[c](first_pattern_string, second_pattern_string)
 				if c == "a":
 					break
 			elif c == "n":

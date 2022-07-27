@@ -23,6 +23,8 @@ class Config:
 			"UseLineWrap": False,
 			"BracketMatching": True,
 			"QuoteMatching": True,
+			"FindRegexMode": False,
+			"ReplaceRegexMode": False,
 			"ScrollAmount": 20,
 			"LanguageOverrides": {
 				"py": {
