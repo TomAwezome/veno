@@ -82,12 +82,8 @@ class Engine():
 	## @param      self  This object
 	##
 	def __init__(self):
-		for module_name in [name for name in MODULE_IMPORT_ORDER if importlib.util.find_spec("modules." + name) == None]:
-			self.errorPrompt(f"[{module_name}] in 'import' list: FILE NOT FOUND.", "import", module_name)
-		for module_name in [name for name in MODULE_IMPORT_ORDER if name not in MODULE_CLASSES]:
-			self.errorPrompt(f"[{module_name}] in 'import' list: NO VALUE in 'module class' dictionary.", "import", module_name)
-		for module_name in [name for name in MODULE_UPDATE_ORDER if name not in MODULE_IMPORT_ORDER]:
-			self.errorPrompt(f"[{module_name}] in 'update' list: NOT FOUND in 'import' list.", "update", module_name)
+
+		self.filenames = self.parseArgs().filename or ["untitled.txt"]
 
 		self.curses = curses
 
@@ -106,42 +102,59 @@ class Engine():
 		curses.curs_set(0)
 		self.screen.timeout(30)
 
-		self.filenames = self.parseArgs().filename or ["untitled.txt"]
-
 		## Dictionary of global objects
 		self.global_objects = {}
 
 		self.module_list = []
 		self.module_classes  = {}
 		self.module_instances = {}
-		for module_name in MODULE_IMPORT_ORDER:
+
+		self.checkModules()
+
+		for module_name in MODULE_IMPORT_ORDER.copy():
 			try:
 				m = importlib.import_module("modules." + module_name)
 			except:
-				self.panic(f"[{module_name}] in 'import' list: ERROR during import.")
+				self.errorPrompt(f"[{module_name}] in 'import' list: ERROR during import.", "import", module_name, is_exception=True)
+				continue
 			self.module_list.append(m)
 			module_class_name = MODULE_CLASSES[module_name]
 			class_definition = ([c for n, c in inspect.getmembers(m, inspect.isclass) if n == module_class_name] or [None])[0]
 			if class_definition == None:
-				self.panic(f"[{module_name}] in 'import' list: class <{module_class_name}> NOT FOUND.\n"
-					"Possible typo? Check MODULE_CLASSES in engine.py, and check {module_name}.py", False)
+				self.errorPrompt(f"[{module_name}] in 'import' list: class <{module_class_name}> NOT FOUND.\n"
+					"Possible typo? Check MODULE_CLASSES in engine.py, and check {module_name}.py\n", "import",  module_name, is_exception=False)
+				continue
 			self.module_classes[module_name] = (module_class_name, class_definition)
 			if module_name not in MODULE_INIT_EXCLUDES:
 				class_function_name_list = [n for n, f in inspect.getmembers(class_definition, inspect.isfunction)]
 				if "terminate" not in class_function_name_list:
-					self.panic(f"[{module_name}] in 'import' list: {module_class_name}.terminate() function NOT FOUND.", False)
+					self.errorPrompt(f"[{module_name}] in 'import' list: {module_class_name}.terminate() function NOT FOUND.", "import", module_name, is_exception=False)
+					continue
 				if module_name in MODULE_UPDATE_ORDER and "update" not in class_function_name_list:
-					self.panic(f"[{module_name}] in 'import' list: {module_class_name}.update() function NOT FOUND.", False)
+					self.errorPrompt(f"[{module_name}] in 'import' list: {module_class_name}.update() function NOT FOUND.", "import", module_name, is_exception=False)
+					continue
 				try:
 					self.module_instances[module_name] = class_instance = class_definition(self) # call imported module class's __init__ with Engine as arg
 				except:
-					self.panic(f"[{module_name}] in 'import' list: ERROR during initialization.")
+					self.errorPrompt(f"[{module_name}] in 'import' list: ERROR during initialization.", "import", module_name, is_exception=True)
+					continue
 
 				self.set(module_name, class_instance)
 			else:
 				self.set(module_class_name, class_definition) # put module class definition into global objects dictionary with module class name as key
 
+		self.checkModules()
+
 		self.exception = Exception
+
+	def checkModules(self):
+		for module_name in [name for name in MODULE_IMPORT_ORDER if importlib.util.find_spec("modules." + name) == None]:
+			self.errorPrompt(f"[{module_name}] in 'import' list: FILE NOT FOUND.", "import", module_name)
+		for module_name in [name for name in MODULE_IMPORT_ORDER if name not in MODULE_CLASSES]:
+			self.errorPrompt(f"[{module_name}] in 'import' list: NO VALUE in 'module class' dictionary.", "import", module_name)
+		for module_name in [name for name in MODULE_UPDATE_ORDER if name not in MODULE_IMPORT_ORDER]:
+			self.errorPrompt(f"[{module_name}] in 'update' list: NOT FOUND in 'import' list.", "update", module_name)
+
 
 	##
 	## @brief      Turn the engine once.
@@ -149,8 +162,13 @@ class Engine():
 	## @param      self  This object
 	##
 	def turn(self):
-		for module_name in MODULE_UPDATE_ORDER:
-			self.module_instances[module_name].update()
+		try:
+			for module_name in MODULE_UPDATE_ORDER:
+				self.module_instances[module_name].update()
+		except self.exception:
+			raise self.exception
+		except:
+			self.errorPrompt(f"[{module_name}] in 'update' list: ERROR during update().", "update", module_name, is_exception=True)
 		self.update()
 
 	##
@@ -209,9 +227,24 @@ class Engine():
 	def addPanel(self, window):
 		return self.panel.new_panel(window.window)
 
-	def errorPrompt(self, prompt, list_name, module_name):
+	def errorPrompt(self, prompt, list_name, module_name, is_exception=False):
 		response = ""
-		prompt = "\n" + str(prompt) + f"\nRemove from '{list_name}' list for this launch? (y/n) "
+		prompt = "\n" + str(prompt)
+		if is_exception:
+			prompt += '\n\n'
+			highlight = self.get("pygments_func_highlight")
+			if highlight is not None:
+				lexer = self.get("pygments_pytb_lexer")
+				formatter = self.get("pygments_term_formatter")
+				trace_text = "".join(traceback.format_exc())
+				prompt += highlight(trace_text, lexer, formatter)
+			else:
+				prompt += traceback.format_exc()
+
+		curses.def_prog_mode()
+		self.curses.endwin()
+
+		prompt += f"\nRemove from '{list_name}' list for this launch? (y/n) "
 		while response != "y" and response != "n":
 			response = input(prompt)
 		if response == "y":
@@ -222,21 +255,9 @@ class Engine():
 		else:
 			exit(-1)
 
-	def panic(self, prompt, is_exception=True):
-		self.terminate()
-		print("\n" + str(prompt) + "\n")
-		if is_exception:
-			highlight = self.get("pygments_func_highlight")
-			if highlight is not None:
-				lexer = self.get("pygments_pytb_lexer")
-				formatter = self.get("pygments_term_formatter")
-				trace_text = "".join(traceback.format_exc())
-				trace = highlight(trace_text, lexer, formatter)
-				print(trace)
-			else:
-				traceback.print_exc()  # Print the exception
-		print("")
-		exit(-1)
+		curses.reset_prog_mode()
+		self.screen.clear()
+		self.screen.refresh()
 
 	##
 	## @brief      terminate engine
