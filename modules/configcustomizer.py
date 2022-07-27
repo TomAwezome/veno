@@ -20,6 +20,8 @@ class ConfigCustomizerWindow(Window):
 		self.current_option = 0
 		self.viewport_y = 0
 
+		self.top_text_tip = " (Press Ctrl-/ or Ctrl-C to dismiss, scroll and change values with arrow keys) "
+
 		## Config instance.
 		self.config = self.engine.get("config")
 		## ConfigCustomizer keybindings dictionary stores functions
@@ -103,7 +105,7 @@ class ConfigCustomizerWindow(Window):
 			if self.current_option < self.viewport_y:
 				#self.viewport_y-=1
 				self.viewport_y -= self.viewport_y - self.current_option
-			if self.current_option > self.getWindowMaxY() + self.viewport_y - 4:
+			if self.current_option > self.getWindowMaxY() + self.viewport_y - 3:
 				self.viewport_y += self.current_option - self.viewport_y
 
 	def moveCurrentOptionDown(self, d, name): #name unused; passed to all customizer keybinding functions
@@ -112,7 +114,7 @@ class ConfigCustomizerWindow(Window):
 			self.current_option += 1
 			#if self.getWindowMaxY() == 6:
 				#exit()
-			if self.current_option > self.getWindowMaxY() + self.viewport_y - 4:
+			if self.current_option > self.getWindowMaxY() + self.viewport_y - 3:
 				self.viewport_y += self.current_option - self.viewport_y
 
 	def descendIntoDict(self, d, name): #name unused; passed to all customizer keybinding functions
@@ -143,21 +145,18 @@ class ConfigCustomizerWindow(Window):
 		option_keys = list(d.keys())
 
 		if name == "Color Customizer":
-			self.intended_height = len(option_keys) + 3
+			self.intended_height = len(option_keys) + 2
 			self.intended_width = max(len(str(len(option_keys)) + "\t#"), len("Color Customizer") + 2)
 			# intended_width explained: d.keys will return a number with as many digits..
 			self.intended_x = int(self.getScreenMaxX() / 2 - (self.intended_width / 2))
 		
 		self.keepWindowInMainScreen()
-		self.window.box()
 			
 		# HAVE to consider screensize. self.window.getmaxyx() at this point should be happily computed.
 		# if we wanna config on small displays, do we need scrolling?.....
 		# yes. we can do that after we get it displaying based on maxyx.
 		if self.getWindowMaxY() <= 2 or self.getWindowMaxX() <= 2:
 			return # window is too small to print anything so quit while we're ahead.
-
-		self.window.addnstr(1, 1, name, self.getWindowMaxX() - 2, self.engine.curses.A_STANDOUT)
 			
 		# Explaining some possibly hard to read code;
 		# this for loop increments i over a range of 1...windowMaxY to do the following with i:
@@ -183,18 +182,22 @@ class ConfigCustomizerWindow(Window):
 			color_highlight_index = len(str(option_string + "\t").expandtabs(tab_expand_size)) + 1
 
 			if option_type != "dict" and option_type != "list":
-				self.window.addnstr(i + 1, 1, line_string, self.getWindowMaxX() - 2)
+				self.window.addnstr(i, 1, line_string, self.getWindowMaxX() - 2)
 
 				if name == "Color Customizer" and self.getWindowMaxX() > len(line_string) + 1:
-					self.window.chgat(i + 1, color_highlight_index, len(option_value_string), self.engine.curses.color_pair(option_value))
+					self.window.chgat(i, color_highlight_index, len(option_value_string), self.engine.curses.color_pair(option_value))
 
 			else: # it is a dict or list
-				self.window.addnstr(i + 1, 1, object_string, self.getWindowMaxX() - 2)
+				self.window.addnstr(i, 1, object_string, self.getWindowMaxX() - 2)
 
 			if self.current_option == option_index:
-				self.window.chgat(i + 1, 1, min(self.getWindowMaxX() - 2, len(option_string)), self.engine.curses.color_pair(3) | self.engine.curses.A_REVERSE)
+				self.window.chgat(i, 1, min(self.getWindowMaxX() - 2, len(option_string)), self.engine.curses.color_pair(3) | self.engine.curses.A_REVERSE)
 
 		self.window.box()
+		top_text = name
+		if name != "Color Customizer":
+			top_text += self.top_text_tip
+		self.window.addnstr(0, 1, top_text, self.getWindowMaxX() - 2, self.engine.curses.A_STANDOUT)
 		self.engine.update()
 		
 		while True:
@@ -232,7 +235,7 @@ class ConfigCustomizerWindow(Window):
 			self.intended_x = 0
 
 			if name == "Color Customizer":
-				self.intended_height = len(d.keys()) + 3
+				self.intended_height = len(d.keys()) + 2
 				self.intended_width = max(len(str(len(d.keys())) + "\t#"), len("Color Customizer") + 2)
 				# intended_width explained: d.keys will return a number with as many digits..
 				self.intended_x = int(self.getScreenMaxX() / 2 - (self.intended_width / 2))
@@ -240,7 +243,6 @@ class ConfigCustomizerWindow(Window):
 			self.keepWindowInMainScreen()
 			self.window.clear()
 			
-			self.window.addnstr(1, 1, name, self.getWindowMaxX() - 2, self.engine.curses.A_STANDOUT)
 			for i in range(1, self.getWindowMaxY() - 1): # for each line of window after title text				
 				tab_expand_size = self.config.options["TabExpandSize"]
 				option_index = i + self.viewport_y - 1				
@@ -256,17 +258,21 @@ class ConfigCustomizerWindow(Window):
 
 			
 				if option_type != "dict" and option_type != "list":
-					self.window.addnstr(i + 1, 1, line_string, self.getWindowMaxX() - 2)
+					self.window.addnstr(i, 1, line_string, self.getWindowMaxX() - 2)
 					if name == "Color Customizer" and self.getWindowMaxX() > len(line_string) + 1:
-						self.window.chgat(i + 1, color_highlight_index, len(option_value_string), self.engine.curses.color_pair(option_value))
+						self.window.chgat(i, color_highlight_index, len(option_value_string), self.engine.curses.color_pair(option_value))
 
 				else: # it is a dict or list
-					self.window.addnstr(i + 1, 1, object_string, self.getWindowMaxX() - 2)
+					self.window.addnstr(i, 1, object_string, self.getWindowMaxX() - 2)
 
 				if self.current_option == option_index:
-					self.window.chgat(i + 1, 1, min(self.getWindowMaxX() - 2, len(option_string)), self.engine.curses.color_pair(3) | self.engine.curses.A_REVERSE)
+					self.window.chgat(i, 1, min(self.getWindowMaxX() - 2, len(option_string)), self.engine.curses.color_pair(3) | self.engine.curses.A_REVERSE)
 
 			self.window.box()
+			top_text = name
+			if name != "Color Customizer":
+				top_text += self.top_text_tip
+			self.window.addnstr(0, 1, top_text, self.getWindowMaxX() - 2, self.engine.curses.A_STANDOUT)
 				
 			for i in self.engine.global_objects:
 				if not issubclass(type(self.engine.get(i)), Window):
