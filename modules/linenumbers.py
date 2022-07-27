@@ -6,9 +6,9 @@ class LineNumbersWindow(Window):
 		## FileWindow instance that LineNumbersWindow is attached to.
 		self.file_window = self.engine.get("current_file_window")
 
-		self.intended_y			= self.file_window.getWindowBegY()
+		self.intended_y			= self.file_window.getWindowY()
 		self.intended_width		= 5
-		self.intended_x			= self.file_window.getWindowBegX() - self.intended_width
+		self.intended_x			= self.file_window.getWindowX() - self.intended_width
 		self.intended_height	= self.file_window.getWindowMaxY()
 		if self.intended_x < 0:
 			self.intended_x = 0
@@ -38,7 +38,7 @@ class LineNumbersWindow(Window):
 		self.file_window.intended_width	= self.getScreenMaxX() - self.file_window.intended_x - 1
 		self.file_window.keepWindowInMainScreen()
 
-		self.intended_x			= self.file_window.getWindowBegX() - self.intended_width + 1
+		self.intended_x			= self.file_window.getWindowX() - self.intended_width + 1
 		self.intended_height	= self.file_window.getWindowMaxY()
 		self.keepWindowInMainScreen()
 
