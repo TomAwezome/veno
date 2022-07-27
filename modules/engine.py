@@ -28,6 +28,7 @@ MODULE_IMPORT_ORDER = [
 	"debugwindow",
 	"openbar",
 	"helpwindow",
+	"runwindow",
 	"keybindings",
 ]
 
@@ -47,6 +48,7 @@ MODULE_UPDATE_ORDER = [
 	"debugwindow",
 	"helpwindow",
 	"diffwindow",
+	"runwindow",
 ]
 
 MODULE_CLASSES = {
@@ -67,6 +69,7 @@ MODULE_CLASSES = {
 	"diffwindow": "DiffWindow",
 	"keybindings": "Keyboard",
 	"debug": "Debug",
+	"runwindow": "RunWindow",
 }
 
 ##

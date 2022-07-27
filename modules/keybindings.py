@@ -37,6 +37,8 @@ class Keyboard:
 
 		self.syntax_highlighting = self.engine.get("syntaxhighlighting")
 
+		self.run_window = self.engine.get("runwindow")
+
 		## ConfigCustomizer instance for customizer keybindings. (Only used for toggle)
 		self.config_customizer = self.engine.get("configcustomizer")
 
@@ -106,6 +108,8 @@ class Keyboard:
 			"^?":            self.file_window.backspaceTextAtFilecursor,
 
 			"KEY_DC": self.file_window.deleteTextAtFilecursor,
+
+			"KEY_F(2)": self.run_window.run,
 
 			"KEY_END":   self.file_window.gotoEndOfLine,
 			"KEY_F(3)":  self.file_window.gotoStartOfFile,

@@ -34,12 +34,12 @@ while True:
 		break
 	except:
 		engine.terminate()
+		print("")
 		highlight = engine.get("pygments_func_highlight")
 		if highlight is not None:
 			lexer = engine.get("pygments_pytb_lexer")
 			formatter = engine.get("pygments_term_formatter")
-			trace_text = "".join(traceback.format_exc())
-			trace = highlight(trace_text, lexer, formatter)
+			trace = highlight(traceback.format_exc(), lexer, formatter)
 			print(trace)
 		else:
 			traceback.print_exc()  # Print the exception
