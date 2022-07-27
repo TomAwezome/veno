@@ -8,8 +8,6 @@ class LineJumpBar(Window):
 		## FileWindow instance LineJumpBar is attached to.
 		self.file_window = self.engine.get("current_file_window")
 
-		self.config = self.engine.get("config").options
-
 		self.line_jump_cursor_x = 0
 		self.line_jump_string = ""
 
@@ -144,3 +142,4 @@ class LineJumpBar(Window):
 
 	def terminate(self):
 		pass
+
