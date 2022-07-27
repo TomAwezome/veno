@@ -156,15 +156,18 @@ class SearchBar(Window):
 
 		tab_expand_size = self.config["TabExpandSize"]
 		prompt = "Search: "
-		self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.engine.curses.color_pair(7) | self.engine.curses.A_REVERSE)
 
-		tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
-		if self.search_cursor_x + tab_diff + len(prompt) <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
-			self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
-
-		self.engine.update()
 		while True: # break out of this loop with enter key
 			self.window.erase()
+			self.keepWindowInMainScreen()
+			self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.engine.curses.color_pair(7) | self.engine.curses.A_REVERSE)
+
+			tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
+			if self.search_cursor_x + tab_diff + len(prompt)<= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
+				self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
+
+			self.engine.update()
+
 			try:
 				c = self.engine.screen.getch()
 			except KeyboardInterrupt:
@@ -183,16 +186,6 @@ class SearchBar(Window):
 				self.search_bindings["printable-character"](c)
 			elif c == "^J": # enter key
 				break
-
-			self.keepWindowInMainScreen()
-			self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.engine.curses.color_pair(7) | self.engine.curses.A_REVERSE)
-
-			tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
-			if self.search_cursor_x + tab_diff + len(prompt)<= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
-				self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
-
-			self.engine.update()
-
 		try:
 			pattern = re.compile(self.search_string)
 		except:
@@ -270,21 +263,21 @@ class SearchBar(Window):
 		self.keepWindowInMainScreen()
 
 		tab_expand_size = self.config["TabExpandSize"]
-
 		prompt = "Replace: "
 
-		self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.engine.curses.color_pair(7) | self.engine.curses.A_REVERSE)
-
-		tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
-		if self.search_cursor_x + tab_diff + len(prompt) <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
-			self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
-
-		self.engine.update()
-
-	# search string
-	# keypress loop: begin catching characters
+		# search string
+		# keypress loop: begin catching characters
 		while True: # break out of this loop with enter key
 			self.window.erase()
+			self.keepWindowInMainScreen()
+			self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.engine.curses.color_pair(7) | self.engine.curses.A_REVERSE)
+
+			tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
+			if self.search_cursor_x + tab_diff + len(prompt) <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
+				self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
+
+			self.engine.update()
+
 			try:
 				c = self.engine.screen.getch()
 			except KeyboardInterrupt:
@@ -301,20 +294,11 @@ class SearchBar(Window):
 				self.search_bindings["printable-character"](c)
 			elif c == "^J": # enter key
 				break
-			
-			self.keepWindowInMainScreen()
-			self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.engine.curses.color_pair(7) | self.engine.curses.A_REVERSE)
-
-			tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
-			if self.search_cursor_x + tab_diff + len(prompt) <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
-				self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
-
-			self.engine.update()
 		
 		first_string = self.search_string
 		
-	# replacement string
-	# keypress loop: begin catching characters
+		# replacement string
+		# keypress loop: begin catching characters
 		self.search_string = self.replace_string
 		cursor_x_last = self.search_cursor_x
 		self.search_cursor_x = self.replace_cursor_x
@@ -324,16 +308,17 @@ class SearchBar(Window):
 
 		prompt = "Replace with: "
 
-		self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.engine.curses.color_pair(7) | self.engine.curses.A_REVERSE)
-
-		tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
-		if self.search_cursor_x + tab_diff + len(prompt) <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
-			self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
-
-		self.engine.update()
-
 		while True: # break out of this loop with enter key
 			self.window.erase()
+			self.keepWindowInMainScreen()
+			self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.engine.curses.color_pair(7) | self.engine.curses.A_REVERSE)
+
+			tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
+			if self.search_cursor_x + tab_diff + len(prompt) <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
+				self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
+
+			self.engine.update()
+
 			try:
 				c = self.engine.screen.getch()
 			except KeyboardInterrupt:
@@ -350,16 +335,7 @@ class SearchBar(Window):
 				self.search_bindings["printable-character"](c)
 			elif c == "^J": # enter key
 				break
-			
-			self.keepWindowInMainScreen()
-			self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.engine.curses.color_pair(7) | self.engine.curses.A_REVERSE)
 
-			tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
-			if self.search_cursor_x + tab_diff + len(prompt) <= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
-				self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
-
-			self.engine.update()
-			
 		second_string = self.search_string
 		self.replace_string = second_string
 		self.replace_cursor_x = self.search_cursor_x
