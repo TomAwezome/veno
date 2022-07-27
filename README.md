@@ -47,7 +47,7 @@ Runs in a terminal window. GUI not yet implemented.
 |Ctrl-D|Remove line at cursor from file|
 |Arrow Keys|Move cursor in file|
 |PageUp, PageDown|Scroll cursor up/down|
-|Alt-PageUp, Alt-PageDown|Scroll viewport up/down|
+|Alt-PageUp, Alt-PageDown, Ctrl-PageUp, Ctrl-PageDown|Scroll viewport up/down|
 |Ctrl-Arrow Keys|Move viewport up/down/left/right.  (Ctrl-Arrow Keys not supported by all terminals)|
 |Ctrl-W|Save file|
 |Home Key|Go to start of line in file|

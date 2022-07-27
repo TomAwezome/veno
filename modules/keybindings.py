@@ -121,6 +121,8 @@ class Keyboard:
 			"KEY_PPAGE": self.file_window.scrollFilecursorUp,
 			"kPRV3":     self.file_window.scrollViewportUp,
 			"kNXT3":     self.file_window.scrollViewportDown,
+			"kPRV5":     self.file_window.scrollViewportUp,
+			"kNXT5":     self.file_window.scrollViewportDown,
 
 			"KEY_BTAB":  self.file_window.unindentSelectedLines,
 
