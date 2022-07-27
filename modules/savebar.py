@@ -106,6 +106,31 @@ class SaveBar(Window):
 
 		result = False
 
+		file_window_list = self.engine.get("file_window_list")
+		while True and len(file_window_list) == 1:
+			self.keepWindowInMainScreen()
+
+			self.window.erase()
+			self.window.addnstr(0, 0, "Are you sure you want to exit? (Y/N)", self.getWindowMaxX() - 1, self.engine.curses.color_pair(4) | self.engine.curses.A_REVERSE)
+
+			self.engine.update()
+
+			try:
+				c = self.engine.screen.getch()
+			except KeyboardInterrupt:
+				result = True
+				return result
+			if c == -1:
+				continue
+			c = self.engine.curses.keyname(c)
+			c = c.decode("utf-8")
+			if c.lower() == 'n':
+				result = False
+				self.panel.hide()
+				return result
+			if c == "^J" or c.lower() == "y":
+				break
+
 		while True:
 			self.keepWindowInMainScreen()
 
@@ -186,6 +211,31 @@ class SaveBar(Window):
 			self.keepWindowInMainScreen()
 
 			self.window.erase()
+			self.window.addnstr(0, 0, "Are you sure you want to exit? (Y/N)", self.getWindowMaxX() - 1, self.engine.curses.color_pair(4) | self.engine.curses.A_REVERSE)
+
+			self.engine.update()
+
+			try:
+				c = self.engine.screen.getch()
+			except KeyboardInterrupt:
+				result = True
+				return result
+			if c == -1:
+				continue
+			c = self.engine.curses.keyname(c)
+			c = c.decode("utf-8")
+			if c.lower() == 'n':
+				result = False
+				self.panel.hide()
+				return result
+			if c == "^J" or c.lower() == "y":
+				break
+
+		while True:
+			self.keepWindowInMainScreen()
+
+			self.window.erase()
+
 			self.window.addnstr(0, 0, "Sync files before exit? (Y/N or Enter/Ctrl-C)", self.getWindowMaxX() - 1, self.engine.curses.color_pair(4) | self.engine.curses.A_REVERSE)
 
 			self.engine.update()
