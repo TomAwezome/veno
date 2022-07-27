@@ -63,7 +63,7 @@ Multi-purpose text/code editor meant for easy and vast expandability.
 			for line in lines[self.view_y:]:
 				if window_y >= window_max_y - 1:
 					break
-				self.window.addnstr(window_y, 1, line, window_max_x - 2, self.engine.curses.color_pair(4))
+				self.window.addnstr(window_y, 1, line, window_max_x - 2, self.engine.curses.color_pair(0))
 				window_y += 1
 
 			self.engine.update()
