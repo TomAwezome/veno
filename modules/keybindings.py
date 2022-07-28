@@ -1,4 +1,66 @@
-import string
+import string, inspect
+
+KEYBINDINGS = {
+	"KEY_UP":    "filewindowmanager.moveFilecursorUp",
+	"KEY_DOWN":  "filewindowmanager.moveFilecursorDown",
+	"KEY_LEFT":  "filewindowmanager.moveFilecursorLeft",
+	"KEY_RIGHT": "filewindowmanager.moveFilecursorRight",
+
+	"printable-character": "filewindowmanager.enterTextAtFilecursor",
+
+	"KEY_BACKSPACE": "filewindowmanager.backspaceTextAtFilecursor",
+	"^H":            "filewindowmanager.backspaceTextAtFilecursor",
+	"^?":            "filewindowmanager.backspaceTextAtFilecursor",
+
+	"KEY_DC": "filewindowmanager.deleteTextAtFilecursor",
+
+	"KEY_F(2)": "runwindow.run",
+
+	"KEY_END":   "filewindowmanager.gotoEndOfLine",
+	"KEY_F(3)":  "filewindowmanager.gotoStartOfFile",
+	"KEY_F(4)":  "filewindowmanager.gotoEndOfFile",
+	"KEY_F(5)":  "filewindowmanager.selectPrevFileWindow",
+	"KEY_F(6)":  "filewindowmanager.selectNextFileWindow",
+	"KEY_HOME":  "filewindowmanager.gotoStartOfLine",
+	"KEY_NPAGE": "filewindowmanager.scrollFilecursorDown",
+	"KEY_PPAGE": "filewindowmanager.scrollFilecursorUp",
+	"kPRV3":     "filewindowmanager.scrollViewportUp",
+	"kNXT3":     "filewindowmanager.scrollViewportDown",
+	"kPRV5":     "filewindowmanager.scrollViewportUp",
+	"kNXT5":     "filewindowmanager.scrollViewportDown",
+
+	"KEY_BTAB":  "filewindowmanager.unindentSelectedLines",
+
+	"^_": "configcustomizer.toggle",
+
+	"^O": "openbar.openFile",
+
+	"^T": "diffwindow.toggle",
+	"^L": "linejumpbar.jumpToLine",
+	"^F": "searchbar.search",
+	"^G": "searchbar.searchNext",
+	"^R": "searchbar.replace",
+
+	"^D": "filewindowmanager.deleteLineAtFilecursor",
+	"^J": "filewindowmanager.newLineAtFilecursor",
+	"^W": "filewindowmanager.saveFile",
+	"^I": "filewindowmanager.enterTextAtFilecursor",
+
+	"^A": "filewindowmanager.selectAll",
+	"^B": "filewindowmanager.toggleSelect",
+	"^K": "filewindowmanager.copySelect",
+	"^V": "filewindowmanager.pasteAtFilecursor",
+	"^X": "filewindowmanager.cutSelect",
+
+	"kRIT5": "filewindowmanager.moveViewportRight",
+	"kLFT5": "filewindowmanager.moveViewportLeft",
+	"kUP5":  "filewindowmanager.moveViewportUp",
+	"kDN5":  "filewindowmanager.moveViewportDown",
+
+	"KEY_F(9)":  "filewindowmanager.closeFileWindow",
+	"KEY_F(1)":  "helpwindow.toggle",
+	"KEY_F(12)": "debugwindow.toggle",
+}
 
 ##
 ## @brief      Class for keyboard.
@@ -17,30 +79,6 @@ class Keyboard:
 
 		## The binding dictionary. Bindings saved as "keyname": function instance.
 		self.bindings = {}
-
-		## FileWindow instance for fileWindow keybindings.
-		self.file_window = self.engine.get("current_file_window")
-
-		self.line_jump_bar = self.engine.get("linejumpbar")
-
-		self.save_bar = self.engine.get("savebar")
-
-		self.search_bar = self.engine.get("searchbar")
-
-		self.debug_window = self.engine.get("debugwindow")
-
-		self.open_bar = self.engine.get("openbar")
-
-		self.help_window = self.engine.get("helpwindow")
-
-		self.diff_window = self.engine.get("diffwindow")
-
-		self.syntax_highlighting = self.engine.get("syntaxhighlighting")
-
-		self.run_window = self.engine.get("runwindow")
-
-		## ConfigCustomizer instance for customizer keybindings. (Only used for toggle)
-		self.config_customizer = self.engine.get("configcustomizer")
 
 		self.bind()
 		
@@ -67,8 +105,13 @@ class Keyboard:
 				else:
 					self.bindings[c]()
 
+			elif c == "^[": # ESC
+				c = -1
+				self.leave()
+
 			elif c in string.punctuation + string.digits + string.ascii_letters + " \t":
 				self.bindings["printable-character"](c)
+
 
 			c = self.engine.screen.getch()
 
@@ -76,7 +119,8 @@ class Keyboard:
 
 	def leave(self, confirm=True):
 		if confirm:
-			if not self.save_bar.confirmExitSave():
+			save_bar = self.engine.get("savebar")
+			if save_bar is not None and not save_bar.confirmExitSave():
 				return
 		exception = self.engine.get("EngineException")
 		raise exception
@@ -95,128 +139,30 @@ class Keyboard:
 	## @param      self  This object
 	##
 	def bind(self):
-		self.bindings = {
-			"KEY_UP":    self.file_window.moveFilecursorUp,
-			"KEY_DOWN":  self.file_window.moveFilecursorDown,
-			"KEY_LEFT":  self.file_window.moveFilecursorLeft,
-			"KEY_RIGHT": self.file_window.moveFilecursorRight,
+		self.bindings = {}
+		for key, val in KEYBINDINGS.items():
+			objname_and_mthname = val.split('.')
+			if len(objname_and_mthname) != 2:
+				response = ''
+				while response != 'y':
+					response = self.engine.errorPrompt(f"KEYBINDINGS dictionary key '{key}' invalid value: {val}\nKeybinding must be removed.")
+				continue
+			object_name = objname_and_mthname[0]
+			method_name = objname_and_mthname[1]
+			global_object = self.engine.get(object_name)
+			if global_object is None:
+				response = ''
+				while response != 'y':
+					response = self.engine.errorPrompt(f"KEYBINDINGS dictionary key '{key}' no global object named '{object_name}'\nKeybinding must be removed.")
+				continue
+			object_method_dict = dict((key, value) for key, value in inspect.getmembers(global_object, inspect.ismethod))
+			if method_name not in object_method_dict:
+				response = ''
+				while response != 'y':
+					response = self.engine.errorPrompt(f"KEYBINDINGS dictionary key '{key}' no method named '{method_name}' in object '{object_name}'\nKeybinding must be removed.")
+				continue
 
-			"printable-character": self.file_window.enterTextAtFilecursor,
-
-			"KEY_BACKSPACE": self.file_window.backspaceTextAtFilecursor,
-			"^H":            self.file_window.backspaceTextAtFilecursor,
-			"^?":            self.file_window.backspaceTextAtFilecursor,
-
-			"KEY_DC": self.file_window.deleteTextAtFilecursor,
-
-			"KEY_F(2)": self.run_window.run,
-
-			"KEY_END":   self.file_window.gotoEndOfLine,
-			"KEY_F(3)":  self.file_window.gotoStartOfFile,
-			"KEY_F(4)":  self.file_window.gotoEndOfFile,
-			"KEY_F(5)":  self.selectPrevFileWindow,
-			"KEY_F(6)":  self.selectNextFileWindow,
-			"KEY_HOME":  self.file_window.gotoStartOfLine,
-			"KEY_NPAGE": self.file_window.scrollFilecursorDown,
-			"KEY_PPAGE": self.file_window.scrollFilecursorUp,
-			"kPRV3":     self.file_window.scrollViewportUp,
-			"kNXT3":     self.file_window.scrollViewportDown,
-			"kPRV5":     self.file_window.scrollViewportUp,
-			"kNXT5":     self.file_window.scrollViewportDown,
-
-			"KEY_BTAB":  self.file_window.unindentSelectedLines,
-
-			"^_": self.config_customizer.toggle,
-
-			"^O": self.open_bar.openFile,
-
-			"^T": self.diff_window.toggle,
-			"^L": self.line_jump_bar.jumpToLine,
-			"^F": self.search_bar.search,
-			"^G": self.search_bar.searchNext,
-			"^R": self.search_bar.replace,
-
-			"^D": self.file_window.deleteLineAtFilecursor,
-			"^J": self.file_window.newLineAtFilecursor,
-			"^W": self.file_window.saveFile,
-			"^I": self.file_window.enterTextAtFilecursor,
-
-			"^A": self.file_window.selectAll,
-			"^B": self.file_window.toggleSelect,
-			"^K": self.file_window.copySelect,
-			"^V": self.file_window.pasteAtFilecursor,
-			"^X": self.file_window.cutSelect,
-
-			"kRIT5": self.file_window.moveViewportRight,
-			"kLFT5": self.file_window.moveViewportLeft,
-			"kUP5":  self.file_window.moveViewportUp,
-			"kDN5":  self.file_window.moveViewportDown,
-
-			"KEY_F(9)": self.closeFileWindow,
-			"KEY_F(1)": self.help_window.toggle,
-			"KEY_F(12)": self.debug_window.toggle,
-			"^[": self.leave
-		}
+			self.bindings[key] = object_method_dict[method_name]
 
 		self.engine.set("bindings", self.bindings)
-		
-	##
-	## @brief      Change FileWindow instance to which keybindings are bound to the previous instance.
-	##
-	## @param      self  This object
-	##
-	def selectPrevFileWindow(self):
-		self.file_window = self.engine.get("current_file_window")
-		self.file_window.panel.hide()
-		old_copy_lines = self.file_window.copy_lines # share copied text globally across fileWindows
-		file_window_list = self.engine.get("file_window_list")
-		if file_window_list.index(self.file_window) - 1 >= 0:
-			self.file_window = file_window_list[file_window_list.index(self.file_window) - 1]
-		else:
-			self.file_window = file_window_list[len(file_window_list) - 1]
-		self.engine.set("current_file_window", self.file_window) # re-set current file window in engine
-		self.file_window.panel.top()
-		self.file_window.panel.show()
-		self.file_window.is_modified = True
-		self.file_window.copy_lines = old_copy_lines
-		self.bind() # kludge ... bindings array holds function pointers to specific FileWindow object instances... we have to rebind to keep this implementation...
-		self.syntax_highlighting.updateLexer()
-
-	##
-	## @brief      Change FileWindow instance to which keybindings are bound to the next instance.
-	##
-	## @param      self  This object
-	##
-	def selectNextFileWindow(self):
-		self.file_window = self.engine.get("current_file_window")
-		self.file_window.panel.hide()
-		old_copy_lines = self.file_window.copy_lines # share copied text globally across fileWindows
-		file_window_list = self.engine.get("file_window_list")
-		if file_window_list.index(self.file_window) + 1 < len(file_window_list):
-			self.file_window = file_window_list[file_window_list.index(self.file_window) + 1]
-		else:
-			self.file_window = file_window_list[0]
-		self.engine.set("current_file_window", self.file_window) # re-set current file window in engine
-		self.file_window.panel.top()
-		self.file_window.panel.show()
-		self.file_window.is_modified = True
-		self.file_window.copy_lines = old_copy_lines
-		self.bind() # kludge ... bindings array holds function pointers to specific FileWindow object instances... we have to rebind to keep this implementation...
-		self.syntax_highlighting.updateLexer()
-
-	##
-	## @brief      Close FileWindow instance.
-	##
-	## @param      self  This object
-	##
-	def closeFileWindow(self):
-		if not self.save_bar.confirmCloseSave():
-			return
-		file_window_to_remove = self.engine.get("current_file_window")
-		self.selectNextFileWindow()
-		if file_window_to_remove is not self.engine.get("current_file_window"):
-			window_list = self.engine.get("file_window_list")
-			window_list.remove(file_window_to_remove)
-		else:
-			self.leave(confirm=False)
 

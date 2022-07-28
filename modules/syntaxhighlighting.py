@@ -60,6 +60,9 @@ class Highlighter:
 	##
 	def update(self):
 
+		if self.file_window != self.engine.get("current_file_window"):
+			self.updateLexer()
+
 		self.file_window = self.engine.get("current_file_window")
 
 		viewport_x = self.file_window.getViewportX()

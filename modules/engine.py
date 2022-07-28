@@ -115,28 +115,30 @@ class Engine():
 			try:
 				m = importlib.import_module("modules." + module_name)
 			except:
-				self.errorPrompt(f"[{module_name}] in 'import' list: ERROR during import.", "import", module_name, is_exception=True)
+				self.errorModulePrompt(f"[{module_name}] in 'import' list: ERROR during import.", "import", module_name, is_exception=True)
 				continue
 			self.module_list.append(m)
 			module_class_name = MODULE_CLASSES[module_name]
 			class_definition = ([c for n, c in inspect.getmembers(m, inspect.isclass) if n == module_class_name] or [None])[0]
 			if class_definition == None:
-				self.errorPrompt(f"[{module_name}] in 'import' list: class <{module_class_name}> NOT FOUND.\n"
+				self.errorModulePrompt(f"[{module_name}] in 'import' list: class <{module_class_name}> NOT FOUND.\n"
 					"Possible typo? Check MODULE_CLASSES in engine.py, and check {module_name}.py\n", "import",  module_name, is_exception=False)
 				continue
 			self.module_classes[module_name] = (module_class_name, class_definition)
 			if module_name not in MODULE_INIT_EXCLUDES:
 				class_function_name_list = [n for n, f in inspect.getmembers(class_definition, inspect.isfunction)]
 				if "terminate" not in class_function_name_list:
-					self.errorPrompt(f"[{module_name}] in 'import' list: {module_class_name}.terminate() function NOT FOUND.", "import", module_name, is_exception=False)
+					self.errorModulePrompt(f"[{module_name}] in 'import' list: {module_class_name}.terminate() function NOT FOUND.", "import", module_name, is_exception=False)
 					continue
 				if module_name in MODULE_UPDATE_ORDER and "update" not in class_function_name_list:
-					self.errorPrompt(f"[{module_name}] in 'import' list: {module_class_name}.update() function NOT FOUND.", "import", module_name, is_exception=False)
+					self.errorModulePrompt(f"[{module_name}] in 'import' list: {module_class_name}.update() function NOT FOUND.", "import", module_name, is_exception=False)
 					continue
 				try:
 					self.module_instances[module_name] = class_instance = class_definition(self) # call imported module class's __init__ with Engine as arg
+				except SystemExit:
+					exit(-1)
 				except:
-					self.errorPrompt(f"[{module_name}] in 'import' list: ERROR during initialization.", "import", module_name, is_exception=True)
+					self.errorModulePrompt(f"[{module_name}] in 'import' list: ERROR during initialization.", "import", module_name, is_exception=True)
 					continue
 
 				self.set(module_name, class_instance)
@@ -149,11 +151,11 @@ class Engine():
 
 	def checkModules(self):
 		for module_name in [name for name in MODULE_IMPORT_ORDER if importlib.util.find_spec("modules." + name) == None]:
-			self.errorPrompt(f"[{module_name}] in 'import' list: FILE NOT FOUND.", "import", module_name)
+			self.errorModulePrompt(f"[{module_name}] in 'import' list: FILE NOT FOUND.", "import", module_name)
 		for module_name in [name for name in MODULE_IMPORT_ORDER if name not in MODULE_CLASSES]:
-			self.errorPrompt(f"[{module_name}] in 'import' list: NO VALUE in 'module class' dictionary.", "import", module_name)
+			self.errorModulePrompt(f"[{module_name}] in 'import' list: NO VALUE in 'module class' dictionary.", "import", module_name)
 		for module_name in [name for name in MODULE_UPDATE_ORDER if name not in MODULE_IMPORT_ORDER]:
-			self.errorPrompt(f"[{module_name}] in 'update' list: NOT FOUND in 'import' list.", "update", module_name)
+			self.errorModulePrompt(f"[{module_name}] in 'update' list: NOT FOUND in 'import' list.", "update", module_name)
 
 
 	##
@@ -168,7 +170,10 @@ class Engine():
 		except self.exception:
 			raise self.exception
 		except:
-			self.errorPrompt(f"[{module_name}] in 'update' list: ERROR during update().", "update", module_name, is_exception=True)
+			try:
+				self.errorModulePrompt(f"[{module_name}] in 'update' list: ERROR during update().", "update", module_name, is_exception=True)
+			except SystemExit:
+				raise self.exception
 		self.update()
 
 	##
@@ -227,11 +232,11 @@ class Engine():
 	def addPanel(self, window):
 		return self.panel.new_panel(window.window)
 
-	def errorPrompt(self, prompt, list_name, module_name, is_exception=False):
-		response = ""
-		prompt = "\n" + str(prompt)
+	def errorPrompt(self, arg_prompt, is_exception=False):
+		response = " "
+
+		prompt = ""
 		if is_exception:
-			prompt += '\n\n'
 			highlight = self.get("pygments_func_highlight")
 			if highlight is not None:
 				lexer = self.get("pygments_pytb_lexer")
@@ -240,25 +245,34 @@ class Engine():
 				prompt += highlight(trace_text, lexer, formatter)
 			else:
 				prompt += traceback.format_exc()
+			prompt += '\n'
 
 		curses.def_prog_mode()
 		self.curses.endwin()
 
-		prompt += f"\nRemove from '{list_name}' list for this launch? (y/n) "
-		while response != "y" and response != "n":
-			response = input(prompt)
-		if response == "y":
-			if list_name == "import":
-				MODULE_IMPORT_ORDER.remove(module_name)
-			elif list_name == "update":
-				MODULE_UPDATE_ORDER.remove(module_name)
-		else:
+		while response != "y" and response != "n" and response[0] != "q":
+			response = input("\n" + prompt + arg_prompt + " (y/n/quit) ")
+			response.lower()
+			if response == '':
+				response = ' '
+
+		if response[0] == "q":
 			exit(-1)
 
 		curses.reset_prog_mode()
 		self.screen.clear()
 		self.screen.refresh()
 
+		return response.lower()
+
+	def errorModulePrompt(self, prompt, list_name, module_name, is_exception=False):
+		prompt += f"\nRemove from '{list_name}' list for this launch?"
+		response = self.errorPrompt(prompt, is_exception)
+		if response == "y":
+			if list_name == "import":
+				MODULE_IMPORT_ORDER.remove(module_name)
+			elif list_name == "update":
+				MODULE_UPDATE_ORDER.remove(module_name)
 	##
 	## @brief      terminate engine
 	##
@@ -274,4 +288,3 @@ class Engine():
 			if module_name not in MODULE_INIT_EXCLUDES:
 				if module_name in self.module_instances:
 					self.module_instances[module_name].terminate()
-

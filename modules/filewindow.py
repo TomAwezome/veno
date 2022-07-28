@@ -613,9 +613,6 @@ class FileWindow(Window):
 
 		return returnval
 
-	def searchForText(self):
-		pass
-
 	def scrollFilecursorDown(self):
 		scroll_amount = self.config["ScrollAmount"]
 		filecursor_y = self.getFilecursorY()
