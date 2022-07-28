@@ -39,14 +39,14 @@ class DebugWindow(Window):
 		self.window.addnstr(0, 1, " DEBUG (Press F12 to dismiss) ", window_max_x - 2, self.engine.curses.color_pair(0) | self.engine.curses.A_REVERSE)
 
 		self.debug.log("Global Objects:")
-		self.debug.log("---------------")
+
 		items = self.engine.global_objects.items()
 		for key, val in items:
-			self.debug.log(f"  {key}".ljust(24) + f"{val}")
-		self.debug.log("---------------")
+			self.debug.log(f"    {key}".ljust(26) + f"{val}")
 
 		lines = self.debug.text.split("\n")
-		lines.reverse()
+		if len(lines) > window_max_y + 2:
+			lines = lines[len(lines) - window_max_y + 2:]
 		for line in lines:
 			if window_y >= window_max_y - 1:
 				break
