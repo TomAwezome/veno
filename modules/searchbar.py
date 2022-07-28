@@ -481,6 +481,8 @@ class SearchBar(Window):
 				break
 			elif c == "^[": # ESC
 				break
+			else:
+				continue
 
 			file_string = '\n'.join(self.file_window.file_lines)
 
