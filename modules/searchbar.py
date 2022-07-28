@@ -124,13 +124,11 @@ class SearchBar(Window):
 		replaced_string_right = file_string[self.next_match.end():]
 		replaced_string_combined = replaced_string_left + replaced_string + replaced_string_right
 		self.file_window.file_lines = replaced_string_combined.splitlines()
-		self.file_window.file.contents = replaced_string_combined
 
 	def replaceAllMatches(self, first_string, second_string):
 		file_lines = self.file_window.file_lines
 		file_string = '\n'.join(file_lines)
 		replaced_string = re.sub(first_string, second_string, file_string)
-		self.file_window.file.contents = replaced_string
 		self.file_window.file_lines = replaced_string.splitlines()
 
 	def search(self):
@@ -193,11 +191,13 @@ class SearchBar(Window):
 			self.panel.hide()
 			return
 
-		self.pattern_matches = pattern.finditer(self.file_window.file.contents)
+		file_string = '\n'.join(self.file_window.file_lines)
+
+		self.pattern_matches = pattern.finditer(file_string)
 		try:
 			self.next_match = next(self.pattern_matches)
-			search_index_y = self.file_window.file.contents[:self.next_match.start()].count('\n')
-			search_lines = self.file_window.file.contents[:self.next_match.start()].split('\n')
+			search_index_y = file_string[:self.next_match.start()].count('\n')
+			search_lines = file_string[:self.next_match.start()].split('\n')
 			if len(search_lines) > 0:
 				search_index_x = len(search_lines[len(search_lines) - 1])
 		except StopIteration:
@@ -207,8 +207,8 @@ class SearchBar(Window):
 			while search_index_y < self.cursor[1]:
 				try:
 					self.next_match = next(self.pattern_matches)
-					search_index_y = self.file_window.file.contents[:self.next_match.start()].count('\n')
-					search_lines = self.file_window.file.contents[:self.next_match.start()].split('\n')
+					search_index_y = file_string[:self.next_match.start()].count('\n')
+					search_lines = file_string[:self.next_match.start()].split('\n')
 					if len(search_lines) > 0:
 						search_index_x = len(search_lines[len(search_lines) - 1])
 				except StopIteration:
@@ -217,8 +217,8 @@ class SearchBar(Window):
 			while search_index_y == self.cursor[1] and search_index_x <= self.cursor[0]:
 				try:
 					self.next_match = next(self.pattern_matches)
-					search_index_y = self.file_window.file.contents[:self.next_match.start()].count('\n')
-					search_lines = self.file_window.file.contents[:self.next_match.start()].split('\n')
+					search_index_y = file_string[:self.next_match.start()].count('\n')
+					search_lines = file_string[:self.next_match.start()].split('\n')
 					if len(search_lines) > 0:
 						search_index_x = len(search_lines[len(search_lines) - 1])
 				except StopIteration:
@@ -233,22 +233,53 @@ class SearchBar(Window):
 		self.panel.hide()
 
 	def searchNext(self):
+		if self.search_string == '':
+			return
 		try:
-			try:
-				self.next_match = next(self.pattern_matches) # next operates to go down iterator, in this case if hitting first instance of given string, next() will start at that first index and continue through matches
-			except TypeError: # if patternMatches is not iterator, next() raises TypeError. Catch and abort.
-				return
+			pattern_string = self.search_string
+			if not self.config["FindRegexMode"]:
+				pattern_string = re.escape(pattern_string)
+			pattern = re.compile(pattern_string)
+		except:
+			self.panel.hide()
+			return
 
-			search_index_y = self.file_window.file.contents[:self.next_match.start()].count('\n')
-			search_lines = self.file_window.file.contents[:self.next_match.start()].split('\n')
+		file_string = '\n'.join(self.file_window.file_lines)
+
+		self.pattern_matches = pattern.finditer(file_string)
+		try:
+			self.next_match = next(self.pattern_matches)
+			search_index_y = file_string[:self.next_match.start()].count('\n')
+			search_lines = file_string[:self.next_match.start()].split('\n')
 			if len(search_lines) > 0:
 				search_index_x = len(search_lines[len(search_lines) - 1])
+		except StopIteration:
+			self.next_match = None
+
+		if self.next_match:
+			while search_index_y < self.cursor[1]:
+				try:
+					self.next_match = next(self.pattern_matches)
+					search_index_y = file_string[:self.next_match.start()].count('\n')
+					search_lines = file_string[:self.next_match.start()].split('\n')
+					if len(search_lines) > 0:
+						search_index_x = len(search_lines[len(search_lines) - 1])
+				except StopIteration:
+					break
+
+			while search_index_y == self.cursor[1] and search_index_x <= self.cursor[0]:
+				try:
+					self.next_match = next(self.pattern_matches)
+					search_index_y = file_string[:self.next_match.start()].count('\n')
+					search_lines = file_string[:self.next_match.start()].split('\n')
+					if len(search_lines) > 0:
+						search_index_x = len(search_lines[len(search_lines) - 1])
+				except StopIteration:
+					break
 
 			self.file_window.jumpToLine(search_index_y)
 			self.file_window.setFilecursorX(search_index_x)
-
-		except StopIteration:
-			pass
+			self.cursor = self.file_window.filecursor
 
 	def replace(self):
 		self.panel.show()
@@ -369,11 +400,13 @@ class SearchBar(Window):
 
 		search_index_y = None # if try block success, this is set to a number, else error and should bail
 
-		self.pattern_matches = pattern.finditer(self.file_window.file.contents)
+		file_string = '\n'.join(self.file_window.file_lines)
+
+		self.pattern_matches = pattern.finditer(file_string)
 		try:
 			self.next_match = next(self.pattern_matches)
-			search_index_y = self.file_window.file.contents[:self.next_match.start()].count('\n')
-			search_lines = self.file_window.file.contents[:self.next_match.start()].split('\n')
+			search_index_y = file_string[:self.next_match.start()].count('\n')
+			search_lines = file_string[:self.next_match.start()].split('\n')
 			if len(search_lines) > 0:
 				search_index_x = len(search_lines[len(search_lines) - 1])
 		except StopIteration:
@@ -387,8 +420,8 @@ class SearchBar(Window):
 			while search_index_y < self.cursor[1]:
 				try:
 					self.next_match = next(self.pattern_matches)
-					search_index_y = self.file_window.file.contents[:self.next_match.start()].count('\n')
-					search_lines = self.file_window.file.contents[:self.next_match.start()].split('\n')
+					search_index_y = file_string[:self.next_match.start()].count('\n')
+					search_lines = file_string[:self.next_match.start()].split('\n')
 					if len(search_lines) > 0:
 						search_index_x = len(search_lines[len(search_lines) - 1])
 				except StopIteration:
@@ -397,8 +430,8 @@ class SearchBar(Window):
 			while search_index_y == self.cursor[1] and search_index_x < self.cursor[0]:
 				try:
 					self.next_match = next(self.pattern_matches)
-					search_index_y = self.file_window.file.contents[:self.next_match.start()].count('\n')
-					search_lines = self.file_window.file.contents[:self.next_match.start()].split('\n')
+					search_index_y = file_string[:self.next_match.start()].count('\n')
+					search_lines = file_string[:self.next_match.start()].split('\n')
 					if len(search_lines) > 0:
 						search_index_x = len(search_lines[len(search_lines) - 1])
 				except StopIteration:
@@ -449,11 +482,13 @@ class SearchBar(Window):
 			elif c == "^[": # ESC
 				break
 
-			self.pattern_matches = pattern.finditer(self.file_window.file.contents)
+			file_string = '\n'.join(self.file_window.file_lines)
+
+			self.pattern_matches = pattern.finditer(file_string)
 			try:
 				self.next_match = next(self.pattern_matches)
-				search_index_y = self.file_window.file.contents[:self.next_match.start()].count('\n')
-				search_lines = self.file_window.file.contents[:self.next_match.start()].split('\n')
+				search_index_y = file_string[:self.next_match.start()].count('\n')
+				search_lines = file_string[:self.next_match.start()].split('\n')
 				if len(search_lines) > 0:
 					search_index_x = len(search_lines[len(search_lines) - 1])
 			except StopIteration:
@@ -463,8 +498,8 @@ class SearchBar(Window):
 				while search_index_y < self.cursor[1]:
 					try:
 						self.next_match = next(self.pattern_matches)
-						search_index_y = self.file_window.file.contents[:self.next_match.start()].count('\n')
-						search_lines = self.file_window.file.contents[:self.next_match.start()].split('\n')
+						search_index_y = file_string[:self.next_match.start()].count('\n')
+						search_lines = file_string[:self.next_match.start()].split('\n')
 						if len(search_lines) > 0:
 							search_index_x = len(search_lines[len(search_lines) - 1])
 					except StopIteration:
@@ -473,8 +508,8 @@ class SearchBar(Window):
 				while search_index_y == self.cursor[1] and search_index_x <= self.cursor[0]:
 					try:
 						self.next_match = next(self.pattern_matches)
-						search_index_y = self.file_window.file.contents[:self.next_match.start()].count('\n')
-						search_lines = self.file_window.file.contents[:self.next_match.start()].split('\n')
+						search_index_y = file_string[:self.next_match.start()].count('\n')
+						search_lines = file_string[:self.next_match.start()].split('\n')
 						if len(search_lines) > 0:
 							search_index_x = len(search_lines[len(search_lines) - 1])
 					except StopIteration:

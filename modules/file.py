@@ -26,12 +26,13 @@ class File:
 	##
 	## @brief      Save altered contents to File
 	##
-	## @param      self        This object
-	## @param      fileString  The altered contents as a string
+	## @param      self         This object
+	## @param      file_string  The altered contents as a string
 	##
-	def save(self, fileString):
+	def save(self, file_string):
 		if self.source != "":
 			file = open(self.source, "w")
-			file.write(fileString)
+			file.write(file_string)
+			self.contents = file_string
 			file.close()
 
