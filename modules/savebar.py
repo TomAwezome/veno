@@ -130,6 +130,9 @@ class SaveBar(Window):
 				return result
 			if c == "^J" or c.lower() == "y":
 				break
+			if c == "^[": # ESC
+				result = True
+				return result
 
 		while True:
 			self.keepWindowInMainScreen()
@@ -149,6 +152,9 @@ class SaveBar(Window):
 
 			c = self.engine.curses.keyname(c)
 			c = c.decode("utf-8")
+			if c == "^[": # ESC
+				result = True
+				break
 			if c.lower() == 'n':
 				result = True
 				break
@@ -184,6 +190,9 @@ class SaveBar(Window):
 						self.window.erase()
 						self.file_window.saveFile()
 						break
+					if c == "^[": # ESC
+						break
+
 				self.diff_window.toggle()
 				result = True
 				break
@@ -230,6 +239,9 @@ class SaveBar(Window):
 				return result
 			if c == "^J" or c.lower() == "y":
 				break
+			if c == "^[": # ESC
+				result = True
+				return result
 
 		while True:
 			self.keepWindowInMainScreen()
@@ -250,6 +262,9 @@ class SaveBar(Window):
 
 			c = self.engine.curses.keyname(c)
 			c = c.decode("utf-8")
+			if c == "^[": # ESC
+				result = True
+				break
 			if c.lower() == 'n':
 				result = True
 				break
@@ -288,7 +303,11 @@ class SaveBar(Window):
 							self.window.erase()
 							file_window.saveFile()
 							break
+						if c == "^[": # ESC
+							break
+
 					file_window_list.remove(file_window)
+
 				result = True
 				break
 
@@ -342,6 +361,10 @@ class SaveBar(Window):
 			elif c == "^J": # enter key
 				if self.save_string != "":
 					break
+			elif c == "^[": # ESC
+				returnval = False
+				self.panel.hide()
+				break
 
 			self.keepWindowInMainScreen()
 			self.window.addnstr(0, 0, prompt + self.save_string, self.getWindowMaxX() - 1, self.engine.curses.color_pair(4) | self.engine.curses.A_REVERSE)

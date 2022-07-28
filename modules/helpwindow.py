@@ -82,7 +82,7 @@ Multi-purpose text/code editor meant for easy and vast expandability.
 			if c in self.bindings:
 				self.bindings[c]()
 
-			if c == "^J" or c == "KEY_F(1)" or c == " ":
+			if c == "^J" or c == "KEY_F(1)" or c == " " or c == "^[":
 				self.toggle()
 				break
 

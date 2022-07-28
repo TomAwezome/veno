@@ -91,7 +91,7 @@ class DiffWindow(Window):
 			if c in self.bindings:
 				self.bindings[c]()
 
-			if c == "^J" or c == "^T" or c == " ":
+			if c == "^J" or c == "^T" or c == " " or c == "^[":
 				self.toggle()
 				break
 

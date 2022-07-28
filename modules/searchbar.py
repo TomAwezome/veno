@@ -180,6 +180,10 @@ class SearchBar(Window):
 				self.search_bindings["printable-character"](c)
 			elif c == "^J": # enter key
 				break
+			elif c == "^[": # ESC
+				self.panel.hide()
+				return
+
 		try:
 			pattern_string = self.search_string
 			if not self.config["FindRegexMode"]:
@@ -293,7 +297,10 @@ class SearchBar(Window):
 				self.search_bindings["printable-character"](c)
 			elif c == "^J": # enter key
 				break
-		
+			elif c == "^[": # ESC
+				self.panel.hide()
+				return
+
 		first_string = self.search_string
 		first_pattern_string = first_string
 		if not self.config["FindRegexMode"]:
@@ -337,6 +344,9 @@ class SearchBar(Window):
 				self.search_bindings["printable-character"](c)
 			elif c == "^J": # enter key
 				break
+			elif c == "^[": # ESC
+				self.panel.hide()
+				return
 
 		second_string = self.search_string
 		second_pattern_string = second_string
@@ -435,6 +445,8 @@ class SearchBar(Window):
 			elif c == "n":
 				pass
 			elif c == "^J": # enter key
+				break
+			elif c == "^[": # ESC
 				break
 
 			self.pattern_matches = pattern.finditer(self.file_window.file.contents)

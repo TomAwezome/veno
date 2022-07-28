@@ -123,6 +123,9 @@ class LineJumpBar(Window):
 				self.line_jump_bindings["digit"](c)
 			elif c == "^J": # enter key
 				break
+			elif c == "^[": # ESC
+				self.panel.hide()
+				return
 
 			self.keepWindowInMainScreen()
 			self.window.addnstr(0, 0, prompt + self.line_jump_string, self.getWindowMaxX() - 1, self.engine.curses.color_pair(7) | self.engine.curses.A_REVERSE)

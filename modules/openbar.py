@@ -123,6 +123,10 @@ class OpenBar(Window):
 			elif c == "^J": # enter key
 				if self.open_string != "":
 					break
+			elif c == "^[": # ESC
+				result = False
+				self.panel.hide()
+				return result
 
 			self.keepWindowInMainScreen()
 			self.window.addnstr(0, 0, prompt + self.open_string, self.getWindowMaxX() - 1, self.engine.curses.color_pair(4) | self.engine.curses.A_REVERSE)
@@ -152,7 +156,7 @@ class OpenBar(Window):
 				c = self.engine.curses.keyname(c)
 				c = c.decode("utf-8")
 
-				if c.lower() == 'n':
+				if c.lower() == 'n' or c == "^[":
 					self.panel.hide()
 					return False
 				if c == "^J" or c.lower() == "y":

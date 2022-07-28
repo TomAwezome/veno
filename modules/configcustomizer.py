@@ -44,6 +44,7 @@ class ConfigCustomizerWindow(Window):
 	def bind(self):
 		self.bindings = {
 			"^_":        self.closeCurrentCustomizer,
+			"^[":        self.closeCurrentCustomizer,
 			"KEY_LEFT":  self.decrementConfigValue,
 			"KEY_RIGHT": self.incrementConfigValue,
 			"KEY_UP":    self.moveCurrentOptionUp,
@@ -213,7 +214,7 @@ class ConfigCustomizerWindow(Window):
 
 			if c in self.bindings:
 				self.bindings[c](d, name)
-				if c == "^_":
+				if c == "^_" or c == "^[":
 					break
 
 			self.intended_width = self.getScreenMaxX()

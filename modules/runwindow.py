@@ -132,6 +132,9 @@ class RunWindow(Window):
 				self.run_cursor_bindings["printable-character"](c)
 			elif c == "^J": # enter key
 				break
+			elif c == "^[": # ESC
+				self.panel.hide()
+				return
 
 			self.keepWindowInMainScreen()
 			self.window.addnstr(0, 0, prompt + self.run_string, self.getWindowMaxX() - 1, self.engine.curses.color_pair(3) | self.engine.curses.A_REVERSE)
@@ -203,7 +206,7 @@ class RunWindow(Window):
 				if c in self.run_window_bindings:
 					self.run_window_bindings[c]()
 
-				if c == "^J" or c == "KEY_F(2)" or c == " ":
+				if c == "^J" or c == "KEY_F(2)" or c == " " or c == "^[":
 					break
 
 		self.keepWindowInMainScreen()
