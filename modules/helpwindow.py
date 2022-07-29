@@ -1,3 +1,5 @@
+import random
+
 from modules.window import Window
 class HelpWindow(Window):
 	def __init__(self, engine):
@@ -9,8 +11,18 @@ class HelpWindow(Window):
 		
 		self.help_top_text = " HELP (Press F1/Ctrl-C/Enter/Space to dismiss, scroll with arrow keys) "
 
+		self.help_logo_text = """
+                 #               
+                 ##              
+ ##   ## ####### ###  ##  ##### 
+ ##   ## ##      #### ## ##   ##
+ ##   ## ####### ####### ##   ##
+  ## ##  ##      ### ### ##   ##
+   ###   ####### ###  ##  ##### 
+    #                  #         
+"""
+
 		self.help_header_text = """
-VENO
 
 Multi-purpose text/code editor meant for easy and vast expandability.
 
@@ -43,6 +55,8 @@ Multi-purpose text/code editor meant for easy and vast expandability.
 		text = self.help_header_text + self.help_body_text
 		lines = text.split("\n")
 
+		color = random.randint(2,8)
+		
 		while True:
 			self.intended_x			= 0
 			self.intended_y			= 0
@@ -60,7 +74,18 @@ Multi-purpose text/code editor meant for easy and vast expandability.
 			self.window.box()
 			if window_max_y - 1 > 1:
 				self.window.addnstr(0, 1, self.help_top_text, window_max_x - 2, self.engine.curses.color_pair(0) | self.engine.curses.A_REVERSE)
-			for line in lines[self.view_y:]:
+			for line in self.help_logo_text.split('\n')[self.view_y:]:
+				if window_y >= window_max_y - 1:
+					break
+				window_x = 0
+				for char in line:
+					if window_x >= window_max_x - 1:
+						break
+					if char == '#':
+						self.window.chgat(window_y, window_x, 1, self.engine.curses.color_pair(color) | self.engine.curses.A_REVERSE)
+					window_x += 1
+				window_y += 1
+			for line in lines[max(0, self.view_y - self.help_logo_text.count('\n')):]:
 				if window_y >= window_max_y - 1:
 					break
 				self.window.addnstr(window_y, 1, line, window_max_x - 2, self.engine.curses.color_pair(0))
