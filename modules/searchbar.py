@@ -382,7 +382,7 @@ class SearchBar(Window):
 		second_string = self.search_string
 		second_pattern_string = second_string
 		if not self.config["ReplaceRegexMode"]:
-			second_pattern_string = re.escape(second_string)
+			second_pattern_string = second_pattern_string.replace('\\', '\\\\')
 		self.replace_string = second_string
 		self.replace_cursor_x = self.search_cursor_x
 		self.search_string = first_string
