@@ -1,5 +1,3 @@
-from difflib import unified_diff as diff
-
 from modules.window import Window
 class DiffWindow(Window):
 	def __init__(self, engine):
@@ -31,17 +29,13 @@ class DiffWindow(Window):
 		tab_expand_size = self.config["TabSize"]
 
 		self.file_window = self.engine.get("current_file_window")
-		
-		File = self.engine.get("File")
 		filename = self.file_window.file.source
-		file = File(filename)
-		disk_file_lines = file.contents.splitlines()
 		
-		diff_result = diff(disk_file_lines, self.file_window.file_lines, f"File on disk   [ {filename} ]", f"File in memory [ {filename} ]")
+		diff_result = self.file_window.diff()
 		diff_lines = []
 		for line in diff_result:
 			diff_lines.append(line.expandtabs(tab_expand_size))
-		if diff_lines == []:
+		if len(diff_result) == 0:
 			diff_lines = ["", f"No differences between file on disk and file in memory. [ {filename} ]"]
 		
 		while True:

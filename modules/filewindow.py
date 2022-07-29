@@ -1,3 +1,5 @@
+from difflib import unified_diff as diff
+
 from modules.window import Window
 class FileWindow(Window):
 	def __init__(self, engine, file):
@@ -102,6 +104,14 @@ class FileWindow(Window):
 
 	def setFilecursorY(self, y):
 		self.filecursor[1] = y
+
+	def diff(self):
+		filename = self.file.source
+		diff_output = diff(self.file.contents.splitlines(), self.file_lines, f"File on disk   [ {filename} ]", f"File in memory [ {filename} ]")
+		result = []
+		for line in diff_output:
+			result.append(line)
+		return result
 
 	def toggleSelect(self):
 		if not self.is_select_on:

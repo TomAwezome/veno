@@ -273,6 +273,9 @@ class SaveBar(Window):
 				file_window_list = self.engine.get("file_window_list")
 				while file_window_list != []:
 					file_window = self.file_window = file_window_list[0]
+					if len(file_window.diff()) == 0:
+						file_window_list.remove(file_window)
+						continue
 					self.engine.set("current_file_window", file_window)
 					self.window_bar.update()
 					self.diff_window.view_y = 0
