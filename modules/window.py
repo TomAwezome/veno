@@ -1,7 +1,6 @@
 class Window:
 	def __init__(self, engine):
 		self.engine = engine
-		self.name = None
 		self.intended_x			= 0 #  
 		self.intended_y			= 0 # default
 		self.intended_width		= 1 # values
