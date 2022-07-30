@@ -1,5 +1,5 @@
 import argparse # load arg parser module for file input
-import importlib
+import importlib, importlib.util
 import inspect
 import curses
 import curses.panel as panel
