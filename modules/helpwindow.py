@@ -85,7 +85,7 @@ Multi-purpose text/code editor meant for easy and vast expandability.
 						self.window.chgat(window_y, window_x, 1, self.engine.curses.color_pair(color) | self.engine.curses.A_REVERSE)
 					window_x += 1
 				window_y += 1
-			for line in lines[max(0, self.view_y - self.help_logo_text.count('\n')):]:
+			for line in lines[max(0, self.view_y - self.help_logo_text.count('\n') - 1):]:
 				if window_y >= window_max_y - 1:
 					break
 				self.window.addnstr(window_y, 1, line, window_max_x - 2, self.engine.curses.color_pair(0))
