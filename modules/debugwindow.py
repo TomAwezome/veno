@@ -42,7 +42,7 @@ class DebugWindow(Window):
 
 		items = self.engine.global_objects.items()
 		for key, val in items:
-			self.debug.log(f"    {key}".ljust(26) + f"{val}")
+			self.debug.log(f"    {key}".ljust(28) + f"{val}")
 
 		lines = self.debug.text.split("\n")
 		if len(lines) > window_max_y + 2:
