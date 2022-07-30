@@ -20,7 +20,7 @@ class ConfigCustomizerWindow(Window):
 		self.current_option = 0
 		self.viewport_y = 0
 
-		self.top_text_tip = " (Press Ctrl-/ or Ctrl-C to dismiss, scroll and change values with arrow keys) "
+		self.top_text_tip = " (Press Ctrl-/ or Ctrl-C to dismiss, Enter or Space to enter sub-menus, scroll and change values with arrow keys) "
 
 		## Config instance.
 		self.config = self.engine.get("config")
@@ -39,7 +39,7 @@ class ConfigCustomizerWindow(Window):
 		
 		else:
 			self.panel.top()
-			self.editDict(self.config.options, "Config Customizer")
+			self.editDict(self.config.options, "CONFIG CUSTOMIZER")
 
 	def bind(self):
 		self.bindings = {
@@ -54,10 +54,10 @@ class ConfigCustomizerWindow(Window):
 		}
 
 	def closeCurrentCustomizer(self, d, name): #d unused; passed to all customizer keybinding functions
-		if name == "Config Customizer":
+		if name == "CONFIG CUSTOMIZER":
 			self.toggle()
 			self.panel.hide()
-		elif name == "Color Customizer":
+		elif name == "COLOR CUSTOMIZER":
 			self.intended_x = 0
 			self.window.mvwin(0, 0) # for some reason, despite intended_x being 0, kWIMS() does not move it upon leaving a method...
 			#self.keepWindowInMainScreen()
@@ -110,7 +110,7 @@ class ConfigCustomizerWindow(Window):
 
 		if datatype == "dict":
 			if option_keys[self.current_option] == "ColorMap": # custom ColorMap config logic, window resizes to see color changes realtime
-				self.editDict(d[option_keys[self.current_option]], "Color Customizer")
+				self.editDict(d[option_keys[self.current_option]], "COLOR CUSTOMIZER")
 			else:
 				self.editDict(d[option_keys[self.current_option]])
 
@@ -121,7 +121,7 @@ class ConfigCustomizerWindow(Window):
 		else:
 			self.is_open = True
 
-	def editDict(self, d, name="Dictionary Editor"):
+	def editDict(self, d, name="CONFIG DICTIONARY EDITOR"):
 		self.window.erase()
 		self.current_option = 0
 		self.viewport_y = 0
@@ -131,9 +131,9 @@ class ConfigCustomizerWindow(Window):
 
 		option_keys = list(d.keys())
 
-		if name == "Color Customizer":
+		if name == "COLOR CUSTOMIZER":
 			self.intended_height = len(option_keys) + 2
-			self.intended_width = max(len(str(len(option_keys)) + "\t#"), len("Color Customizer") + 2)
+			self.intended_width = max(len(str(len(option_keys)) + "\t#"), len("COLOR CUSTOMIZER") + 2)
 			# intended_width explained: d.keys will return a number with as many digits..
 			self.intended_x = int(self.getScreenMaxX() / 2 - (self.intended_width / 2))
 		
@@ -171,7 +171,7 @@ class ConfigCustomizerWindow(Window):
 			if option_type != "dict" and option_type != "list":
 				self.window.addnstr(i, 1, line_string, self.getWindowMaxX() - 2)
 
-				if name == "Color Customizer" and self.getWindowMaxX() > len(line_string) + 1:
+				if name == "COLOR CUSTOMIZER" and self.getWindowMaxX() > len(line_string) + 1:
 					self.window.chgat(i, color_highlight_index, len(option_value_string), self.engine.curses.color_pair(option_value))
 
 			else: # it is a dict or list
@@ -182,7 +182,7 @@ class ConfigCustomizerWindow(Window):
 
 		self.window.box()
 		top_text = name
-		if name != "Color Customizer":
+		if name != "COLOR CUSTOMIZER":
 			top_text += self.top_text_tip
 		self.window.addnstr(0, 1, top_text, self.getWindowMaxX() - 2, self.engine.curses.A_STANDOUT)
 		self.engine.update()
@@ -193,10 +193,10 @@ class ConfigCustomizerWindow(Window):
 			except KeyboardInterrupt:
 				self.current_option = 0
 				self.viewport_y = 0
-				if name == "Config Customizer":
+				if name == "CONFIG CUSTOMIZER":
 					self.toggle()
 					self.panel.hide()
-				elif name == "Color Customizer":
+				elif name == "COLOR CUSTOMIZER":
 					self.intended_x = 0
 					self.window.mvwin(0, 0) # for some reason, despite intended_x being 0, kWIMS() does not move it upon leaving a method...
 					#self.keepWindowInMainScreen()
@@ -221,9 +221,9 @@ class ConfigCustomizerWindow(Window):
 			self.intended_height = self.getScreenMaxY()
 			self.intended_x = 0
 
-			if name == "Color Customizer":
+			if name == "COLOR CUSTOMIZER":
 				self.intended_height = len(d.keys()) + 2
-				self.intended_width = max(len(str(len(d.keys())) + "\t#"), len("Color Customizer") + 2)
+				self.intended_width = max(len(str(len(d.keys())) + "\t#"), len("COLOR CUSTOMIZER") + 2)
 				# intended_width explained: d.keys will return a number with as many digits..
 				self.intended_x = int(self.getScreenMaxX() / 2 - (self.intended_width / 2))
 
@@ -246,7 +246,7 @@ class ConfigCustomizerWindow(Window):
 			
 				if option_type != "dict" and option_type != "list":
 					self.window.addnstr(i, 1, line_string, self.getWindowMaxX() - 2)
-					if name == "Color Customizer" and self.getWindowMaxX() > len(line_string) + 1:
+					if name == "COLOR CUSTOMIZER" and self.getWindowMaxX() > len(line_string) + 1:
 						self.window.chgat(i, color_highlight_index, len(option_value_string), self.engine.curses.color_pair(option_value))
 
 				else: # it is a dict or list
@@ -257,7 +257,7 @@ class ConfigCustomizerWindow(Window):
 
 			self.window.box()
 			top_text = name
-			if name != "Color Customizer":
+			if name != "COLOR CUSTOMIZER":
 				top_text += self.top_text_tip
 			self.window.addnstr(0, 1, top_text, self.getWindowMaxX() - 2, self.engine.curses.A_STANDOUT)
 				
