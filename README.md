@@ -12,6 +12,7 @@ Multi-purpose text/code editor meant for easy and vast expandability.
    - Help window reporting generated keybindings and respective module functions
  - Syntax highlighting
  - Multi-file support
+ - Run window with command output
  - Diff window comparing disk/editor file contents
  - Regex Find/Replace mode
  - Text select-region toggle; cut, copy, paste
