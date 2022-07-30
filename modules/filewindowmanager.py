@@ -24,6 +24,8 @@ class FileWindowManager:
 			self.file_window_list.append(self.current_file_window)
 			file_window.update()
 			self.engine.set("current_file_window", self.current_file_window)
+		for file_window in [fw for fw in self.file_window_list if fw != self.current_file_window]:
+			file_window.panel.hide()
 
 	def update(self):
 		self.current_file_window = self.engine.get("current_file_window")
