@@ -58,5 +58,7 @@ class LineNumbersWindow(Window):
 				self.window.addstr(window_y, 0, line_number_string + (" " * (len(str(total_lines)) - len(line_number_string))) + " ", self.engine.curses.A_REVERSE)
 				window_y += 1
 
+		self.file_window.update()
+
 	def terminate(self):
  		pass
