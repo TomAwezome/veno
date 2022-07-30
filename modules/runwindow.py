@@ -178,7 +178,6 @@ class RunWindow(Window):
 				self.keepWindowInMainScreen()
 				self.window.erase()
 				self.window.box()
-				self.engine.update()
 				window_y = 1
 				window_max_y = self.getWindowMaxY()
 				window_max_x = self.getWindowMaxX()
