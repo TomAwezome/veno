@@ -4,6 +4,24 @@
 
 Multi-purpose text/code editor meant for easy and vast expandability.
 
+## Features
+
+ - Fully modular
+   - Realtime crash-preventing module unloading
+   - Keybinding initialization error detection with automatic dynamic key unbinding
+   - Help window reporting generated keybindings and respective module functions
+ - Syntax highlighting
+ - Multi-file support
+ - Regex Find/Replace mode
+ - Text select-region toggle; cut, copy, paste
+ - Line jump
+ - In-editor configuration customizer
+   - Bracket matching, quote matching
+   - Auto-indent
+   - Find/Replace regex/standard toggle
+ - Language-specific configuration overrides
+ - 100% Python code
+
 ## Install
 
 Requires Python 3.
@@ -40,7 +58,7 @@ Runs in a terminal window. GUI not yet implemented.
 |Ctrl-D|Remove line at cursor from file|
 |Arrow Keys|Move cursor in file|
 |PageUp, PageDown|Scroll cursor up/down|
-|Alt-PageUp, Alt-PageDown, Ctrl-PageUp, Ctrl-PageDown|Scroll viewport up/down|
+|Ctrl/Alt-PageUp, Ctrl/Alt-PageDown|Scroll viewport up/down|
 |Ctrl-Arrow Keys|Move viewport up/down/left/right.  (Ctrl-Arrow Keys not supported by all terminals)|
 |Ctrl-W|Save file|
 |Home Key|Go to start of line in file|
@@ -65,3 +83,4 @@ Runs in a terminal window. GUI not yet implemented.
 |Ctrl-T|Diff file|
 |Ctrl-_, Ctrl-/|Toggle config customizer|
 |F12|Toggle debug window|
+
