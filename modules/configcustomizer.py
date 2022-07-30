@@ -35,8 +35,7 @@ class ConfigCustomizerWindow(Window):
 		
 		if not self.is_open:
 			if not self.panel.hidden:
-				self.panel.hide()
-		
+				self.panel.hide()		
 		else:
 			self.panel.top()
 			self.editDict(self.config.options, "CONFIG CUSTOMIZER")

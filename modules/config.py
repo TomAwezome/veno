@@ -65,6 +65,9 @@ class Config:
 				self.options = {**self.default_options, **json_dict} # set config options as default options, overridden by config file settings
 				if len(json_dict) < len(self.default_options): # if config file has less entries than default, .veno is old and will be updated
 					self.save()
+				for ext in self.options["LanguageOverrides"]:
+					if "TabLength" in self.options["LanguageOverrides"][ext]: # this .veno config option is deprecated and its existence will cause trouble
+						self.options["LanguageOverrides"][ext] = self.default_options["LanguageOverrides"][ext]
 			except:
 				self.options = self.default_options
 
@@ -77,17 +80,29 @@ class Config:
 
 		self.standard_options = copy.deepcopy(self.options) # backup a 'standard' config to use for filetypes with no overrides
 
-		extension = os.path.splitext(self.engine.filenames[0])[1][1:]
+		self.last_filename = current_filename = self.engine.filenames[0]
+		extension = os.path.splitext(current_filename)[1][1:]
 		if extension in self.options["LanguageOverrides"]:
 			self.options = {**self.options, **self.options["LanguageOverrides"][extension]}
 
 	def update(self):
 		current_filename = self.engine.get("current_file_window").file.source
+		if current_filename == self.last_filename:
+			return # bail to save time
+		self.last_filename = current_filename
 		extension = os.path.splitext(current_filename)[1][1:]
 		if extension in self.options["LanguageOverrides"]:
 			self.options = {**self.options, **self.options["LanguageOverrides"][extension]}
-		else:
-			self.options = {**self.options, **self.standard_options}
+		else: # if no overrides for current file, iterate through language overrides and reset config vals back to standard_options value if current values match overrides
+			lang_changes = {}
+			for ext in self.options["LanguageOverrides"]:
+				for key in self.options["LanguageOverrides"][ext]:
+					if key not in lang_changes:
+						lang_changes[key] = []
+					lang_changes[key].append(self.options["LanguageOverrides"][ext][key])
+			for key, val in lang_changes.items():
+				if self.options[key] in val:
+					self.options[key] = self.standard_options[key]
 
 	def save(self):
 		self.text = json.dumps(self.options, sort_keys=True, indent=4, separators=(',', ': '))
