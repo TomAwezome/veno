@@ -34,8 +34,8 @@ Dependencies:
 
 Run `pip3 install -r requirements.txt` to install dependencies.
  - In case this does not successfully install Pygments, installing Pygments through a package manager may.
-   - On Ubuntu, try `sudo apt install python3-pygments`
-   - On NetBSD 9.2, try `pkgin install py39-curses py39-cursespanel py39-pygments`, and change line 1 of `veno` from `#!/usr/bin/env python3` to `#!/usr/bin/env python3.9`.
+   - On Ubuntu, run `sudo apt install python3-pygments`
+   - On NetBSD 9.2, run `pkgin install py39-curses py39-cursespanel py39-pygments && sed 's/python3/python3.9/g' veno`
 
 
 Run `chmod +x veno` to mark `veno` as executable.
