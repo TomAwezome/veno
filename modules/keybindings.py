@@ -77,6 +77,8 @@ class Keyboard:
 		## The engine to allow scheduling actions in external Windows.
 		self.engine = engine
 
+		self.debug = self.engine.get("debug")
+
 		## The binding dictionary. Bindings saved as "keyname": function instance.
 		self.bindings = {}
 
@@ -98,6 +100,8 @@ class Keyboard:
 			self.engine.screen.timeout(20)
 			c = self.engine.curses.keyname(c)
 			c = c.decode("utf-8")
+			if self.debug is not None:
+				self.debug.log(f"\n-- KEYBINDINGS --\nLast ncurses key name pressed: {c}\n-----------------")
 
 			if c in self.bindings:
 				if c == "^I":
