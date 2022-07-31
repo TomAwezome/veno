@@ -53,7 +53,7 @@ class FileWindowManager:
 			self.current_file_window = self.file_window_list[len(self.file_window_list) - 1]
 		self.engine.set("current_file_window", self.current_file_window) # re-set current file window in engine
 		self.current_file_window.panel.show()
-		self.current_file_window.is_modified = True
+		self.current_file_window.needs_highlighting = True
 		self.current_file_window.copy_lines = old_copy_lines
 
 	##
@@ -70,7 +70,7 @@ class FileWindowManager:
 			self.current_file_window = self.file_window_list[0]
 		self.engine.set("current_file_window", self.current_file_window) # re-set current file window in engine
 		self.current_file_window.panel.show()
-		self.current_file_window.is_modified = True
+		self.current_file_window.needs_highlighting = True
 		self.current_file_window.copy_lines = old_copy_lines
 
 	##

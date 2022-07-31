@@ -444,7 +444,7 @@ class SearchBar(Window):
 
 			self.keepWindowInMainScreen()
 
-		self.file_window.is_modified = True
+		self.file_window.needs_highlighting = True
 		self.file_window.update() # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
 
 		self.engine.get("syntaxhighlighting").update()
@@ -526,7 +526,7 @@ class SearchBar(Window):
 
 			self.keepWindowInMainScreen()
 
-			self.file_window.is_modified = True
+			self.file_window.needs_highlighting = True
 			self.file_window.update() # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
 
 			self.engine.get("syntaxhighlighting").update()
@@ -536,7 +536,7 @@ class SearchBar(Window):
 		self.window.erase()
 		self.keepWindowInMainScreen()
 
-		self.file_window.is_modified = True
+		self.file_window.needs_highlighting = True
 		self.file_window.update() # this is broken, I need to take this to a module in loop stack order above these to not have to update every module upon movement
 
 		self.engine.get("syntaxhighlighting").update()

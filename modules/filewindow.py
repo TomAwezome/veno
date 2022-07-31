@@ -10,7 +10,7 @@ class FileWindow(Window):
 		self.file_lines	= self.file.contents.splitlines()
 		self.config		= self.engine.get("config").options
 
-		self.is_modified		= True ## i.e. Modified since last highlight. Variable used for speed optimization of syntax highlighting algorithm.
+		self.needs_highlighting		= True ## i.e. Modified since last highlight. Variable used for speed optimization of syntax highlighting algorithm.
 		self.select_position	= []
 		self.is_select_on = self.is_repeating_quote = False
 		self.copy_lines			= []
@@ -229,7 +229,7 @@ class FileWindow(Window):
 
 				i += 1
 
-			self.is_modified = True
+			self.needs_highlighting = True
 
 			self.toggleSelect()
 
@@ -245,7 +245,7 @@ class FileWindow(Window):
 				line_string_left += line
 
 				self.file_lines[filecursor_y] = line_string_left + line_string_right
-				self.is_modified = True
+				self.needs_highlighting = True
 				for ch in line:
 					self.moveFilecursorRight()
 
@@ -411,7 +411,7 @@ class FileWindow(Window):
 				line = self.file_lines[filecursor_y]
 				if line.find(indent_text) == 0: # if we find indent_text at line start, remove it, skips removal if not found or at wrong spot in line
 					self.file_lines[filecursor_y] = line.replace(indent_text, "", 1) # 1 to only replace first occurence of indent_text
-					self.is_modified = True
+					self.needs_highlighting = True
 					
 					self.setSelectX(select_x - len(indent_text))
 					if filecursor_x >= len(indent_text): # if won't be pushed off line during moving, shift it back
@@ -468,7 +468,7 @@ class FileWindow(Window):
 				if filecursor_x >= len(indent_text): # if won't be pushed off line during moving, shift it back
 					self.moveFilecursorLeft(len(indent_text))
 		
-		self.is_modified = True
+		self.needs_highlighting = True
 
 
 	def indentSelectedLines(self, text):
@@ -489,7 +489,7 @@ class FileWindow(Window):
 			line_string_left += text
 
 			self.file_lines[start_y] = line_string_left + line_string_right
-			self.is_modified = True
+			self.needs_highlighting = True
 
 			self.moveFilecursorRight(len(text))
 			if start_x == select_x: # if stored select value is start, set select to start + text length
@@ -539,7 +539,7 @@ class FileWindow(Window):
 			line = text + line
 			self.file_lines[line_index] = line
 
-		self.is_modified = True
+		self.needs_highlighting = True
 
 	def enterTextAtFilecursor(self, text):
 		if text == "\t":
@@ -557,7 +557,7 @@ class FileWindow(Window):
 
 		self.file_lines[filecursor_y] = line_string_left + line_string_right
 		self.moveFilecursorRight(len(text))
-		self.is_modified = True
+		self.needs_highlighting = True
 		
 		if self.config["BracketMatching"]:
 			braceMatches = {
@@ -591,7 +591,7 @@ class FileWindow(Window):
 		self.moveFilecursorDown()
 		self.file_lines[self.getFilecursorY()] = line_string_right
 		self.moveFilecursorRight(indent_size)
-		self.is_modified = True
+		self.needs_highlighting = True
 
 	def backspaceTextAtFilecursor(self):
 		filecursor_x = self.getFilecursorX()
@@ -610,7 +610,7 @@ class FileWindow(Window):
 			self.file_lines[filecursor_y] = line_string_left + line_string_right
 			self.moveFilecursorLeft()
 
-		self.is_modified = True
+		self.needs_highlighting = True
 
 	def saveFile(self):
 		file_string = ""
@@ -651,7 +651,7 @@ class FileWindow(Window):
 			else:
 				self.setFilecursorX(0)
 
-		self.is_modified = True
+		self.needs_highlighting = True
 
 	def deleteTextAtFilecursor(self):
 		filecursor_x = self.getFilecursorX()
@@ -667,4 +667,4 @@ class FileWindow(Window):
 			self.file_lines.pop(filecursor_y + 1)
 			self.file_lines[filecursor_y] += nextLine
 
-		self.is_modified = True
+		self.needs_highlighting = True

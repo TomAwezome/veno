@@ -51,7 +51,7 @@ class Highlighter:
 				self.lexer = lexers.PhpLexer(startinline=True)
 		except:
 			pass
-		self.file_window.is_modified = True
+		self.file_window.needs_highlighting = True
 
 	##
 	## @brief      Update syntax highlighting on fileWindow
@@ -73,7 +73,7 @@ class Highlighter:
 		window_code_string = '\n'.join(window_code_lines)
 		tab_expand_size = self.engine.get("config").options["TabSize"]
 
-		if self.lexer and self.file_window.is_modified:
+		if self.lexer and self.file_window.needs_highlighting:
 			highlighted_code_string = pygments.highlight(window_code_string, self.lexer, self.irc)
 			## **Highlighted** code lines from window_code_lines (which is default defined as file_lines[viewport_y:viewport_y + window_max_y])
 			self.highlighted_code_lines = highlighted_code_string.split('\n')
@@ -98,7 +98,7 @@ class Highlighter:
 				self.highlighted_code_lines.extend([''] * leading_newlines)
 				self.highlighted_code_lines.reverse()
 
-			self.file_window.is_modified = False
+			self.file_window.needs_highlighting = False
 		elif not self.lexer:
 			highlighted_code_string = window_code_string
 			self.highlighted_code_lines = highlighted_code_string.split('\n')
