@@ -29,8 +29,10 @@ class Config:
 			"LanguageOverrides": {
 				"py": {
 					"TabCharMode": True,
+					"TabSize": 4,
 				},
 				"js": {
+					"TabCharMode": False,
 					"TabSize": 2,
 				}
 			},
@@ -63,11 +65,14 @@ class Config:
 			try:
 				json_dict = json.loads(self.text) # load config json file in as dictionary
 				self.options = {**self.default_options, **json_dict} # set config options as default options, overridden by config file settings
+				for ext, vals in self.default_options["LanguageOverrides"].items():
+					if ext not in self.options["LanguageOverrides"]:
+						self.options["LanguageOverrides"][ext] = vals
+					for key, val in vals.items():
+						if key not in self.options["LanguageOverrides"][ext]:
+							self.options["LanguageOverrides"][ext][key] = val
 				if len(json_dict) < len(self.default_options): # if config file has less entries than default, .veno is old and will be updated
 					self.save()
-				for ext in self.options["LanguageOverrides"]:
-					if "TabLength" in self.options["LanguageOverrides"][ext]: # this .veno config option is deprecated and its existence will cause trouble
-						self.options["LanguageOverrides"][ext] = self.default_options["LanguageOverrides"][ext]
 			except:
 				self.options = self.default_options
 
