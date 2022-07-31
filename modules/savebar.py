@@ -279,8 +279,9 @@ class SaveBar(Window):
 					self.engine.set("current_file_window", file_window)
 					self.window_bar.update()
 					self.diff_window.view_y = 0
-					self.diff_window.is_open = True
-					self.diff_window.panel.show()
+					self.diff_window.view_x = 0
+					if not self.diff_window.is_open:
+						self.diff_window.toggle()
 					self.diff_window.update()
 					self.diff_window.toggle()
 					while True: # ask if want to save
