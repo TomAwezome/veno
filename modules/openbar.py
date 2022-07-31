@@ -165,6 +165,7 @@ class OpenBar(Window):
 		file_window = FileWindow(self.engine, file) # Create fileWindow.
 		self.engine.get("file_window_list").append(file_window)
 
+		file_window.panel.hide()
 		self.panel.hide()
 		
 		return result
