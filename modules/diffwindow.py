@@ -104,6 +104,7 @@ class DiffWindow(Window):
 			self.panel.hide()
 		else:
 			self.view_y = 0
+			self.view_x = 0
 			self.is_open = True
 			self.panel.show()
 

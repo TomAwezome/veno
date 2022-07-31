@@ -175,6 +175,7 @@ class RunWindow(Window):
 				self.run_output = traceback.format_exc()
 
 			self.view_y = 0
+			self.view_x = 0
 
 			lines = self.run_output.split('\n')
 
