@@ -13,6 +13,7 @@ class DiffWindow(Window):
 		self.panel.hide()
 
 		self.view_y = 0
+		self.view_x = 0
 
 		self.bindings = {}
 
@@ -61,12 +62,12 @@ class DiffWindow(Window):
 			for line in diff_lines[self.view_y:]:
 				if window_y >= window_max_y - 1:
 					break
-				self.window.addnstr(window_y, 1, line, window_max_x - 2, self.engine.curses.color_pair(0))
+				self.window.addnstr(window_y, 1, line[self.view_x:], window_max_x - 2, self.engine.curses.color_pair(0))
 				if line != "":
 					if line[0] == '-':
-						self.window.chgat(window_y, 1, min(len(line), window_max_x - 2), self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
+						self.window.chgat(window_y, 1, min(len(line[self.view_x:]), window_max_x - 2), self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
 					elif line[0] == '+':
-						self.window.chgat(window_y, 1, min(len(line), window_max_x - 2), self.engine.curses.color_pair(3) | self.engine.curses.A_REVERSE)
+						self.window.chgat(window_y, 1, min(len(line[self.view_x:]), window_max_x - 2), self.engine.curses.color_pair(3) | self.engine.curses.A_REVERSE)
 				window_y += 1
 
 			self.engine.update()
@@ -91,8 +92,8 @@ class DiffWindow(Window):
 
 	def bind(self):
 		self.bindings = {
-#			"KEY_LEFT":  self.moveViewLeft,
-#			"KEY_RIGHT": self.moveViewRight,
+			"KEY_LEFT":  self.moveViewLeft,
+			"KEY_RIGHT": self.moveViewRight,
 			"KEY_UP":    self.moveViewUp,
 			"KEY_DOWN":  self.moveViewDown
 		}
@@ -112,6 +113,13 @@ class DiffWindow(Window):
 
 	def moveViewDown(self):
 		self.view_y += 1
+
+	def moveViewLeft(self):
+		if self.view_x > 0:
+			self.view_x -= 1
+
+	def moveViewRight(self):
+		self.view_x += 1
 
 	def terminate(self):
 		pass

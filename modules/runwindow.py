@@ -16,6 +16,7 @@ class RunWindow(Window):
 		self.bind()
 
 		self.view_y = 0
+		self.view_x = 0
 
 		self.panel.hide()
 
@@ -43,8 +44,8 @@ class RunWindow(Window):
 		}
 
 		self.run_window_bindings = {
-#			"KEY_LEFT":  self.moveViewLeft,
-#			"KEY_RIGHT": self.moveViewRight,
+			"KEY_LEFT":  self.moveViewLeft,
+			"KEY_RIGHT": self.moveViewRight,
 			"KEY_UP":    self.moveViewUp,
 			"KEY_DOWN":  self.moveViewDown
 		}
@@ -55,6 +56,14 @@ class RunWindow(Window):
 
 	def moveViewDown(self):
 		self.view_y += 1
+
+	def moveViewLeft(self):
+		if self.view_x > 0:
+			self.view_x -= 1
+
+	def moveViewRight(self):
+		self.view_x += 1
+
 
 	def moveRunCursorLeft(self):
 		if self.run_cursor_x > 0:
@@ -184,7 +193,7 @@ class RunWindow(Window):
 				if window_max_y - 1 > 1:
 					self.window.addnstr(0, 1, self.top_text, window_max_x - 2, self.engine.curses.color_pair(0) | self.engine.curses.A_REVERSE)
 				for line in lines[self.view_y:]:
-					line = line.expandtabs(self.config["TabSize"])
+					line = line.expandtabs(self.config["TabSize"])[self.view_x:]
 					if window_y >= window_max_y - 1:
 						break
 					self.window.addnstr(window_y, 1, line, window_max_x - 2, self.engine.curses.color_pair(0))

@@ -30,6 +30,7 @@ Multi-purpose text/code editor meant for easy and vast expandability.
 		self.help_body_text = ""
 		
 		self.view_y = 0
+		self.view_x = 0
 
 		self.bindings = {}
 
@@ -77,8 +78,8 @@ Multi-purpose text/code editor meant for easy and vast expandability.
 			for line in self.help_logo_text.split('\n')[self.view_y:]:
 				if window_y >= window_max_y - 1:
 					break
-				window_x = 0
-				for char in line:
+				window_x = 1
+				for char in line[self.view_x:]:
 					if window_x >= window_max_x - 1:
 						break
 					if char == '#':
@@ -88,7 +89,7 @@ Multi-purpose text/code editor meant for easy and vast expandability.
 			for line in lines[max(0, self.view_y - self.help_logo_text.count('\n') - 1):]:
 				if window_y >= window_max_y - 1:
 					break
-				self.window.addnstr(window_y, 1, line, window_max_x - 2, self.engine.curses.color_pair(0))
+				self.window.addnstr(window_y, 1, line[self.view_x:], window_max_x - 2, self.engine.curses.color_pair(0))
 				window_y += 1
 
 			self.engine.update()
@@ -113,8 +114,8 @@ Multi-purpose text/code editor meant for easy and vast expandability.
 
 	def bind(self):
 		self.bindings = {
-#			"KEY_LEFT":  self.moveViewLeft,
-#			"KEY_RIGHT": self.moveViewRight,
+			"KEY_LEFT":  self.moveViewLeft,
+			"KEY_RIGHT": self.moveViewRight,
 			"KEY_UP":    self.moveViewUp,
 			"KEY_DOWN":  self.moveViewDown
 		}
@@ -134,6 +135,14 @@ Multi-purpose text/code editor meant for easy and vast expandability.
 
 	def moveViewDown(self):
 		self.view_y += 1
+
+	def moveViewLeft(self):
+		if self.view_x > 0:
+			self.view_x -= 1
+
+	def moveViewRight(self):
+		self.view_x += 1
+
 
 	def terminate(self):
 		pass
