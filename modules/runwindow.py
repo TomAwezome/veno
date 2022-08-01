@@ -7,6 +7,8 @@ class RunWindow(Window):
 
 		self.config = self.engine.get("config").options
 
+		self.file_window = self.engine.get("current_file_window")
+
 		self.run_cursor_x = 0
 		self.run_string = ""
 		self.run_output = ""
@@ -28,12 +30,14 @@ class RunWindow(Window):
 		self.intended_height	= 1
 		self.keepWindowInMainScreen()
 		self.engine.update()
+		self.file_window = self.engine.get("current_file_window")
 
 	def bind(self):
 
 		self.run_cursor_bindings = {
 			"KEY_LEFT":             self.moveRunCursorLeft,
 			"KEY_RIGHT":            self.moveRunCursorRight,
+			"^V":                   self.pasteAtRunCursor,
 			"KEY_BACKSPACE":        self.backspaceAtRunCursor,
 			"^?":                   self.backspaceAtRunCursor,
 			"^H":                   self.backspaceAtRunCursor,
@@ -72,6 +76,14 @@ class RunWindow(Window):
 	def moveRunCursorRight(self):
 		if self.run_cursor_x < len(self.run_string):
 			self.run_cursor_x += 1
+
+	def pasteAtRunCursor(self):
+		if self.file_window.copy_lines != []:
+			paste_string = "\\n".join(self.file_window.copy_lines)
+			run_string_left = self.run_string[:self.run_cursor_x] + paste_string
+			run_string_right = self.run_string[self.run_cursor_x:]
+			self.run_string = run_string_left + run_string_right
+			self.run_cursor_x += len(paste_string)
 
 	def backspaceAtRunCursor(self):
 		if self.run_cursor_x > 0:
