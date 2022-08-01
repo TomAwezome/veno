@@ -459,6 +459,7 @@ class SearchBar(Window):
 			self.window.addnstr(0, 0, "Replace? (y/n/a) ['a' = All]", self.getWindowMaxX() - 1, self.engine.curses.color_pair(7) | self.engine.curses.A_REVERSE)
 
 			self.engine.get("linenumbers").update()
+			self.engine.get("syntaxhighlighting").update()
 
 			self.engine.update()
 
