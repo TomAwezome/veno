@@ -106,7 +106,7 @@ class Config:
 						lang_changes[key] = []
 					lang_changes[key].append(self.options["LanguageOverrides"][ext][key])
 			for key, val in lang_changes.items():
-				if self.options[key] in val and key in self.standard_options:
+				if key in self.options and key in self.standard_options and self.options[key] in val:
 					self.options[key] = self.standard_options[key]
 
 	def save(self):
