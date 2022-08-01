@@ -75,16 +75,16 @@ class RunWindow(Window):
 
 	def backspaceAtRunCursor(self):
 		if self.run_cursor_x > 0:
-			search_string_left = self.run_string[:self.run_cursor_x - 1]
-			search_string_right = self.run_string[self.run_cursor_x:]
-			self.run_string = search_string_left + search_string_right
+			run_string_left = self.run_string[:self.run_cursor_x - 1]
+			run_string_right = self.run_string[self.run_cursor_x:]
+			self.run_string = run_string_left + run_string_right
 			self.run_cursor_x -= 1
 
 	def deleteAtRunCursor(self):
 		if self.run_cursor_x + 1 <= len(self.run_string): # if there is text to the right of our cursor
-			search_string_left = self.run_string[:self.run_cursor_x]
-			search_string_right = self.run_string[self.run_cursor_x + 1:]
-			self.run_string = search_string_left + search_string_right
+			run_string_left = self.run_string[:self.run_cursor_x]
+			run_string_right = self.run_string[self.run_cursor_x + 1:]
+			self.run_string = run_string_left + run_string_right
 
 	def moveRunCursorToStart(self):
 		if self.run_cursor_x > 0:
