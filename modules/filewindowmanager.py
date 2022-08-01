@@ -182,17 +182,17 @@ class FileWindowManager:
 	def jumpToLine(self, line_num, preserve_x = False):
 		return self.current_file_window.jumpToLine(line_num, preserve_x)
 
-	def gotoStartOfFile(self):
-		return self.current_file_window.gotoStartOfFile()
+	def jumpToStartOfFile(self):
+		return self.current_file_window.jumpToStartOfFile()
 
-	def gotoEndOfFile(self):
-		return self.current_file_window.gotoEndOfFile()
+	def jumpToEndOfFile(self):
+		return self.current_file_window.jumpToEndOfFile()
 
-	def gotoStartOfLine(self):
-		return self.current_file_window.gotoStartOfLine()
+	def jumpToStartOfLine(self):
+		return self.current_file_window.jumpToStartOfLine()
 
-	def gotoEndOfLine(self):
-		return self.current_file_window.gotoEndOfLine()
+	def jumpToEndOfLine(self):
+		return self.current_file_window.jumpToEndOfLine()
 
 	def unindentSelectedLines(self):
 		return self.current_file_window.unindentSelectedLines()

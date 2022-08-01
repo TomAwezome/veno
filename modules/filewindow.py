@@ -124,8 +124,8 @@ class FileWindow(Window):
 	def selectAll(self):
 		self.is_select_on = True
 		self.select_position = [0, 0]
-		self.gotoEndOfFile()
-		self.gotoEndOfLine()		
+		self.jumpToEndOfFile()
+		self.jumpToEndOfLine()		
 
 	def copySelect(self, toggle=True):
 		filecursor_x = self.getFilecursorX()
@@ -312,17 +312,17 @@ class FileWindow(Window):
 			if filecursor_y != 0: # if filecursor not at first line
 				self.setFilecursorX(0)
 				self.moveFilecursorUp()
-				self.gotoEndOfLine()
+				self.jumpToEndOfLine()
 			else: # filcursor on first line
-				self.gotoStartOfLine()
+				self.jumpToStartOfLine()
 
 		if filecursor_x > len(self.file_lines[filecursor_y]):
 			if filecursor_y != len(self.file_lines) - 1: # if filecursor not at last line
 				self.moveFilecursorDown()
-				self.gotoStartOfLine()
+				self.jumpToStartOfLine()
 
 			else: # filecursor on last line
-				self.gotoEndOfLine()
+				self.jumpToEndOfLine()
 
 		self.moveViewportToCursor()
 
@@ -361,7 +361,7 @@ class FileWindow(Window):
 		filecursor_y = self.getFilecursorY()
 
 		if line_num >= len(self.file_lines): # if linenumber is greater than last line,
-			line_num = len(self.file_lines) - 1 # goto last line
+			line_num = len(self.file_lines) - 1 # jumpTo last line
 
 		if line_num > -1:
 			self.setFilecursorY(line_num)
@@ -376,17 +376,17 @@ class FileWindow(Window):
 
 			self.moveViewportToCursor()
 
-	def gotoStartOfFile(self):
+	def jumpToStartOfFile(self):
 		self.jumpToLine(0)
 
-	def gotoEndOfFile(self):
+	def jumpToEndOfFile(self):
 		self.jumpToLine(len(self.file_lines) - 1)
 
-	def gotoStartOfLine(self):
+	def jumpToStartOfLine(self):
 		self.setFilecursorX(0)
 		self.moveViewportToCursorX()
 
-	def gotoEndOfLine(self):
+	def jumpToEndOfLine(self):
 		self.setFilecursorX(len(self.file_lines[self.getFilecursorY()]))
 		self.moveViewportToCursorX()
 
@@ -602,7 +602,7 @@ class FileWindow(Window):
 				line_string = self.file_lines[filecursor_y]
 				self.file_lines.pop(filecursor_y)
 				self.moveFilecursorUp()
-				self.gotoEndOfLine()
+				self.jumpToEndOfLine()
 				self.file_lines[self.getFilecursorY()] += line_string
 		else:
 			line_string_left = self.file_lines[filecursor_y][:filecursor_x - 1]

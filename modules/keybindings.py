@@ -16,12 +16,12 @@ KEYBINDINGS = {
 
 	"KEY_F(2)": "runwindow.run",
 
-	"KEY_END":   "filewindowmanager.gotoEndOfLine",
-	"KEY_F(3)":  "filewindowmanager.gotoStartOfFile",
-	"KEY_F(4)":  "filewindowmanager.gotoEndOfFile",
+	"KEY_END":   "filewindowmanager.jumpToEndOfLine",
+	"KEY_F(3)":  "filewindowmanager.jumpToStartOfFile",
+	"KEY_F(4)":  "filewindowmanager.jumpToEndOfFile",
 	"KEY_F(5)":  "filewindowmanager.selectPrevFileWindow",
 	"KEY_F(6)":  "filewindowmanager.selectNextFileWindow",
-	"KEY_HOME":  "filewindowmanager.gotoStartOfLine",
+	"KEY_HOME":  "filewindowmanager.jumpToStartOfLine",
 	"KEY_NPAGE": "filewindowmanager.scrollFilecursorDown",
 	"KEY_PPAGE": "filewindowmanager.scrollFilecursorUp",
 	"kPRV3":     "filewindowmanager.scrollViewportUp",
@@ -169,4 +169,3 @@ class Keyboard:
 			self.bindings[key] = object_method_dict[method_name]
 
 		self.engine.set("bindings", self.bindings)
-
