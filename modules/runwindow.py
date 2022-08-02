@@ -1,4 +1,4 @@
-import string, shlex, subprocess, traceback
+import string, shlex, subprocess, traceback, threading
 
 from modules.window import Window
 class RunWindow(Window):
@@ -19,6 +19,9 @@ class RunWindow(Window):
 
 		self.view_y = 0
 		self.view_x = 0
+
+		self.spinner_chars = ['/', '-', '\\' , '|']
+		self.spinner_index = 0
 
 		self.panel.hide()
 
@@ -112,6 +115,10 @@ class RunWindow(Window):
 		self.run_string = run_string_left + run_string_right
 		self.run_cursor_x += 1
 
+	def readRunOutput(self, process):
+		for line in iter(process.stdout.readline, ''):
+			self.run_output += line
+
 	def run(self):
 		self.panel.show()
 		self.panel.top()
@@ -178,20 +185,22 @@ class RunWindow(Window):
 			self.window.box()
 			self.engine.update()
 
+			process = thread = None
+
 			try:
 				args = shlex.split(self.run_string)
-				with subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=1) as p:
-					for line in p.stdout:
-						self.run_output += line
+				process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=1)
+				thread = threading.Thread(target=self.readRunOutput, args=(process,))
+				thread.start()
 			except:
 				self.run_output = traceback.format_exc()
 
 			self.view_y = 0
 			self.view_x = 0
 
-			lines = self.run_output.split('\n')
-
 			while True:
+				lines = self.run_output.split('\n')
+
 				self.intended_x			= 0
 				self.intended_y			= 0
 				self.intended_width		= self.getScreenMaxX() - 1
@@ -212,9 +221,16 @@ class RunWindow(Window):
 					self.window.addnstr(window_y, 1, line, window_max_x - 2, self.engine.curses.color_pair(0))
 					window_y += 1
 
+				if process and process.poll() is None:
+					self.window.addnstr(0, 0, self.spinner_chars[self.spinner_index], 1, self.engine.curses.color_pair(0))
+					self.spinner_index += 1
+					if self.spinner_index >= len(self.spinner_chars):
+						self.spinner_index = 0
+
 				self.engine.update()
 				
 				try:
+					self.engine.screen.timeout(60)
 					c = self.engine.screen.getch()
 				except KeyboardInterrupt:
 					break
@@ -229,7 +245,8 @@ class RunWindow(Window):
 
 				if c == "^J" or c == "KEY_F(2)" or c == " " or c == "^[":
 					break
-
+		if thread:
+			thread.join()
 		self.keepWindowInMainScreen()
 		self.panel.hide()
 
