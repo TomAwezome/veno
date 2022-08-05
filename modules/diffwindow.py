@@ -62,7 +62,7 @@ class DiffWindow(Window):
 			for line in diff_lines[self.view_y:]:
 				if window_y >= window_max_y - 1:
 					break
-				self.window.addnstr(window_y, 1, line[self.view_x:], window_max_x - 2, self.engine.curses.color_pair(0))
+				self.window.addnstr(window_y, 1, line[self.view_x:].rstrip(), window_max_x - 2, self.engine.curses.color_pair(0))
 				if line != "":
 					if line[0] == '-':
 						self.window.chgat(window_y, 1, min(len(line[self.view_x:]), window_max_x - 2), self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
