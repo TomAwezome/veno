@@ -411,7 +411,7 @@ class RunWindow(Window):
 		self.editSequence(new_sequence, new_sequence_name)
 
 	def editSequence(self, sequence, name):
-		top_text = " EDIT COMMAND SEQUENCE (Press F2/Ctrl-C to save & dismiss, Enter to select, Ctrl-D to delete command, Ctrl-N to create command, scroll with arrow keys) "
+		top_text = " EDIT COMMAND SEQUENCE (Press F2/Ctrl-C to save & dismiss, Enter to select/create command, Ctrl-D to delete command, Ctrl-N to insert command, scroll with arrow keys) "
 		self.run_sequence_choice = 0
 		self.run_sequence_cursor_x = 0
 
@@ -513,6 +513,11 @@ class RunWindow(Window):
 					self.showHelp()
 				elif self.run_sequence_choice == choice_count - 2: # Add Command...
 					sequence.append("")
+				elif self.run_sequence_choice > 0 and self.run_sequence_choice < len(sequence) + 1:
+					sequence.insert(self.run_sequence_choice, "")
+					self.run_sequence_choice += 1
+					self.run_sequence_cursor_x = 0
+
 			elif c == "KEY_F(2)" or c == "^[":
 				break
 
