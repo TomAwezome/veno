@@ -5,7 +5,6 @@ TODO:
  - '#' character in a command in a sequence will break the rest of the sequence
  - implement ask and confirm before overwrite existing sequence name
  - IMPLEMENT ASK AND CONFIRM BEFORE REMOVING A SEQUENCE
- - write help text that is helpeful
 """
 
 import string, shlex, subprocess, traceback, threading
@@ -19,7 +18,28 @@ class RunWindow(Window):
 
 		self.file_window = self.engine.get("current_file_window")
 
-		self.help_text = "\n :) \n"
+		self.help_text = """
+The RunWindow has 3 parts: prompt, sequence edit, and output.
+
+When the RunWindow opens, it opens to a prompt for typing a
+command into the 'Run command:' option, or selecting a 
+Command Sequence to launch. If no Command Sequences have been
+defined, none will appear.
+
+Selecting 'Add Sequence' or pressing Space on an existing
+Command Sequence will open the sequence editor, where
+commands can be entered that will be sequentially run
+whenever the sequence is run.
+
+After creating a sequence and returning to the prompt or typing
+a command directly at the 'Run command:' prompt, pressing
+Enter while it is selected will launch the command/sequence
+and display its output to the body of the RunWindow.
+The RunWindow output display implements threading, so
+the stdout output can be scrolled in real-time
+while commands are still being executed.
+
+		"""
 
 		self.run_prompt_cursor_x = 0
 		self.run_string = ""
