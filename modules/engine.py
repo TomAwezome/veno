@@ -251,7 +251,10 @@ class Engine():
 		self.curses.endwin()
 
 		while response != "y" and response != "n" and response[0] != "q":
-			response = input("\n" + prompt + arg_prompt + " (y/n/quit) ")
+			try:
+				response = input("\n" + prompt + arg_prompt + " (y/n/quit) ")
+			except KeyboardInterrupt:
+				response = "q"
 			response.lower()
 			if response == '':
 				response = ' '
