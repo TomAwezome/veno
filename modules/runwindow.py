@@ -1,3 +1,13 @@
+"""
+TODO:
+ - make Ctrl-V to paste at prompt and sequence cursors from the last filewindow copylines
+ - fix Ctrl-C exits without wait for join thread...
+ - '#' character in a command in a sequence will break the rest of the sequence
+ - implement ask and confirm before overwrite existing sequence name
+ - IMPLEMENT ASK AND CONFIRM BEFORE REMOVING A SEQUENCE
+ - write help text that is helpeful
+"""
+
 import string, shlex, subprocess, traceback, threading
 
 from modules.window import Window
@@ -9,12 +19,18 @@ class RunWindow(Window):
 
 		self.file_window = self.engine.get("current_file_window")
 
-		self.run_cursor_x = 0
+		self.help_text = "\n :) \n"
+
+		self.run_prompt_cursor_x = 0
 		self.run_string = ""
 		self.run_output = ""
-		self.top_text = " RUN OUTPUT (Press F2/Ctrl-C/Enter/Space to dismiss, scroll with arrow keys) "
+		self.run_prompt_choice = 0
 
-		self.run_cursor_bindings = {}
+		self.run_sequence_choice = 0
+		self.run_sequence_cursor_x = 0
+
+		self.is_open = False
+
 		self.bind()
 
 		self.view_y = 0
@@ -28,33 +44,55 @@ class RunWindow(Window):
 	def update(self):
 		self.window.erase()
 		self.intended_x			= 0
-		self.intended_y			= self.getScreenMaxY() - 2
+		self.intended_y			= 0
 		self.intended_width		= self.getScreenMaxX() - 1
-		self.intended_height	= 1
+		self.intended_height	= self.getScreenMaxY() - 1
 		self.keepWindowInMainScreen()
+		self.window.box()
 		self.engine.update()
 		self.file_window = self.engine.get("current_file_window")
+		
+		if not self.is_open:
+			if not self.panel.hidden:
+				self.panel.hide()		
+		else:
+			self.panel.show()
+			self.runPrompt()
 
 	def bind(self):
-
-		self.run_cursor_bindings = {
-			"KEY_LEFT":             self.moveRunCursorLeft,
-			"KEY_RIGHT":            self.moveRunCursorRight,
-			"^V":                   self.pasteAtRunCursor,
-			"KEY_BACKSPACE":        self.backspaceAtRunCursor,
-			"^?":                   self.backspaceAtRunCursor,
-			"^H":                   self.backspaceAtRunCursor,
-			"KEY_DC":               self.deleteAtRunCursor,
-			"KEY_HOME":             self.moveRunCursorToStart,
-			"KEY_END":              self.moveRunCursorToEnd,
-			"printable-character":  self.enterTextAtRunCursor
+		self.run_prompt_bindings = {
+			"KEY_LEFT":  self.moveRunPromptCursorLeft,
+			"KEY_RIGHT": self.moveRunPromptCursorRight,
+			"KEY_UP":    self.moveRunPromptChoiceUp,
+			"KEY_DOWN":  self.moveRunPromptChoiceDown,
+			"printable-character":  self.enterTextAtRunPromptCursor,
+			"KEY_BACKSPACE":        self.backspaceAtRunPromptCursor,
+			"^?":                   self.backspaceAtRunPromptCursor,
+			"^H":                   self.backspaceAtRunPromptCursor,
+			"KEY_DC":               self.deleteAtRunPromptCursor,
+			"^D":               self.deleteAtRunPromptCursor,
+			"KEY_END":              self.jumpRunPromptCursorToEnd,
+			"KEY_HOME":             self.jumpRunPromptCursorToStart,
 		}
-
-		self.run_window_bindings = {
+		self.run_output_bindings = {
 			"KEY_LEFT":  self.moveViewLeft,
 			"KEY_RIGHT": self.moveViewRight,
 			"KEY_UP":    self.moveViewUp,
 			"KEY_DOWN":  self.moveViewDown
+		}
+		self.run_help_bindings = {
+			"KEY_LEFT":  self.moveViewLeft,
+			"KEY_RIGHT": self.moveViewRight,
+			"KEY_UP":    self.moveViewUp,
+			"KEY_DOWN":  self.moveViewDown
+		}
+		self.run_sequence_bindings = {
+			"KEY_LEFT":  self.moveRunSequenceCursorLeft,
+			"KEY_RIGHT": self.moveRunSequenceCursorRight,
+			"KEY_UP":    self.moveRunSequenceChoiceUp,
+			"KEY_DOWN":  self.moveRunSequenceChoiceDown,
+			"KEY_END":   self.jumpRunSequenceCursorToEnd,
+			"KEY_HOME":  self.jumpRunSequenceCursorToStart,
 		}
 
 	def moveViewUp(self):
@@ -71,109 +109,217 @@ class RunWindow(Window):
 	def moveViewRight(self):
 		self.view_x += 1
 
+	def moveRunPromptChoiceUp(self):
+		self.run_prompt_choice = max(0, self.run_prompt_choice - 1)
 
-	def moveRunCursorLeft(self):
-		if self.run_cursor_x > 0:
-			self.run_cursor_x -= 1
+	def moveRunPromptChoiceDown(self):
+		sequence_count = 0
+		if "CommandSequences" in self.config:
+			for sequence in self.config["CommandSequences"]:
+				sequence_count += 1
 
-	def moveRunCursorRight(self):
-		if self.run_cursor_x < len(self.run_string):
-			self.run_cursor_x += 1
+		# +1 for Run command:, +2 for Add Sequence... and Help...
+		choice_count = 1 + sequence_count + 2
+		self.run_prompt_choice = min(choice_count - 1, self.run_prompt_choice + 1)
+		# choice_count - 1 to cap at max index
 
-	def pasteAtRunCursor(self):
-		if self.file_window.copy_lines != []:
-			paste_string = "\\n".join(self.file_window.copy_lines)
-			run_string_left = self.run_string[:self.run_cursor_x] + paste_string
-			run_string_right = self.run_string[self.run_cursor_x:]
+	def moveRunPromptCursorLeft(self):
+		if self.run_prompt_choice == 0:
+			self.run_prompt_cursor_x = max(0, self.run_prompt_cursor_x - 1)
+
+	def moveRunPromptCursorRight(self):
+		if self.run_prompt_choice == 0:
+			self.run_prompt_cursor_x = min(len(self.run_string), self.run_prompt_cursor_x + 1)
+
+	def jumpRunPromptCursorToStart(self):
+		if self.run_prompt_choice == 0:
+			self.run_prompt_cursor_x = 0
+
+	def jumpRunPromptCursorToEnd(self):
+		if self.run_prompt_choice == 0:
+			self.run_prompt_cursor_x = len(self.run_string)
+
+	def enterTextAtRunPromptCursor(self, c):
+		if self.run_prompt_choice == 0:
+			run_string_left = self.run_string[:self.run_prompt_cursor_x] + c
+			run_string_right = self.run_string[self.run_prompt_cursor_x:]
 			self.run_string = run_string_left + run_string_right
-			self.run_cursor_x += len(paste_string)
+			self.run_prompt_cursor_x += 1
 
-	def backspaceAtRunCursor(self):
-		if self.run_cursor_x > 0:
-			run_string_left = self.run_string[:self.run_cursor_x - 1]
-			run_string_right = self.run_string[self.run_cursor_x:]
+	def backspaceAtRunPromptCursor(self):
+		if self.run_prompt_choice == 0 and self.run_prompt_cursor_x > 0:
+			run_string_left = self.run_string[:self.run_prompt_cursor_x - 1]
+			run_string_right = self.run_string[self.run_prompt_cursor_x:]
 			self.run_string = run_string_left + run_string_right
-			self.run_cursor_x -= 1
+			self.run_prompt_cursor_x -= 1
+		elif self.run_prompt_choice != 0:
+			sequence_count = 0
+			if "CommandSequences" in self.config:
+				for sequence in self.config["CommandSequences"]:
+					sequence_count += 1
+			choice_count = 1 + sequence_count + 2 # +1 for Run command:, +2 for Add Sequence... and Help...
+			if self.run_prompt_choice < choice_count - 2:
+				i = 0
+				for name, sequence in self.config["CommandSequences"].items():
+					if i == self.run_prompt_choice - 1:
+						break
+					i += 1
+				self.config["CommandSequences"].pop(name)
+				self.engine.get("config").save()
 
-	def deleteAtRunCursor(self):
-		if self.run_cursor_x + 1 <= len(self.run_string): # if there is text to the right of our cursor
-			run_string_left = self.run_string[:self.run_cursor_x]
-			run_string_right = self.run_string[self.run_cursor_x + 1:]
+	def deleteAtRunPromptCursor(self):
+		if self.run_prompt_choice == 0 and self.run_prompt_cursor_x + 1 <= len(self.run_string):
+			run_string_left = self.run_string[:self.run_prompt_cursor_x]
+			run_string_right = self.run_string[self.run_prompt_cursor_x + 1:]
 			self.run_string = run_string_left + run_string_right
+		elif self.run_prompt_choice != 0:
+			sequence_count = 0
+			if "CommandSequences" in self.config:
+				for sequence in self.config["CommandSequences"]:
+					sequence_count += 1
+			choice_count = 1 + sequence_count + 2 # +1 for Run command:, +2 for Add Sequence... and Help...
+			if self.run_prompt_choice < choice_count - 2:
+				i = 0
+				for name, sequence in self.config["CommandSequences"].items():
+					if i == self.run_prompt_choice - 1:
+						break
+					i += 1
+				self.config["CommandSequences"].pop(name)
+				self.engine.get("config").save()
 
-	def moveRunCursorToStart(self):
-		if self.run_cursor_x > 0:
-			self.run_cursor_x = 0
+	def moveRunSequenceChoiceUp(self, sequence, text):
+		self.run_sequence_cursor_x = 0
+		self.run_sequence_choice = max(0, self.run_sequence_choice - 1)
 
-	def moveRunCursorToEnd(self):
-		if self.run_cursor_x < len(self.run_string):
-			self.run_cursor_x = len(self.run_string)
+	def moveRunSequenceChoiceDown(self, sequence, text):
+		self.run_sequence_cursor_x = 0
+		# +1 for Name:, +2 for Add Command... and Help...
+		choice_count = 1 + len(sequence) + 2
+		self.run_sequence_choice = min(choice_count - 1, self.run_sequence_choice + 1)
+		# choice_count - 1 to cap at max index
 
-	def enterTextAtRunCursor(self, text):
-		run_string_left = self.run_string[:self.run_cursor_x] + text
-		run_string_right = self.run_string[self.run_cursor_x:]
-		self.run_string = run_string_left + run_string_right
-		self.run_cursor_x += 1
+	def moveRunSequenceCursorLeft(self, sequence, text):
+		self.run_sequence_cursor_x = max(0, self.run_sequence_cursor_x - 1)
 
-	def readRunOutput(self, process):
-		for line in iter(process.stdout.readline, ''):
-			self.run_output += line
+	def moveRunSequenceCursorRight(self, sequence, text):
+		self.run_sequence_cursor_x = min(len(text), self.run_sequence_cursor_x + 1)
 
-	def run(self):
-		self.panel.show()
-		self.panel.top()
-		self.window.erase()
-		self.intended_x			= 0
-		self.intended_y			= self.getScreenMaxY() - 2
-		self.intended_width		= self.getScreenMaxX() - 1
-		self.intended_height	= 1
+	def jumpRunSequenceCursorToStart(self, sequence, text):
+		self.run_sequence_cursor_x = 0
 
-		self.keepWindowInMainScreen()
-		self.engine.update()
-		
+	def jumpRunSequenceCursorToEnd(self, sequence, text):
+		self.run_sequence_cursor_x = len(text)
+
+	def runPrompt(self):
 		self.config = self.engine.get("config").options
-
-		prompt = "Run command: "
-
-		self.window.addnstr(0, 0, prompt + self.run_string, self.getWindowMaxX() - 1, self.engine.curses.color_pair(3) | self.engine.curses.A_REVERSE)
-
-		if self.run_cursor_x + len(prompt) <= self.getWindowMaxX() - 2 and self.run_cursor_x >= 0:
-			self.window.chgat(0, self.run_cursor_x + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
-
-		self.engine.update()
+		self.run_prompt_choice = 0
+		top_text = " RUN (Press F2/Ctrl-C to dismiss, Enter to select, Space to edit Sequence, Delete/Backspace/Ctrl-D to delete Sequence, scroll with arrow keys) "
 
 		while True: # break out of this loop with enter key
 			self.window.erase()
+			self.window.box()
+
+			choice_lines = []
+			choice_lines.append("Run command: " + self.run_string)
+
+			sequence_count = 0
+			if "CommandSequences" in self.config:
+				for name, commands in self.config["CommandSequences"].items():
+					choice_lines.append(f"Run Sequence '{name}': {commands}")
+					sequence_count += 1
+			
+			choice_lines.append("Add Sequence...")
+			choice_lines.append("Help...")
+
+			choice_count = 1 + sequence_count + 2 # +1 for Run command:, +2 for Add Sequence... and Help...
+
+			window_max_x = self.getWindowMaxX()
+			window_max_y = self.getWindowMaxY()
+			if window_max_y - 1 > 1:
+				self.window.addnstr(0, 1, top_text, window_max_x - 2, self.engine.curses.color_pair(0) | self.engine.curses.A_REVERSE)
+
+			window_y = 1
+			for line in choice_lines:
+				self.window.addnstr(window_y, 1, line, self.getWindowMaxX() - 2, self.engine.curses.color_pair(0))
+				if window_y - 1 == self.run_prompt_choice:
+					self.window.chgat(window_y, 1, min(self.getWindowMaxX() - 2, len(line)), self.engine.curses.color_pair(3) | self.engine.curses.A_REVERSE)
+				window_y += 1
+
+			if self.run_prompt_choice == 0 and self.run_prompt_cursor_x + len("Run command: ") + 1 <= self.getWindowMaxX() - 2 and self.run_prompt_cursor_x >= 0:
+				self.window.chgat(1, self.run_prompt_cursor_x + len("Run command: ") + 1, 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
+
+			self.engine.update()
+
 			try:
 				c = self.engine.screen.getch()
 			except KeyboardInterrupt:
-				self.panel.hide()
-				return
+				break
 			if c == -1:
 				continue
 			c = self.engine.curses.keyname(c)
 			c = c.decode("utf-8")
 
-			if c in self.run_cursor_bindings:
-				self.run_cursor_bindings[c]()
-			elif c in string.punctuation + string.digits + string.ascii_letters + string.whitespace:
-				self.run_cursor_bindings["printable-character"](c)
+			if c in self.run_prompt_bindings:
+				self.run_prompt_bindings[c]()
+			elif self.run_prompt_choice == 0 and c in string.punctuation + string.digits + string.ascii_letters + string.whitespace:
+				self.run_prompt_bindings["printable-character"](c)
 			elif c == "^J": # enter key
+				if self.run_prompt_choice == 0:
+					if self.run_string != "":
+						self.runSingleCommand()
+					else:
+						continue
+				elif self.run_prompt_choice == choice_count - 1: # Help... (choice_count - 1 to cap at max index)
+					self.showHelp()
+				elif self.run_prompt_choice == choice_count - 2: # Add Sequence...
+					self.addSequence()
+				else: # cursor on a Command Sequence choice to run
+					self.runCommandSequence()
+			elif c == " " and self.run_prompt_choice >= 1 and self.run_prompt_choice < choice_count - 2:
+				i = 0
+				for name, sequence in self.config["CommandSequences"].items():
+					if i == self.run_prompt_choice - 1:
+						break
+					i += 1
+				self.editSequence(sequence, name)
+			elif c == "KEY_F(2)" or c == "^[": # ESC
 				break
-			elif c == "^[": # ESC
-				self.panel.hide()
-				return
-
-			self.keepWindowInMainScreen()
-			self.window.addnstr(0, 0, prompt + self.run_string, self.getWindowMaxX() - 1, self.engine.curses.color_pair(3) | self.engine.curses.A_REVERSE)
-
-			if self.run_cursor_x + len(prompt) <= self.getWindowMaxX() - 2 and self.run_cursor_x >= 0:
-				self.window.chgat(0, self.run_cursor_x + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
 
 			self.engine.update()
 
-		if self.run_string != "":
-			self.run_output = '\n' + prompt + self.run_string + '\n\n'
+		self.panel.hide()
+		self.toggle()
+
+	def readRunOutput(self, process):
+		for line in iter(process.stdout.readline, ''):
+			self.run_output += line
+
+	def runCommandSequence(self):
+		i = 0
+		for name, sequence in self.config["CommandSequences"].items():
+			if i == self.run_prompt_choice - 1:
+				break
+			i += 1
+
+		process = thread = None
+		top_text = " RUN OUTPUT (Press F2/Ctrl-C/Enter/Space to dismiss, scroll with arrow keys) "
+
+		run_string = ""
+		i = 1
+		if len(sequence) > 0:
+			for command in sequence[:-1]:
+				if command == '':
+					i += 1
+					continue
+				# TODO: detect command lines ending in & or ;, skip add the && just space it
+				run_string += f"echo '' && echo Command {i}: {command} && echo '' && " + command + " && " 
+				i += 1
+			run_string += f"echo '' && echo Command {i}: {sequence[-1]} && echo '' && " + sequence[-1]
+		else:
+			run_string = "echo Error: Command Sequence has no commands."
+
+		if run_string != "":
+			self.run_output = '\nRun sequence: ' + str(sequence) + '\n'
 			
 			self.intended_x			= 0
 			self.intended_y			= 0
@@ -185,15 +331,20 @@ class RunWindow(Window):
 			self.window.box()
 			self.engine.update()
 
-			process = thread = None
-
+			error_text = ""
 			try:
-				args = shlex.split(self.run_string)
-				process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=1)
+				command_num = 1
+				for command in sequence:
+					args = shlex.split(command)
+					command_num += 1
+				command = None 
+				process = subprocess.Popen(run_string, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=1, shell=True)
 				thread = threading.Thread(target=self.readRunOutput, args=(process,))
 				thread.start()
 			except:
-				self.run_output = traceback.format_exc()
+				if command: # would be None if args shlex check success, value on error
+					error_text += f"at Command {command_num}: {command}"
+				self.run_output = traceback.format_exc() + error_text
 
 			self.view_y = 0
 			self.view_x = 0
@@ -213,7 +364,7 @@ class RunWindow(Window):
 				window_max_y = self.getWindowMaxY()
 				window_max_x = self.getWindowMaxX()
 				if window_max_y - 1 > 1:
-					self.window.addnstr(0, 1, self.top_text, window_max_x - 2, self.engine.curses.color_pair(0) | self.engine.curses.A_REVERSE)
+					self.window.addnstr(0, 1, top_text, window_max_x - 2, self.engine.curses.color_pair(0) | self.engine.curses.A_REVERSE)
 				for line in lines[self.view_y:]:
 					line = line.expandtabs(self.config["TabSize"])[self.view_x:]
 					if window_y >= window_max_y - 1:
@@ -240,15 +391,265 @@ class RunWindow(Window):
 				c = self.engine.curses.keyname(c)
 				c = c.decode("utf-8")
 
-				if c in self.run_window_bindings:
-					self.run_window_bindings[c]()
+				if c in self.run_output_bindings:
+					self.run_output_bindings[c]()
 
 				if c == "^J" or c == "KEY_F(2)" or c == " " or c == "^[":
 					break
 		if thread:
 			thread.join()
 		self.keepWindowInMainScreen()
-		self.panel.hide()
+
+	def addSequence(self):
+		if "CommandSequences" not in self.config:
+			self.config["CommandSequences"] = {}
+			self.engine.get("config").save()
+
+		new_sequence = []
+		new_sequence_name = ""
+		
+		self.editSequence(new_sequence, new_sequence_name)
+
+	def editSequence(self, sequence, name):
+		top_text = " EDIT COMMAND SEQUENCE (Press F2/Ctrl-C to save & dismiss, Enter to select, Ctrl-D to delete command, Ctrl-N to create command, scroll with arrow keys) "
+		self.run_sequence_choice = 0
+		self.run_sequence_cursor_x = 0
+
+		while True:
+			self.intended_x			= 0
+			self.intended_y			= 0
+			self.intended_width		= self.getScreenMaxX() - 1
+			self.intended_height	= self.getScreenMaxY()
+
+			self.keepWindowInMainScreen()
+			self.window.erase()
+			self.window.box()
+			window_max_y = self.getWindowMaxY()
+			window_max_x = self.getWindowMaxX()
+			if window_max_y - 1 > 1:
+				self.window.addnstr(0, 1, top_text, window_max_x - 2, self.engine.curses.color_pair(0) | self.engine.curses.A_REVERSE)
+
+			choice_lines = []
+			choice_lines.append("Sequence Name: " + name)
+			command_num = 1
+			for command in sequence:
+				choice_lines.append("Command " + f"{command_num}: ".rjust(4) + command)
+				command_num += 1
+			choice_lines.append("Add Command...")
+			choice_lines.append("Help...")
+
+			window_y = 1
+			for line in choice_lines:
+				if window_y >= window_max_y - 1:
+					break
+				self.window.addnstr(window_y, 1, line, self.getWindowMaxX() - 2, self.engine.curses.color_pair(0))
+				if window_y - 1 == self.run_sequence_choice:
+					self.window.chgat(window_y, 1, min(self.getWindowMaxX() - 2, len(line)), self.engine.curses.color_pair(3) | self.engine.curses.A_REVERSE)
+				if window_y - 1 == self.run_sequence_choice and self.run_sequence_choice < len(sequence) + 1 and self.run_prompt_cursor_x + len("Run command: ") + 1 <= self.getWindowMaxX() - 2:
+					if self.run_sequence_choice == 0:
+						self.window.chgat(window_y, self.run_sequence_cursor_x + len("Sequence Name: ") + 1, 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
+					else:
+						self.window.chgat(window_y, self.run_sequence_cursor_x + len("Command ##: ") + 1, 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
+				window_y += 1
+
+			self.engine.update()
+			
+			try:
+				self.engine.screen.timeout(60)
+				c = self.engine.screen.getch()
+			except KeyboardInterrupt:
+				break
+			if c == -1:
+				continue
+
+			c = self.engine.curses.keyname(c)
+			c = c.decode("utf-8")
+
+			if c in self.run_sequence_bindings:
+				if self.run_sequence_choice == 0:
+					self.run_sequence_bindings[c](sequence, name)
+				elif self.run_sequence_choice < len(sequence) + 1:
+					self.run_sequence_bindings[c](sequence, sequence[self.run_sequence_choice - 1])
+				else:
+					self.run_sequence_bindings[c](sequence, name)
+			elif c in string.punctuation + string.digits + string.ascii_letters + string.whitespace:
+				if self.run_sequence_choice == 0: # Name: 
+					name = name[:self.run_sequence_cursor_x] + c + name[self.run_sequence_cursor_x:]
+					self.run_sequence_cursor_x += 1
+				elif self.run_sequence_choice < len(sequence) + 1:
+					command_text = sequence[self.run_sequence_choice - 1]
+					command_text = command_text[:self.run_sequence_cursor_x] + c + command_text[self.run_sequence_cursor_x:]
+					sequence[self.run_sequence_choice - 1] = command_text
+					self.run_sequence_cursor_x += 1
+			elif c == "KEY_BACKSPACE" or c == "^?" or c == "^H":
+				if self.run_sequence_choice == 0: # Name:
+					if self.run_sequence_cursor_x > 0:
+						name = name[:self.run_sequence_cursor_x - 1] + name[self.run_sequence_cursor_x:]
+						self.run_sequence_cursor_x -= 1
+				elif self.run_sequence_choice < len(sequence) + 1:
+					if self.run_sequence_cursor_x > 0:
+						command_text = sequence[self.run_sequence_choice - 1]
+						command_text = command_text[:self.run_sequence_cursor_x - 1] + command_text[self.run_sequence_cursor_x:]
+						sequence[self.run_sequence_choice - 1] = command_text
+						self.run_sequence_cursor_x -= 1
+			elif c == "KEY_DC": # Delete key delete text at run sequence cursor
+				if self.run_sequence_choice == 0: # Name:
+					if self.run_sequence_cursor_x + 1 <= len(name):
+						name = name[:self.run_sequence_cursor_x] + name[self.run_sequence_cursor_x + 1:]
+				elif self.run_sequence_choice < len(sequence) + 1:
+					command_text = sequence[self.run_sequence_choice - 1]
+					if self.run_sequence_cursor_x + 1 <= len(command_text):
+						command_text = command_text[:self.run_sequence_cursor_x] + command_text[self.run_sequence_cursor_x + 1:]
+						sequence[self.run_sequence_choice - 1] = command_text
+			elif c == "^D": # Ctrl-D to delete command at choice position
+				if self.run_sequence_choice > 0 and self.run_sequence_choice < len(sequence) + 1:
+					sequence.pop(self.run_sequence_choice - 1)
+			elif c == "^N": # Ctrl-N to add a new command at choice position (rather than at the end using Add Command)
+				if self.run_sequence_choice > 0 and self.run_sequence_choice < len(sequence) + 1:
+					sequence.insert(self.run_sequence_choice - 1, "")
+			elif c == "^J":
+				choice_count = 1 + len(sequence) + 2 # +1 for Name:, +2 for Add Command... and Help...
+				if self.run_sequence_choice == choice_count - 1: # Help... (choice_count - 1 to cap at max index)
+					self.showHelp()
+				elif self.run_sequence_choice == choice_count - 2: # Add Command...
+					sequence.append("")
+			elif c == "KEY_F(2)" or c == "^[":
+				break
+
+		self.config["CommandSequences"][name] = sequence
+		self.engine.get("config").save()
+
+	def showHelp(self):
+		top_text = " RUN HELP (Press F2/Ctrl-C/Enter/Space to dismiss, scroll with arrow keys) "
+		self.view_y = 0
+		self.view_x = 0
+
+		while True:
+			lines = self.help_text.split('\n')
+
+			self.intended_x			= 0
+			self.intended_y			= 0
+			self.intended_width		= self.getScreenMaxX() - 1
+			self.intended_height	= self.getScreenMaxY()
+
+			self.keepWindowInMainScreen()
+			self.window.erase()
+			self.window.box()
+			window_y = 1
+			window_max_y = self.getWindowMaxY()
+			window_max_x = self.getWindowMaxX()
+			if window_max_y - 1 > 1:
+				self.window.addnstr(0, 1, top_text, window_max_x - 2, self.engine.curses.color_pair(0) | self.engine.curses.A_REVERSE)
+			for line in lines[self.view_y:]:
+				line = line.expandtabs(self.config["TabSize"])[self.view_x:]
+				if window_y >= window_max_y - 1:
+					break
+				self.window.addnstr(window_y, 1, line, window_max_x - 2, self.engine.curses.color_pair(0))
+				window_y += 1
+
+			self.engine.update()
+			
+			try:
+				self.engine.screen.timeout(60)
+				c = self.engine.screen.getch()
+			except KeyboardInterrupt:
+				break
+			if c == -1:
+				continue
+
+			c = self.engine.curses.keyname(c)
+			c = c.decode("utf-8")
+
+			if c in self.run_help_bindings:
+				self.run_help_bindings[c]()
+
+			if c == "^J" or c == "KEY_F(2)" or c == " " or c == "^[":
+				break
+
+	def runSingleCommand(self):
+		process = thread = None
+		top_text = " RUN OUTPUT (Press F2/Ctrl-C/Enter/Space to dismiss, scroll with arrow keys) "
+
+		if self.run_string != "":
+			self.run_output = '\nRun command: ' + self.run_string + '\n\n'
+			
+			self.intended_x			= 0
+			self.intended_y			= 0
+			self.intended_width		= self.getScreenMaxX() - 1
+			self.intended_height	= self.getScreenMaxY()
+			self.window.mvwin(0, 0)
+			self.keepWindowInMainScreen()
+			self.window.erase()
+			self.window.box()
+			self.engine.update()
+
+			try:
+#				args = shlex.split(self.run_string)
+				process = subprocess.Popen(self.run_string, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=1, shell=True)
+				thread = threading.Thread(target=self.readRunOutput, args=(process,))
+				thread.start()
+			except:
+				self.run_output = traceback.format_exc()
+
+			self.view_y = 0
+			self.view_x = 0
+
+			while True:
+				lines = self.run_output.split('\n')
+
+				self.intended_x			= 0
+				self.intended_y			= 0
+				self.intended_width		= self.getScreenMaxX() - 1
+				self.intended_height	= self.getScreenMaxY()
+
+				self.keepWindowInMainScreen()
+				self.window.erase()
+				self.window.box()
+				window_y = 1
+				window_max_y = self.getWindowMaxY()
+				window_max_x = self.getWindowMaxX()
+				if window_max_y - 1 > 1:
+					self.window.addnstr(0, 1, top_text, window_max_x - 2, self.engine.curses.color_pair(0) | self.engine.curses.A_REVERSE)
+				for line in lines[self.view_y:]:
+					line = line.expandtabs(self.config["TabSize"])[self.view_x:]
+					if window_y >= window_max_y - 1:
+						break
+					self.window.addnstr(window_y, 1, line, window_max_x - 2, self.engine.curses.color_pair(0))
+					window_y += 1
+
+				if process and process.poll() is None:
+					self.window.addnstr(0, 0, self.spinner_chars[self.spinner_index], 1, self.engine.curses.color_pair(0))
+					self.spinner_index += 1
+					if self.spinner_index >= len(self.spinner_chars):
+						self.spinner_index = 0
+
+				self.engine.update()
+				
+				try:
+					self.engine.screen.timeout(60)
+					c = self.engine.screen.getch()
+				except KeyboardInterrupt:
+					break
+				if c == -1:
+					continue
+
+				c = self.engine.curses.keyname(c)
+				c = c.decode("utf-8")
+
+				if c in self.run_output_bindings:
+					self.run_output_bindings[c]()
+
+				if c == "^J" or c == "KEY_F(2)" or c == " " or c == "^[":
+					break
+		if thread:
+			thread.join()
+		self.keepWindowInMainScreen()
+
+	def toggle(self):
+		if self.is_open:
+			self.is_open = False
+		else:
+			self.is_open = True
 
 	def terminate(self):
 		pass

@@ -14,7 +14,7 @@ KEYBINDINGS = {
 
 	"KEY_DC": "filewindowmanager.deleteTextAtFilecursor",
 
-	"KEY_F(2)": "runwindow.run",
+	"KEY_F(2)": "runwindow.toggle",
 
 	"KEY_END":   "filewindowmanager.jumpToEndOfLine",
 	"KEY_F(3)":  "filewindowmanager.jumpToStartOfFile",
