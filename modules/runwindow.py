@@ -467,9 +467,11 @@ while commands are still being executed.
 					self.window.chgat(window_y, 1, min(self.getWindowMaxX() - 2, len(line)), self.engine.curses.color_pair(3) | self.engine.curses.A_REVERSE)
 				if window_y - 1 == self.run_sequence_choice and self.run_sequence_choice < len(sequence) + 1 and self.run_prompt_cursor_x + len("Run command: ") + 1 <= self.getWindowMaxX() - 2:
 					if self.run_sequence_choice == 0:
-						self.window.chgat(window_y, self.run_sequence_cursor_x + len("Sequence Name: ") + 1, 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
+						x = self.run_sequence_cursor_x + len("Sequence Name: ") + 1
 					else:
-						self.window.chgat(window_y, self.run_sequence_cursor_x + len("Command ##: ") + 1, 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
+						x = self.run_sequence_cursor_x + len("Command ##: ") + 1
+					if x < self.getWindowMaxX() - 2:
+						self.window.chgat(window_y, x, 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
 				window_y += 1
 
 			self.engine.update()
