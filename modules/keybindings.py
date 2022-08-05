@@ -21,6 +21,8 @@ KEYBINDINGS = {
 	"KEY_F(4)":  "filewindowmanager.jumpToEndOfFile",
 	"KEY_F(5)":  "filewindowmanager.selectPrevFileWindow",
 	"KEY_F(6)":  "filewindowmanager.selectNextFileWindow",
+	"KEY_F(29)":  "filewindowmanager.selectPrevFileWindow",
+	"KEY_F(30)":  "filewindowmanager.selectNextFileWindow",
 	"KEY_HOME":  "filewindowmanager.jumpToStartOfLine",
 	"KEY_NPAGE": "filewindowmanager.scrollFilecursorDown",
 	"KEY_PPAGE": "filewindowmanager.scrollFilecursorUp",
