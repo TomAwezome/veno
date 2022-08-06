@@ -98,13 +98,13 @@ while commands are still being executed.
 			"KEY_LEFT":  self.moveViewLeft,
 			"KEY_RIGHT": self.moveViewRight,
 			"KEY_UP":    self.moveViewUp,
-			"KEY_DOWN":  self.moveViewDown
+			"KEY_DOWN":  self.moveViewDown,
 		}
 		self.run_help_bindings = {
 			"KEY_LEFT":  self.moveViewLeft,
 			"KEY_RIGHT": self.moveViewRight,
 			"KEY_UP":    self.moveViewUp,
-			"KEY_DOWN":  self.moveViewDown
+			"KEY_DOWN":  self.moveViewDown,
 		}
 		self.run_sequence_bindings = {
 			"KEY_LEFT":  self.moveRunSequenceCursorLeft,
@@ -113,6 +113,7 @@ while commands are still being executed.
 			"KEY_DOWN":  self.moveRunSequenceChoiceDown,
 			"KEY_END":   self.jumpRunSequenceCursorToEnd,
 			"KEY_HOME":  self.jumpRunSequenceCursorToStart,
+			"^J":        self.selectRunSequenceChoice,
 		}
 
 	def moveViewUp(self):
@@ -229,6 +230,18 @@ while commands are still being executed.
 
 	def jumpRunSequenceCursorToEnd(self, sequence, text):
 		self.run_sequence_cursor_x = len(text)
+
+	def selectRunSequenceChoice(self, sequence, text):
+		choice_count = 1 + len(sequence) + 2 # +1 for Name:, +2 for Add Command... and Help...
+		if self.run_sequence_choice == choice_count - 1: # Help... (choice_count - 1 to cap at max index)
+			self.showHelp()
+		elif self.run_sequence_choice == choice_count - 2: # Add Command...
+			sequence.append("")
+		elif self.run_sequence_choice > 0 and self.run_sequence_choice < len(sequence) + 1:
+			sequence.insert(self.run_sequence_choice, "")
+			self.run_sequence_choice += 1
+			self.run_sequence_cursor_x = 0
+
 
 	def runPrompt(self):
 		self.config = self.engine.get("config").options
@@ -529,16 +542,6 @@ while commands are still being executed.
 			elif c == "^N": # Ctrl-N to add a new command at choice position (rather than at the end using Add Command)
 				if self.run_sequence_choice > 0 and self.run_sequence_choice < len(sequence) + 1:
 					sequence.insert(self.run_sequence_choice - 1, "")
-			elif c == "^J":
-				choice_count = 1 + len(sequence) + 2 # +1 for Name:, +2 for Add Command... and Help...
-				if self.run_sequence_choice == choice_count - 1: # Help... (choice_count - 1 to cap at max index)
-					self.showHelp()
-				elif self.run_sequence_choice == choice_count - 2: # Add Command...
-					sequence.append("")
-				elif self.run_sequence_choice > 0 and self.run_sequence_choice < len(sequence) + 1:
-					sequence.insert(self.run_sequence_choice, "")
-					self.run_sequence_choice += 1
-					self.run_sequence_cursor_x = 0
 
 			elif c == "KEY_F(2)" or c == "^[":
 				break
