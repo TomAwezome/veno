@@ -116,6 +116,7 @@ while commands are still being executed.
 			"^J":        self.selectRunSequenceChoice,
 			"^D":        self.deleteRunSequenceCommandChoice,
 			"^N":        self.insertRunSequenceCommandAtChoice,
+			"KEY_IC":    self.insertRunSequenceCommandAtChoice,
 		}
 
 	def moveViewUp(self):
