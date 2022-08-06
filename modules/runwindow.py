@@ -1,5 +1,6 @@
 """
 TODO:
+ - fix no scrolling
  - make Ctrl-V to paste at prompt and sequence cursors from the last filewindow copylines
  - fix Ctrl-C exits without wait for join thread...
  - '#' character in a command in a sequence will break the rest of the sequence
@@ -90,7 +91,7 @@ while commands are still being executed.
 			"^?":                   self.backspaceAtRunPromptCursor,
 			"^H":                   self.backspaceAtRunPromptCursor,
 			"KEY_DC":               self.deleteAtRunPromptCursor,
-			"^D":               self.deleteAtRunPromptCursor,
+			"^D":                   self.deleteAtRunPromptCursor,
 			"KEY_END":              self.jumpRunPromptCursorToEnd,
 			"KEY_HOME":             self.jumpRunPromptCursorToStart,
 		}
@@ -117,6 +118,11 @@ while commands are still being executed.
 			"^D":        self.deleteRunSequenceCommandChoice,
 			"^N":        self.insertRunSequenceCommandAtChoice,
 			"KEY_IC":    self.insertRunSequenceCommandAtChoice,
+			"printable-character":  self.enterTextAtRunSequenceCursor,
+			"KEY_BACKSPACE":        self.backspaceAtRunSequenceCursor,
+			"^?":                   self.backspaceAtRunSequenceCursor,
+			"^H":                   self.backspaceAtRunSequenceCursor,
+			"KEY_DC":               self.deleteAtRunSequenceCursor,
 		}
 
 	def moveViewUp(self):
@@ -211,30 +217,32 @@ while commands are still being executed.
 				self.config["CommandSequences"].pop(name)
 				self.engine.get("config").save()
 
-	def moveRunSequenceChoiceUp(self, sequence, text):
+	def moveRunSequenceChoiceUp(self, sequence, text_list):
 		self.run_sequence_cursor_x = 0
 		self.run_sequence_choice = max(0, self.run_sequence_choice - 1)
 
-	def moveRunSequenceChoiceDown(self, sequence, text):
+	def moveRunSequenceChoiceDown(self, sequence, text_list):
 		self.run_sequence_cursor_x = 0
 		# +1 for Name:, +2 for Add Command... and Help...
 		choice_count = 1 + len(sequence) + 2
 		self.run_sequence_choice = min(choice_count - 1, self.run_sequence_choice + 1)
 		# choice_count - 1 to cap at max index
 
-	def moveRunSequenceCursorLeft(self, sequence, text):
+	def moveRunSequenceCursorLeft(self, sequence, text_list):
 		self.run_sequence_cursor_x = max(0, self.run_sequence_cursor_x - 1)
 
-	def moveRunSequenceCursorRight(self, sequence, text):
+	def moveRunSequenceCursorRight(self, sequence, text_list):
+		text = text_list[0]
 		self.run_sequence_cursor_x = min(len(text), self.run_sequence_cursor_x + 1)
 
-	def jumpRunSequenceCursorToStart(self, sequence, text):
+	def jumpRunSequenceCursorToStart(self, sequence, text_list):
 		self.run_sequence_cursor_x = 0
 
-	def jumpRunSequenceCursorToEnd(self, sequence, text):
+	def jumpRunSequenceCursorToEnd(self, sequence, text_list):
+		text = text_list[0]
 		self.run_sequence_cursor_x = len(text)
 
-	def selectRunSequenceChoice(self, sequence, text):
+	def selectRunSequenceChoice(self, sequence, text_list):
 		choice_count = 1 + len(sequence) + 2 # +1 for Name:, +2 for Add Command... and Help...
 		if self.run_sequence_choice == choice_count - 1: # Help... (choice_count - 1 to cap at max index)
 			self.showHelp()
@@ -245,13 +253,44 @@ while commands are still being executed.
 			self.run_sequence_choice += 1
 			self.run_sequence_cursor_x = 0
 
-	def deleteRunSequenceCommandChoice(self, sequence, text):
+	def deleteRunSequenceCommandChoice(self, sequence, text_list):
 		if self.run_sequence_choice > 0 and self.run_sequence_choice < len(sequence) + 1:
 			sequence.pop(self.run_sequence_choice - 1)
 
-	def insertRunSequenceCommandAtChoice(self, sequence, text):
+	def insertRunSequenceCommandAtChoice(self, sequence, text_list):
 		if self.run_sequence_choice > 0 and self.run_sequence_choice < len(sequence) + 1:
 			sequence.insert(self.run_sequence_choice - 1, "")
+
+	def enterTextAtRunSequenceCursor(self, sequence, text_list, c):
+		text = text_list[0]
+		text = text[:self.run_sequence_cursor_x] + c + text[self.run_sequence_cursor_x:]
+		if self.run_sequence_choice == 0: # Name:
+			self.run_sequence_cursor_x += 1
+			text_list[0] = text
+		elif self.run_sequence_choice < len(sequence) + 1:
+			sequence[self.run_sequence_choice - 1] = text
+			self.run_sequence_cursor_x += 1
+
+	def backspaceAtRunSequenceCursor(self, sequence, text_list):
+		text = text_list[0]
+		text = text[:self.run_sequence_cursor_x - 1] + text[self.run_sequence_cursor_x:]
+		if self.run_sequence_choice == 0: # Name:
+			if self.run_sequence_cursor_x > 0:
+				self.run_sequence_cursor_x -= 1
+				text_list[0] = text
+		elif self.run_sequence_choice < len(sequence) + 1:
+			if self.run_sequence_cursor_x > 0:
+				sequence[self.run_sequence_choice - 1] = text
+				self.run_sequence_cursor_x -= 1
+
+	def deleteAtRunSequenceCursor(self, sequence, text_list):
+		text = text_list[0]
+		if self.run_sequence_cursor_x + 1 <= len(text):
+			text = text[:self.run_sequence_cursor_x] + text[self.run_sequence_cursor_x + 1:]
+			if self.run_sequence_choice == 0: # Name:
+				text_list[0] = text
+			elif self.run_sequence_choice < len(sequence) + 1:
+				sequence[self.run_sequence_choice - 1] = text
 
 	def runPrompt(self):
 		self.config = self.engine.get("config").options
@@ -510,42 +549,23 @@ while commands are still being executed.
 			c = self.engine.curses.keyname(c)
 			c = c.decode("utf-8")
 
+			text_list = []
+			if self.run_sequence_choice == 0:
+				text_list.append(name)
+			elif self.run_sequence_choice < len(sequence) + 1:
+				text_list.append(sequence[self.run_sequence_choice - 1])
+			else:
+				text_list.append(name)
+
 			if c in self.run_sequence_bindings:
-				if self.run_sequence_choice == 0:
-					self.run_sequence_bindings[c](sequence, name)
-				elif self.run_sequence_choice < len(sequence) + 1:
-					self.run_sequence_bindings[c](sequence, sequence[self.run_sequence_choice - 1])
-				else:
-					self.run_sequence_bindings[c](sequence, name)
+				last_choice = self.run_sequence_choice
+				self.run_sequence_bindings[c](sequence, text_list)
+				if self.run_sequence_choice == 0 and last_choice == self.run_sequence_choice:
+					name = text_list[0]
 			elif c in string.punctuation + string.digits + string.ascii_letters + string.whitespace:
-				if self.run_sequence_choice == 0: # Name: 
-					name = name[:self.run_sequence_cursor_x] + c + name[self.run_sequence_cursor_x:]
-					self.run_sequence_cursor_x += 1
-				elif self.run_sequence_choice < len(sequence) + 1:
-					command_text = sequence[self.run_sequence_choice - 1]
-					command_text = command_text[:self.run_sequence_cursor_x] + c + command_text[self.run_sequence_cursor_x:]
-					sequence[self.run_sequence_choice - 1] = command_text
-					self.run_sequence_cursor_x += 1
-			elif c == "KEY_BACKSPACE" or c == "^?" or c == "^H":
-				if self.run_sequence_choice == 0: # Name:
-					if self.run_sequence_cursor_x > 0:
-						name = name[:self.run_sequence_cursor_x - 1] + name[self.run_sequence_cursor_x:]
-						self.run_sequence_cursor_x -= 1
-				elif self.run_sequence_choice < len(sequence) + 1:
-					if self.run_sequence_cursor_x > 0:
-						command_text = sequence[self.run_sequence_choice - 1]
-						command_text = command_text[:self.run_sequence_cursor_x - 1] + command_text[self.run_sequence_cursor_x:]
-						sequence[self.run_sequence_choice - 1] = command_text
-						self.run_sequence_cursor_x -= 1
-			elif c == "KEY_DC": # Delete key delete text at run sequence cursor
-				if self.run_sequence_choice == 0: # Name:
-					if self.run_sequence_cursor_x + 1 <= len(name):
-						name = name[:self.run_sequence_cursor_x] + name[self.run_sequence_cursor_x + 1:]
-				elif self.run_sequence_choice < len(sequence) + 1:
-					command_text = sequence[self.run_sequence_choice - 1]
-					if self.run_sequence_cursor_x + 1 <= len(command_text):
-						command_text = command_text[:self.run_sequence_cursor_x] + command_text[self.run_sequence_cursor_x + 1:]
-						sequence[self.run_sequence_choice - 1] = command_text
+				self.run_sequence_bindings["printable-character"](sequence, text_list, c)
+				if self.run_sequence_choice == 0:
+					name = text_list[0]
 
 			elif c == "KEY_F(2)" or c == "^[":
 				break
