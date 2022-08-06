@@ -114,6 +114,7 @@ while commands are still being executed.
 			"KEY_END":   self.jumpRunSequenceCursorToEnd,
 			"KEY_HOME":  self.jumpRunSequenceCursorToStart,
 			"^J":        self.selectRunSequenceChoice,
+			"^D":        self.deleteRunSequenceCommandChoice,
 		}
 
 	def moveViewUp(self):
@@ -242,6 +243,9 @@ while commands are still being executed.
 			self.run_sequence_choice += 1
 			self.run_sequence_cursor_x = 0
 
+	def deleteRunSequenceCommandChoice(self, sequence, text):
+		if self.run_sequence_choice > 0 and self.run_sequence_choice < len(sequence) + 1:
+			sequence.pop(self.run_sequence_choice - 1)
 
 	def runPrompt(self):
 		self.config = self.engine.get("config").options
@@ -536,9 +540,6 @@ while commands are still being executed.
 					if self.run_sequence_cursor_x + 1 <= len(command_text):
 						command_text = command_text[:self.run_sequence_cursor_x] + command_text[self.run_sequence_cursor_x + 1:]
 						sequence[self.run_sequence_choice - 1] = command_text
-			elif c == "^D": # Ctrl-D to delete command at choice position
-				if self.run_sequence_choice > 0 and self.run_sequence_choice < len(sequence) + 1:
-					sequence.pop(self.run_sequence_choice - 1)
 			elif c == "^N": # Ctrl-N to add a new command at choice position (rather than at the end using Add Command)
 				if self.run_sequence_choice > 0 and self.run_sequence_choice < len(sequence) + 1:
 					sequence.insert(self.run_sequence_choice - 1, "")
