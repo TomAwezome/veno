@@ -123,6 +123,10 @@ class OpenBar(Window):
 			elif c == "^J": # enter key
 				if self.open_string != "":
 					break
+				else:
+					result = False
+					self.panel.hide()
+					return result
 			elif c == "^[": # ESC
 				result = False
 				self.panel.hide()
