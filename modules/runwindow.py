@@ -1,6 +1,6 @@
 """
 TODO:
- - fix no scrolling
+ - fix no text prompt x scrolling
  - make Ctrl-V to paste at prompt and sequence cursors from the last filewindow copylines
  - fix Ctrl-C exits without wait for join thread...
  - '#' character in a command in a sequence will break the rest of the sequence
@@ -100,6 +100,8 @@ while commands are still being executed.
 			"KEY_RIGHT": self.moveViewRight,
 			"KEY_UP":    self.moveViewUp,
 			"KEY_DOWN":  self.moveViewDown,
+			"KEY_NPAGE": self.scrollViewDown,
+			"KEY_PPAGE": self.scrollViewUp,
 		}
 		self.run_help_bindings = {
 			"KEY_LEFT":  self.moveViewLeft,
@@ -138,6 +140,14 @@ while commands are still being executed.
 
 	def moveViewRight(self):
 		self.view_x += 1
+
+	def scrollViewDown(self):
+		scroll_amount = self.config["ScrollAmount"]
+		self.view_y += scroll_amount
+
+	def scrollViewUp(self):
+		scroll_amount = self.config["ScrollAmount"]
+		self.view_y = max(0, self.view_y - scroll_amount)
 
 	def moveRunPromptChoiceUp(self):
 		self.run_prompt_choice = max(0, self.run_prompt_choice - 1)
@@ -384,7 +394,7 @@ while commands are still being executed.
 			i += 1
 
 		process = thread = None
-		top_text = " RUN OUTPUT (Press F2/Ctrl-C/Enter/Space to dismiss, scroll with arrow keys) "
+		top_text = " RUN OUTPUT (Press F2/Ctrl-C/Enter/Space to dismiss, scroll with arrow keys/PageUp/PageDown) "
 
 		run_string = ""
 		i = 1
@@ -622,7 +632,7 @@ while commands are still being executed.
 
 	def runSingleCommand(self):
 		process = thread = None
-		top_text = " RUN OUTPUT (Press F2/Ctrl-C/Enter/Space to dismiss, scroll with arrow keys) "
+		top_text = " RUN OUTPUT (Press F2/Ctrl-C/Enter/Space to dismiss, scroll with arrow keys/PageUp/PageDown) "
 
 		if self.run_string != "":
 			self.run_output = '\nRun command: ' + self.run_string + '\n\n'
