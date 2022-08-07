@@ -1,9 +1,7 @@
 """
 TODO:
- - fix no text prompt x scrolling
  - make Ctrl-V to paste at prompt and sequence cursors from the last filewindow copylines
  - fix Ctrl-C exits without wait for join thread...
- - '#' character in a command in a sequence will break the rest of the sequence
  - implement ask and confirm before overwrite existing sequence name
  - IMPLEMENT ASK AND CONFIRM BEFORE REMOVING A SEQUENCE
 """
@@ -404,9 +402,9 @@ while commands are still being executed.
 					i += 1
 					continue
 				# TODO: detect command lines ending in & or ;, skip add the && just space it
-				run_string += f"echo '' && echo Command {i}: {command} && echo '' && " + command + " && " 
+				run_string += f"echo '' \n\n echo Command {i}: {command} \n\n echo '' \n\n " + command + " \n\n " 
 				i += 1
-			run_string += f"echo '' && echo Command {i}: {sequence[-1]} && echo '' && " + sequence[-1]
+			run_string += f"echo '' \n\n echo Command {i}: {sequence[-1]} \n\n echo '' \n\n " + sequence[-1]
 		else:
 			run_string = "echo Error: Command Sequence has no commands."
 
