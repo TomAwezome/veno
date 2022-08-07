@@ -57,7 +57,7 @@ class DiffWindow(Window):
 
 			if window_max_y - 1 < 1:
 				return
-			self.window.addnstr(0, 1, " DIFF (Press Ctrl-T/Ctrl-C/Enter/Space to dismiss, scroll with arrow keys)", window_max_x - 2, self.engine.curses.color_pair(0) | self.engine.curses.A_REVERSE)
+			self.window.addnstr(0, 1, " DIFF (Press Ctrl-T/Ctrl-C/Enter/Space to dismiss, scroll with arrow keys/PageUp/PageDown)", window_max_x - 2, self.engine.curses.color_pair(0) | self.engine.curses.A_REVERSE)
 
 			for line in diff_lines[self.view_y:]:
 				if window_y >= window_max_y - 1:
@@ -95,7 +95,9 @@ class DiffWindow(Window):
 			"KEY_LEFT":  self.moveViewLeft,
 			"KEY_RIGHT": self.moveViewRight,
 			"KEY_UP":    self.moveViewUp,
-			"KEY_DOWN":  self.moveViewDown
+			"KEY_DOWN":  self.moveViewDown,
+			"KEY_NPAGE": self.scrollViewDown,
+			"KEY_PPAGE": self.scrollViewUp,
 		}
 
 	def toggle(self):
@@ -121,6 +123,14 @@ class DiffWindow(Window):
 
 	def moveViewRight(self):
 		self.view_x += 1
+
+	def scrollViewDown(self):
+		scroll_amount = self.config["ScrollAmount"]
+		self.view_y += scroll_amount
+
+	def scrollViewUp(self):
+		scroll_amount = self.config["ScrollAmount"]
+		self.view_y = max(0, self.view_y - scroll_amount)
 
 	def terminate(self):
 		pass
