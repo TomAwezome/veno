@@ -95,10 +95,15 @@ class OpenBar(Window):
 		while True: # break out of this loop with enter key
 			self.keepWindowInMainScreen()
 			self.window.erase()
-			self.window.addnstr(0, 0, prompt + self.open_string, self.getWindowMaxX() - 1, self.engine.curses.color_pair(4) | self.engine.curses.A_REVERSE)
 
-			if self.open_cursor_x + len(prompt) <= self.getWindowMaxX() - 2 and self.open_cursor_x >= 0:
-				self.window.chgat(0, self.open_cursor_x + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
+			print_string = prompt + self.open_string
+			offscreen_cols = max(0, len(print_string) - self.getWindowMaxX() + 2)
+			print_string = print_string[offscreen_cols:]
+			self.window.addnstr(0, 0, print_string, self.getWindowMaxX() - 1, self.engine.curses.color_pair(4) | self.engine.curses.A_REVERSE)
+
+			cursor_draw_x = self.open_cursor_x + len(prompt) - offscreen_cols
+			if self.getWindowMaxX() - 1 > 1 and cursor_draw_x <= self.getWindowMaxX() - 2:
+				self.window.chgat(0, cursor_draw_x, 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
 
 			self.engine.update()
 
