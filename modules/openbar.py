@@ -88,23 +88,20 @@ class OpenBar(Window):
 		self.intended_height	= 1
 
 		result = True
-		
-		self.keepWindowInMainScreen()
-		self.engine.update()
-		self.keepWindowInMainScreen()
 
-		# openfile string
-		# keypress loop: begin catching characters
-		self.window.erase()
 		prompt = "Open Filename: "
-		self.window.addnstr(0, 0, prompt + self.open_string, self.getWindowMaxX() - 1, self.engine.curses.color_pair(4) | self.engine.curses.A_REVERSE)
 
-		if self.open_cursor_x <= self.getWindowMaxX() - 2 and self.open_cursor_x >= 0:
-			self.window.chgat(0, self.open_cursor_x + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
-
-		self.engine.update()
+		# keypress loop: begin catching characters
 		while True: # break out of this loop with enter key
+			self.keepWindowInMainScreen()
 			self.window.erase()
+			self.window.addnstr(0, 0, prompt + self.open_string, self.getWindowMaxX() - 1, self.engine.curses.color_pair(4) | self.engine.curses.A_REVERSE)
+
+			if self.open_cursor_x + len(prompt) <= self.getWindowMaxX() - 2 and self.open_cursor_x >= 0:
+				self.window.chgat(0, self.open_cursor_x + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
+
+			self.engine.update()
+
 			try:
 				c = self.engine.screen.getch()
 			except KeyboardInterrupt:
@@ -132,23 +129,15 @@ class OpenBar(Window):
 				self.panel.hide()
 				return result
 
-			self.keepWindowInMainScreen()
-			self.window.addnstr(0, 0, prompt + self.open_string, self.getWindowMaxX() - 1, self.engine.curses.color_pair(4) | self.engine.curses.A_REVERSE)
-
-			if self.open_cursor_x + len(prompt) <= self.getWindowMaxX() - 2 and self.open_cursor_x >= 0:
-				self.window.chgat(0, self.open_cursor_x + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
-
-			self.engine.update()
-
 		File = self.engine.get("File")
 		FileWindow = self.engine.get("FileWindow")
 		file = File(self.open_string)
 		if not file.exists:
-			self.window.erase()
-			self.window.addnstr(0, 0, "File not found. Begin a new file? (Y/N or Enter/Ctrl-C)", self.getWindowMaxX() - 1, self.engine.curses.color_pair(4) | self.engine.curses.A_REVERSE)
-			self.engine.update()
 			while True: # break out of this loop with enter key
+				self.keepWindowInMainScreen()
 				self.window.erase()
+				self.window.addnstr(0, 0, "File not found. Begin a new file? (Y/N or Enter/Ctrl-C)", self.getWindowMaxX() - 1, self.engine.curses.color_pair(4) | self.engine.curses.A_REVERSE)
+				self.engine.update()
 				try:
 					c = self.engine.screen.getch()
 				except KeyboardInterrupt:
