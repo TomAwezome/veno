@@ -152,11 +152,17 @@ class SearchBar(Window):
 		while True: # break out of this loop with enter key
 			self.window.erase()
 			self.keepWindowInMainScreen()
-			self.window.addnstr(0, 0, prompt + self.search_string.expandtabs(tab_expand_size), self.getWindowMaxX() - 1, self.engine.curses.color_pair(7) | self.engine.curses.A_REVERSE)
+
+			print_string = prompt + self.search_string.expandtabs(tab_expand_size)
+			offscreen_cols = max(0, len(print_string) - self.getWindowMaxX() + 2)
+			print_string = print_string[offscreen_cols:]
+
+			self.window.addnstr(0, 0, print_string, self.getWindowMaxX() - 1, self.engine.curses.color_pair(7) | self.engine.curses.A_REVERSE)
 
 			tab_diff = len(self.search_string[:self.search_cursor_x].expandtabs(tab_expand_size)) - len(self.search_string[:self.search_cursor_x])
-			if self.search_cursor_x + tab_diff + len(prompt)<= self.getWindowMaxX() - 2 and self.search_cursor_x >= 0:
-				self.window.chgat(0, self.search_cursor_x + tab_diff + len(prompt), 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
+			cursor_draw_x = self.search_cursor_x + tab_diff + len(prompt) - offscreen_cols
+			if cursor_draw_x <= self.getWindowMaxX() - 2 and cursor_draw_x >= 0:
+				self.window.chgat(0, cursor_draw_x, 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
 
 			self.engine.update()
 
