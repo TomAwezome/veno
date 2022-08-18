@@ -102,7 +102,7 @@ class OpenBar(Window):
 			self.window.addnstr(0, 0, print_string, self.getWindowMaxX() - 1, self.engine.curses.color_pair(4) | self.engine.curses.A_REVERSE)
 
 			cursor_draw_x = self.open_cursor_x + len(prompt) - offscreen_cols
-			if self.getWindowMaxX() - 1 > 1 and cursor_draw_x <= self.getWindowMaxX() - 2:
+			if self.getWindowMaxX() - 1 > 1 and cursor_draw_x <= self.getWindowMaxX() - 2 and cursor_draw_x > 0:
 				self.window.chgat(0, cursor_draw_x, 1, self.engine.curses.color_pair(2) | self.engine.curses.A_REVERSE)
 
 			self.engine.update()
