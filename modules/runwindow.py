@@ -527,6 +527,7 @@ while commands are still being executed.
 		top_text = " EDIT COMMAND SEQUENCE (Press F2/Ctrl-C to save & dismiss, Enter to select/create command, Ctrl-D to delete command, Ctrl-N to insert command, scroll with arrow keys) "
 		self.run_sequence_choice = 0
 		self.run_sequence_cursor_x = 0
+		original_name = name
 
 		while True:
 			self.intended_x			= 0
@@ -600,6 +601,31 @@ while commands are still being executed.
 
 			elif c == "KEY_F(2)" or c == "^[":
 				break
+
+		for sequence_name in self.config["CommandSequences"]:
+			if name == sequence_name and name != original_name:
+				# found a match, but the name-to-set is new! Since not editing existing, confirm before overwrite another sequence!
+				while True:
+					self.keepWindowInMainScreen()
+					self.window.erase()
+					self.window.box()
+					self.window.addnstr(1, 1, f"Overwrite Commmand Sequence '{name}' ? (Y/N)", self.getWindowMaxX() - 1, self.engine.curses.color_pair(4) | self.engine.curses.A_REVERSE)
+					self.engine.update()
+
+					try:
+						c = self.engine.screen.getch()
+					except KeyboardInterrupt:
+						return
+					if c == -1:
+						continue
+					c = self.engine.curses.keyname(c)
+					c = c.decode("utf-8")
+					if c.lower() == 'n':
+						return
+					if c.lower() == "y":
+						break
+					if c == "^[": # ESC
+						return
 
 		self.config["CommandSequences"][name] = sequence
 		self.engine.get("config").save()
