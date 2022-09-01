@@ -222,6 +222,30 @@ while commands are still being executed.
 					if i == self.run_prompt_choice - 1:
 						break
 					i += 1
+
+				# confirm before removing the Command Sequence
+				while True:
+					self.keepWindowInMainScreen()
+					self.window.erase()
+					self.window.box()
+					self.window.addnstr(1, 1, f"Delete Commmand Sequence '{name}' ? (Y/N)", self.getWindowMaxX() - 1, self.engine.curses.color_pair(4) | self.engine.curses.A_REVERSE)
+					self.engine.update()
+
+					try:
+						c = self.engine.screen.getch()
+					except KeyboardInterrupt:
+						return
+					if c == -1:
+						continue
+					c = self.engine.curses.keyname(c)
+					c = c.decode("utf-8")
+					if c.lower() == 'n':
+						return
+					if c.lower() == "y":
+						break
+					if c == "^[": # ESC
+						return
+
 				self.config["CommandSequences"].pop(name)
 				self.engine.get("config").save()
 
