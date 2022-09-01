@@ -3,7 +3,6 @@ TODO:
  - make Ctrl-V to paste at prompt and sequence cursors from the last filewindow copylines
  - fix Ctrl-C exits without wait for join thread...
  - implement ask and confirm before overwrite existing sequence name
- - IMPLEMENT ASK AND CONFIRM BEFORE REMOVING A SEQUENCE
 """
 
 import string, shlex, subprocess, traceback, threading
