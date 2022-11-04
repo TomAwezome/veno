@@ -88,3 +88,15 @@ Runs in a terminal window. GUI not yet implemented.
 |Ctrl-_, Ctrl-/|Toggle config customizer|
 |F12|Toggle debug window|
 
+## Screenshots
+
+### Syntax Highlighting, Text Select, Multiple Files
+![](screenshots/screenshot1.png)
+### Diff Window
+![](screenshots/screenshot5.png)
+### Help Window, Generated Keybinding List
+![](screenshots/screenshot2.png)
+### Run Window, Run Sequence Executing/Editing
+![](screenshots/screenshot3.png)
+### Config Customizer, Dictionary Editor
+![](screenshots/screenshot4.png)
