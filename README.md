@@ -4,6 +4,9 @@
 
 Multi-purpose text/code editor meant for easy and vast expandability.
 
+
+![](screenshots/screenshot1.png)
+
 ## Features
 
  - Fully modular
@@ -90,8 +93,6 @@ Runs in a terminal window. GUI not yet implemented.
 
 ## Screenshots
 
-### Syntax Highlighting, Text Select, Multiple Files
-![](screenshots/screenshot1.png)
 ### Diff Window
 ![](screenshots/screenshot5.png)
 ### Help Window, Generated Keybinding List
