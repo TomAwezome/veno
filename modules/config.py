@@ -23,6 +23,7 @@ class Config:
 			"UseLineWrap": False,
 			"BracketMatching": True,
 			"QuoteMatching": True,
+			"AngleBracketMatching": False,
 			"FindRegexMode": False,
 			"ReplaceRegexMode": False,
 			"ScrollAmount": 20,

@@ -576,6 +576,15 @@ class FileWindow(Window):
 				self.moveFilecursorLeft()
 				self.is_repeating_quote = False
 
+		if self.config["AngleBracketMatching"]:
+			angleMatch = {
+					"<": ">",
+					}
+			if text in angleMatch:
+				self.enterTextAtFilecursor(angleMatch[text])
+				self.moveFilecursorLeft()
+
+
 	def newLineAtFilecursor(self, auto_indent_override=True):
 		filecursor_x = self.getFilecursorX()
 		filecursor_y = self.getFilecursorY()
