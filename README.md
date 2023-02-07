@@ -35,6 +35,8 @@ Dependencies:
  - Pygments
  - ncurses
 
+Run `git clone https://github.com/TomAwezome/veno && cd veno` to download Veno.
+
 Run `pip3 install -r requirements.txt` to install dependencies.
  - In case this does not successfully install Pygments, installing Pygments through a package manager may.
    - On Ubuntu, run `sudo apt install python3-pygments`
