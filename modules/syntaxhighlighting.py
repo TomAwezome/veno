@@ -41,12 +41,23 @@ class Highlighter:
 	## @param      self  This object
 	##
 	def updateLexer(self):
-		self.file_window = self.engine.get("current_file_window")		
+		self.file_window = self.engine.get("current_file_window")
+		self.config = self.engine.get("config").options
+		lexer_override = None
+		if "LexerOverride" in self.config:
+			lexer_override = self.config["LexerOverride"]
+
 		try:
-			try:
-				self.lexer = lexers.guess_lexer_for_filename(self.file_window.file.source, self.file_window.file.contents)
-			except:
-				self.lexer = lexers.guess_lexer(self.file_window.file.contents)
+			if lexer_override != None and lexer_override != "":
+				self.lexer = lexers.guess_lexer_for_filename("."+lexer_override, "")
+			else:
+				try:
+					self.lexer = lexers.guess_lexer_for_filename(self.file_window.file.source, self.file_window.file.contents)
+				except:
+					self.lexer = lexers.guess_lexer(self.file_window.file.contents)
+		except:
+			pass
+		try:
 			if self.lexer.name == "PHP":
 				self.lexer = lexers.PhpLexer(startinline=True)
 		except:
