@@ -1,5 +1,0 @@
-#
-####### requirements.txt #######
-#
-###### Requirements without Version Specifiers ######
-Pygments

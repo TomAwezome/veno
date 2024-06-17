@@ -1,3 +1,5 @@
+import os
+
 class FileWindowManager:
 	def __init__(self, engine):
 		self.engine = engine
@@ -14,7 +16,9 @@ class FileWindowManager:
 				self.file_window_list.append(file_window)
 				file_window.update()											# Update fileWindow contents.
 			except IsADirectoryError:
-				pass
+				for item in os.listdir(filename):
+					self.engine.filenames.append(filename+"/"+item)
+				continue
 
 		if self.file_window_list != []:
 			self.current_file_window = self.file_window_list[0]
