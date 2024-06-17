@@ -1,6 +1,6 @@
 import string
 
-from modules.window import Window
+from veno.modules.window import Window
 class WindowBar(Window):
 	def __init__(self, engine):
 		Window.__init__(self, engine)

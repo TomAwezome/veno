@@ -20,7 +20,7 @@ def profPrintStats():
 class EngineException(Exception):
 	pass
 
-from modules.engine import Engine
+from veno.modules.engine import Engine
 engine = Engine()
 
 engine.setException(EngineException)

@@ -113,7 +113,7 @@ class Engine():
 
 		for module_name in MODULE_IMPORT_ORDER.copy():
 			try:
-				m = importlib.import_module("modules." + module_name)
+				m = importlib.import_module("veno.modules." + module_name)
 			except:
 				self.errorModulePrompt(f"[{module_name}] in 'import' list: ERROR during import.", "import", module_name, is_exception=True)
 				continue
@@ -150,7 +150,7 @@ class Engine():
 		self.exception = Exception
 
 	def checkModules(self):
-		for module_name in [name for name in MODULE_IMPORT_ORDER if importlib.util.find_spec("modules." + name) == None]:
+		for module_name in [name for name in MODULE_IMPORT_ORDER if importlib.util.find_spec("veno.modules." + name) == None]:
 			self.errorModulePrompt(f"[{module_name}] in 'import' list: FILE NOT FOUND.", "import", module_name)
 		for module_name in [name for name in MODULE_IMPORT_ORDER if name not in MODULE_CLASSES]:
 			self.errorModulePrompt(f"[{module_name}] in 'import' list: NO VALUE in 'module class' dictionary.", "import", module_name)

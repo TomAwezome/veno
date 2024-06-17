@@ -27,7 +27,17 @@ Multi-purpose text/code editor meant for easy and vast expandability.
  - Language-specific configuration overrides
  - 100% Python code
 
-## Install
+## Install (via pip3)
+
+Run `pip3 install veno` to install veno.
+
+## Usage
+
+`veno [filename [filename ...]]` Filename(s) optional.
+
+Runs in a terminal window. GUI not yet implemented.
+
+## Install (via legacy developer approach)
 
 Requires Python 3.
 
@@ -42,16 +52,9 @@ Run `pip3 install -r requirements.txt` to install dependencies.
    - On Ubuntu, run `sudo apt install python3-pygments`
    - On NetBSD 9.2, run `pkgin install py39-curses py39-cursespanel py39-pygments && sed -i 's/python3/python3.9/g' veno`
 
+Run `chmod +x veno.sh` to mark `veno.sh` as executable.
 
-Run `chmod +x veno` to mark `veno` as executable.
-
-To use `veno` globally, add the repo to your $PATH. Alternatively, add an alias to `veno` in your `.bashrc` or `.bash_alias`.
-
-## Usage
-
-`veno [filename [filename ...]]` Filename(s) optional.
-
-Runs in a terminal window. GUI not yet implemented.
+Add an alias `veno` pointing to the `veno.sh` file in your `.bashrc` or `.bash_alias`.
 
 ## Keybindings
 

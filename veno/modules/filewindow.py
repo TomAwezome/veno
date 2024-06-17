@@ -1,6 +1,6 @@
 from difflib import unified_diff as diff
 
-from modules.window import Window
+from veno.modules.window import Window
 class FileWindow(Window):
 	def __init__(self, engine, file):
 		Window.__init__(self, engine)

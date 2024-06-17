@@ -1,4 +1,4 @@
-from modules.window import Window
+from veno.modules.window import Window
 class LineNumbersWindow(Window):
 	def __init__(self, engine):
 		Window.__init__(self, engine)

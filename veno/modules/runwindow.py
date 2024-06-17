@@ -6,7 +6,7 @@ TODO:
 
 import string, shlex, subprocess, traceback, threading
 
-from modules.window import Window
+from veno.modules.window import Window
 class RunWindow(Window):
 	def __init__(self, engine):
 		Window.__init__(self, engine)
