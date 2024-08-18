@@ -37,6 +37,8 @@ class Config:
 					"TabSize": 2,
 				}
 			},
+			"LexerOverride": "",
+			"LexerOverrideMode": False,
 			"ColorMap": {
 				"0": 7,
 				"1": 7,

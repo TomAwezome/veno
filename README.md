@@ -50,7 +50,7 @@ Run `git clone https://github.com/TomAwezome/veno && cd veno` to download Veno.
 Run `pip3 install -r requirements.txt` to install dependencies.
  - In case this does not successfully install Pygments, installing Pygments through a package manager may.
    - On Ubuntu, run `sudo apt install python3-pygments`
-   - On NetBSD 9.2, run `pkgin install py39-curses py39-cursespanel py39-pygments && sed -i 's/python3/python3.9/g' veno`
+   - On NetBSD 9.2, run `pkgin install py39-curses py39-cursespanel py39-pygments && sed -i 's/python3/python3.9/g' veno.sh`
 
 Run `chmod +x veno.sh` to mark `veno.sh` as executable.
 

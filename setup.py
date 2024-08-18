@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='veno',
-    version='2.0.7',
+    version='2.0.8',
     description='Multi-purpose text/code editor meant for easy and vast expandability.',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',

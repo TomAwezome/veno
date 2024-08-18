@@ -118,8 +118,7 @@ class SaveBar(Window):
 			try:
 				c = self.engine.screen.getch()
 			except KeyboardInterrupt:
-				result = True
-				return result
+				c = -1
 			if c == -1:
 				continue
 			c = self.engine.curses.keyname(c)
@@ -130,9 +129,6 @@ class SaveBar(Window):
 				return result
 			if c == "^J" or c.lower() == "y":
 				break
-			if c == "^[": # ESC
-				result = True
-				return result
 
 		while True:
 			self.keepWindowInMainScreen()
@@ -239,9 +235,6 @@ class SaveBar(Window):
 				return result
 			if c == "^J" or c.lower() == "y":
 				break
-			if c == "^[": # ESC
-				result = True
-				return result
 
 		while True:
 			self.keepWindowInMainScreen()

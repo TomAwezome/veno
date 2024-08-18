@@ -44,8 +44,9 @@ class Highlighter:
 		self.file_window = self.engine.get("current_file_window")
 		self.config = self.engine.get("config").options
 		lexer_override = None
-		if "LexerOverride" in self.config:
-			lexer_override = self.config["LexerOverride"]
+		if "LexerOverride" in self.config and "LexerOverrideMode" in self.config:
+			if self.config["LexerOverrideMode"] is True:
+				lexer_override = self.config["LexerOverride"]
 
 		try:
 			if lexer_override != None and lexer_override != "":
